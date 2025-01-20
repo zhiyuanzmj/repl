@@ -27,20 +27,20 @@ const App = {
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'preview'),
         viteConfigCode: ref(
-          `import {transformVueJsxVapor,helperId,helperCode} from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor-dev-proxy${import.meta.env.PROD ? '.js' : ''}'
+          `import { transformVueJsxVapor, helperId, helperCode} from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor${import.meta.env.PROD ? '.js' : ''}'
 import { transformJsxDirective } from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vite-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
 
 export default {
   plugins: [
     { transform: transformJsxDirective },
     {
-      resolveId(id){
+      resolveId(id) {
         if(id === helperId) return id
       },
-      load(id){
-        if(id===helperId) return helperCode
+      load(id) {
+        if(id === helperId) return helperCode
       },
-      transform:transformVueJsxVapor
+      transform: transformVueJsxVapor
     }
   ]
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
 import { computed, inject, useTemplateRef } from 'vue'
+import githubIcon from '../assets/svg/github.svg'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -33,6 +34,10 @@ const mode = computed<OutputModes>({
   },
 })
 
+function jumpToGithub() {
+  open('https://github.com/zhiyuanzmj/repl')
+}
+
 function reload() {
   previewRef.value?.reload()
 }
@@ -49,6 +54,13 @@ defineExpose({ reload, previewRef })
       @click="mode = m"
     >
       <span>{{ m }}</span>
+    </button>
+
+    <button
+      style="margin-left: auto; margin-right: 8px; margin-top: 4px"
+      @click="jumpToGithub"
+    >
+      <img :src="githubIcon" />
     </button>
   </div>
 
@@ -72,6 +84,7 @@ defineExpose({ reload, previewRef })
 }
 
 .tab-buttons {
+  display: flex;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);

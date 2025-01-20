@@ -22,7 +22,7 @@ export default defineConfig({
     lib: {
       entry: [
         'index.html',
-        'src/vue-jsx-vapor-dev-proxy.ts',
+        'src/vue-jsx-vapor.ts',
         'src/volar-plugin-jsx-directive.ts',
         'src/vite-plugin-jsx-directive.ts',
       ],

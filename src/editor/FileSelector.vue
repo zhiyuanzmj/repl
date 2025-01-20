@@ -189,7 +189,7 @@ function horizontalScroll(e: WheelEvent) {
         <span class="label">tsconfig.json</span>
       </div>
       <div
-        v-if="showImportMap"
+        v-if="showHidden && showImportMap"
         class="file"
         :class="{ active: store.activeFile.filename === importMapFile }"
         @click="store.setActive(importMapFile)"
