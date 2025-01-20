@@ -248,7 +248,8 @@ async function updatePreview() {
         } as _createApp } from "vue/vapor"
         ${previewOptions.value?.customCode?.importCode || ''}
         const _mount = () => {
-          const AppComponent = __modules__["${mainFile}"].default
+          const AppComponent = __modules__["${mainFile}"]?.default
+          if(!AppComponent) return
           const app = window.__app__ = _createApp(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
             app.config.unwrapInjectedRef = true

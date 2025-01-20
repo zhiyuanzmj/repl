@@ -4,18 +4,11 @@ import {
   computed,
   reactive,
   ref,
-  shallowRef,
   watch,
   watchEffect,
 } from 'vue'
-import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
 import { atou, utoa } from './utils'
-import type {
-  SFCAsyncStyleCompileOptions,
-  SFCScriptCompileOptions,
-  SFCTemplateCompileOptions,
-} from 'vue/compiler-sfc'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
@@ -34,16 +27,14 @@ export function useStore(
     activeFilename = undefined!, // set later
     mainFile = ref('src/App.tsx'),
     template = ref({
-      welcomeSFC: welcomeCode,
-      newSFC: newCode,
+      welcome: welcomeCode,
+      new: newCode,
     }),
     builtinImportMap = undefined!, // set later
 
     errors = ref([]),
     showOutput = ref(false),
     outputMode = ref('preview'),
-    sfcOptions = ref({}),
-    compiler = shallowRef(defaultCompiler),
     vueVersion = ref(null),
 
     locale = ref(),
@@ -61,7 +52,6 @@ export function useStore(
       vueVersion: vueVersion.value,
     }))
   }
-  const loading = ref(false)
 
   function applyBuiltinImportMap() {
     const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
@@ -73,6 +63,19 @@ export function useStore(
       files.value[viteConfigFile] = new File(
         viteConfigFile,
         viteConfigCode.value,
+      )
+    }
+    if (!files.value[tsMacroConfigFile]) {
+      files.value[tsMacroConfigFile] = new File(
+        tsMacroConfigFile,
+        tsMacroConfigCode.value,
+      )
+    }
+    // init tsconfig
+    if (!files.value[tsconfigFile]) {
+      files.value[tsconfigFile] = new File(
+        tsconfigFile,
+        JSON.stringify(tsconfig, undefined, 2),
       )
     }
     await getViteConfig()
@@ -112,58 +115,6 @@ export function useStore(
       { deep: true },
     )
 
-    watch(
-      vueVersion,
-      async (version) => {
-        if (version) {
-          const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-          loading.value = true
-          compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
-            () => (loading.value = false),
-          )
-          console.info(`[@vue/repl] Now using Vue version: ${version}`)
-        } else {
-          // reset to default
-          compiler.value = defaultCompiler
-          console.info(`[@vue/repl] Now using default Vue version`)
-        }
-      },
-      { immediate: true },
-    )
-
-    watch(
-      sfcOptions,
-      () => {
-        sfcOptions.value.script ||= {}
-        sfcOptions.value.script.fs = {
-          fileExists(file: string) {
-            if (file.startsWith('/')) file = file.slice(1)
-            return !!store.files[file]
-          },
-          readFile(file: string) {
-            if (file.startsWith('/')) file = file.slice(1)
-            return store.files[file].code
-          },
-        }
-      },
-      { immediate: true },
-    )
-
-    // init tsconfig
-    if (!files.value[tsconfigFile]) {
-      files.value[tsconfigFile] = new File(
-        tsconfigFile,
-        JSON.stringify(tsconfig, undefined, 2),
-      )
-    }
-
-    if (!files.value[tsMacroConfigFile]) {
-      files.value[tsMacroConfigFile] = new File(
-        tsMacroConfigFile,
-        tsMacroConfigCode.value,
-      )
-    }
-
     // compile rest of the files
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
@@ -197,7 +148,7 @@ export function useStore(
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.tsx') ? template.value.newSFC : '',
+        fileOrFilename.endsWith('.tsx') ? template.value.new : '',
       )
     } else {
       file = fileOrFilename
@@ -356,7 +307,7 @@ export function useStore(
 
     mainFile = addSrcPrefix(mainFile)
     if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value.welcomeSFC || welcomeCode)
+      setFile(files, mainFile, template.value.welcome || welcomeCode)
     }
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
@@ -374,11 +325,7 @@ export function useStore(
     setActive(store.mainFile)
   }
   const setDefaultFile = (): void => {
-    setFile(
-      files.value,
-      mainFile.value,
-      template.value.welcomeSFC || welcomeCode,
-    )
+    setFile(files.value, mainFile.value, template.value.welcome || welcomeCode)
   }
 
   if (serializedState) {
@@ -405,9 +352,6 @@ export function useStore(
     errors,
     showOutput,
     outputMode,
-    sfcOptions,
-    compiler,
-    loading,
     vueVersion,
 
     locale,
@@ -449,19 +393,13 @@ const tsconfig = {
   },
 }
 
-export interface SFCOptions {
-  script?: Partial<SFCScriptCompileOptions>
-  style?: Partial<SFCAsyncStyleCompileOptions>
-  template?: Partial<SFCTemplateCompileOptions>
-}
-
 export type StoreState = ToRefs<{
   files: Record<string, File>
   activeFilename: string
   mainFile: string
   template: {
-    welcomeSFC?: string
-    newSFC?: string
+    welcome?: string
+    new?: string
   }
   builtinImportMap: ImportMap
 
@@ -469,10 +407,6 @@ export type StoreState = ToRefs<{
   errors: (string | Error)[]
   showOutput: boolean
   outputMode: OutputModes
-  sfcOptions: SFCOptions
-  /** `@vue/compiler-sfc` */
-  compiler: typeof defaultCompiler
-  /* only apply for compiler-sfc */
   vueVersion: string | null
 
   // volar-related
@@ -500,8 +434,6 @@ type ViteConfig = {
 
 export interface ReplStore extends UnwrapRef<StoreState> {
   activeFile: File
-  /** Loading compiler */
-  loading: boolean
   viteConfig: ViteConfig
   init(): void
   setActive(filename: string): void
@@ -525,8 +457,6 @@ export type Store = Pick<
   | 'errors'
   | 'showOutput'
   | 'outputMode'
-  | 'sfcOptions'
-  | 'compiler'
   | 'vueVersion'
   | 'locale'
   | 'typescriptVersion'

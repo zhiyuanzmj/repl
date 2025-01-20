@@ -150,11 +150,9 @@ export function loadMonacoEnv(store: Store) {
       return new editorWorker()
     },
   }
-  languages.register({ id: 'vue', extensions: ['.vue'] })
   languages.register({ id: 'javascript', extensions: ['.js'] })
   languages.register({ id: 'typescript', extensions: ['.ts'] })
   languages.register({ id: 'css', extensions: ['.css'] })
-  languages.setLanguageConfiguration('vue', languageConfigs.vue)
   languages.setLanguageConfiguration('javascript', languageConfigs.js)
   languages.setLanguageConfiguration('typescript', languageConfigs.ts)
   languages.setLanguageConfiguration('css', languageConfigs.css)

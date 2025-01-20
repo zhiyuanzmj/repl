@@ -27,8 +27,8 @@ const App = {
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'preview'),
         viteConfigCode: ref(
-          `import {transformVueJsxVapor,helperId,helperCode} from '${location.origin}/src/vue-jsx-vapor-dev-proxy'
-import { transformJsxDirective } from '${location.origin}/src/vite-plugin-jsx-directive'
+          `import {transformVueJsxVapor,helperId,helperCode} from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor-dev-proxy${import.meta.env.PROD ? '.js' : ''}'
+import { transformJsxDirective } from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vite-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
 
 export default {
   plugins: [
@@ -47,7 +47,7 @@ export default {
 `,
         ),
         tsMacroConfigCode: ref(
-          `import jsxDirective from '${location.origin}/src/volar-plugin-jsx-directive'
+          `import jsxDirective from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/volar-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
 
 export default {
   plugins: [
@@ -89,11 +89,6 @@ export default {
         editor: MonacoEditor,
         // layout: 'vertical',
         ssr: false,
-        sfcOptions: {
-          script: {
-            // inlineTemplate: false
-          },
-        },
         // showCompileOutput: false,
         // showImportMap: false
         editorOptions: {

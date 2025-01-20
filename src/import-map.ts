@@ -21,9 +21,9 @@ export function useVueImportMap(
       //   normalizeDefaults(
       //     productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
       //   )) ||
-      (import.meta.env.PROD
+      import.meta.env.PROD
         ? 'https://cdn.jsdelivr.net/npm/@vue-vapor/runtime-vapor@3.20240714.0-6608bb3/dist/runtime-vapor.esm-browser.prod.js'
-        : location.origin + `/src/vue-vapor-dev-proxy`)
+        : location.origin + `/src/vue-vapor-dev-proxy`
     // `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
     //   vueVersion.value || currentVersion
     // }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`

@@ -7,7 +7,10 @@ export default () => {
     <>
       <button onClick={() => count.value++}>+</button>
       <button onClick={() => count.value--}>-</button>
-      <div>{count.value}</div>
+
+      <div v-if={count.value === 0}>eq {count.value}</div>
+      <div v-else-if={count.value > 0}>lg {count.value}</div>
+      <div v-else>lt {count.value}</div>
     </>
   )
 }

@@ -6,19 +6,14 @@ import {
   createTypeScriptWorkerLanguageService,
 } from '@volar/monaco/worker'
 import { createNpmFileSystem } from '@volar/jsdelivr'
-import {
-  type VueCompilerOptions,
-  getFullLanguageServicePlugins,
-  resolveVueCompilerOptions,
-} from '@vue/language-service'
 import { getLanguagePlugins } from '@ts-macro/language-plugin'
+import { create as createTypeScriptServices } from 'volar-service-typescript'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
 
 export interface CreateData {
   tsconfig: {
     compilerOptions?: import('typescript').CompilerOptions
-    vueCompilerOptions?: Partial<VueCompilerOptions>
   }
   tsMacroConfig: any
   dependencies: Record<string, string>
@@ -71,15 +66,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig?.compilerOptions || {},
         '',
       )
-      const vueCompilerOptions = resolveVueCompilerOptions(
-        tsconfig.vueCompilerOptions || {},
-      )
 
-      const languagePlugins = getLanguagePlugins(
-        ts,
-        compilerOptions,
-        tsMacroOptions,
-      )
       return createTypeScriptWorkerLanguageService({
         typescript: ts,
         compilerOptions,
@@ -89,11 +76,12 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           asFileName,
           asUri,
         },
-        languagePlugins,
-        languageServicePlugins: getFullLanguageServicePlugins(ts),
-        setup({ project }) {
-          project.vue = { compilerOptions: vueCompilerOptions }
-        },
+        languagePlugins: getLanguagePlugins(
+          ts,
+          compilerOptions,
+          tsMacroOptions,
+        ),
+        languageServicePlugins: createTypeScriptServices(ts),
       })
     },
   )
