@@ -12,7 +12,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store, autoSave, editorOptions } = inject(injectKeyProps)!
+const { store, autoSave, showHidden, editorOptions } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
@@ -44,6 +44,11 @@ watch(showMessage, () => {
     <Message v-show="showMessage" :err="store.errors[0]" />
 
     <div class="editor-floating">
+      <ToggleButton
+        v-if="editorOptions?.showHiddenText !== false"
+        v-model="showHidden"
+        :text="editorOptions?.showHiddenText || 'Show Error'"
+      />
       <ToggleButton
         v-if="editorOptions?.showErrorText !== false"
         v-model="showMessage"

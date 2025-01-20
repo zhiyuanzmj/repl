@@ -26,6 +26,35 @@ const App = {
         vueVersion,
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'preview'),
+        viteConfigCode: ref(
+          `import {transformVueJsxVapor,helperId,helperCode} from '${location.origin}/src/vue-jsx-vapor-dev-proxy'
+import { transformJsxDirective } from '${location.origin}/src/vite-plugin-jsx-directive'
+
+export default {
+  plugins: [
+    { transform: transformJsxDirective },
+    {
+      resolveId(id){
+        if(id === helperId) return id
+      },
+      load(id){
+        if(id===helperId) return helperCode
+      },
+      transform:transformVueJsxVapor
+    }
+  ]
+}
+`,
+        ),
+        tsMacroConfigCode: ref(
+          `import jsxDirective from '${location.origin}/src/volar-plugin-jsx-directive'
+
+export default {
+  plugins: [
+    jsxDirective()
+  ]
+}`,
+        ),
       },
       location.hash,
     ))
@@ -59,7 +88,7 @@ const App = {
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
         // layout: 'vertical',
-        ssr: true,
+        ssr: false,
         sfcOptions: {
           script: {
             // inlineTemplate: false
@@ -68,7 +97,8 @@ const App = {
         // showCompileOutput: false,
         // showImportMap: false
         editorOptions: {
-          autoSaveText: '💾',
+          autoSaveText: 'Auto Save',
+          showHiddenText: 'Hidden Files',
           monacoOptions: {
             // wordWrap: 'on',
           },

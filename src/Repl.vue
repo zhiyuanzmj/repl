@@ -37,6 +37,7 @@ export interface Props {
   }
   editorOptions?: {
     showErrorText?: string | false
+    showHiddenText?: string | false
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
@@ -47,6 +48,7 @@ export interface Props {
 }
 
 const autoSave = defineModel<boolean>({ default: true })
+const showHidden = defineModel<boolean>('showHidden', { default: false })
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
@@ -78,6 +80,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 provide(injectKeyProps, {
   ...toRefs(props),
   autoSave,
+  showHidden,
 })
 provide(
   injectKeyPreviewRef,

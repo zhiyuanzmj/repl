@@ -1,4 +1,4 @@
-import type { File, Store } from './store'
+import { addSrcPrefix, File, type Store } from './store'
 import type {
   BindingMetadata,
   CompilerOptions,
@@ -37,15 +37,39 @@ export async function compileFile(
     return []
   }
 
-  if (REGEX_JS.test(filename)) {
+  const noExt = !filename.includes('.')
+  if (REGEX_JS.test(filename) || noExt) {
     const isJSX = testJsx(filename)
-    if (testTs(filename)) {
+    if (testTs(filename) || noExt) {
       code = transformTS(code, isJSX)
     }
+
+    const { plugins } = store.viteConfig
     if (isJSX) {
-      code = await import('./jsx').then(({ transformJSX }) =>
-        transformJSX(code),
+      plugins.push(
+        await import('./jsx').then((i) => ({ transform: i.transformJSX })),
       )
+    }
+    for (const plugin of plugins) {
+      const result = plugin.transform(code, filename)
+      code = typeof result === 'string' ? result : result?.code || code
+      if (!plugin.resolveId) continue
+
+      for (const match of code.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+        const [_, id] = match
+        const resolvedId = plugin.resolveId(id)
+        if (!resolvedId) continue
+
+        code = code.replace(id, './' + resolvedId)
+        const loaded = plugin.load?.(resolvedId)
+        if (!loaded) continue
+
+        const fileName = addSrcPrefix('unplugin-vue-jsx-vapor/helper.js')
+        if (!store.files[fileName]) {
+          store.files[fileName] = new File(fileName, loaded, true)
+          compileFile(store, store.files[fileName])
+        }
+      }
     }
     compiled.js = compiled.ssr = code
     return []

@@ -80,10 +80,11 @@ export async function reloadLanguageTools(store: Store) {
 
   const worker = editor.createWebWorker<WorkerLanguageService>({
     moduleId: 'vs/language/vue/vueWorker',
-    label: 'vue',
+    label: 'tsx',
     host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
+      tsMacroConfig: store.getTsMacroConfig?.() || {},
       dependencies,
     } satisfies CreateData,
   })
@@ -122,12 +123,13 @@ export interface WorkerMessage {
   event: 'init'
   tsVersion: string
   tsLocale?: string
+  tsMacroConfig: string
 }
 
 export function loadMonacoEnv(store: Store) {
   ;(self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
-      if (label === 'vue') {
+      if (label === 'tsx') {
         const worker = new vueWorker()
         const init = new Promise<void>((resolve) => {
           worker.addEventListener('message', (data) => {
@@ -139,6 +141,7 @@ export function loadMonacoEnv(store: Store) {
             event: 'init',
             tsVersion: store.typescriptVersion,
             tsLocale: store.locale,
+            tsMacroConfig: store.getTsMacroConfig?.(),
           } satisfies WorkerMessage)
         })
         await init
@@ -162,7 +165,7 @@ export function loadMonacoEnv(store: Store) {
       languageToolsPromise = undefined
     })
   }, 250)
-  languages.onLanguage('vue', () => store.reloadLanguageTools!())
+  languages.onLanguage('javascript', () => store.reloadLanguageTools!())
 
   // Support for go to definition
   editor.registerEditorOpener({

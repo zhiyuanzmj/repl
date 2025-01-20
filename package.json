@@ -50,7 +50,8 @@
     "typecheck": "vue-tsc --noEmit",
     "release": "bumpp --all",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "deploy": "pnpm run build-preview && rsync -v -a --delete ./dist/ root@zmjs.dev:/usr/share/nginx/html/repl"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
@@ -104,7 +105,11 @@
     "vite": "^6.0.6",
     "vite-plugin-dts": "^4.4.0",
     "vscode-uri": "^3.0.8",
-    "vue": "^3.5.13",
-    "vue-tsc": "~2.2.0"
+    "vue": "https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf",
+    "vue-tsc": "~2.2.0",
+    "@ts-macro/language-plugin": "^0.1.13",
+    "@vue-macros/volar": "^0.30.12",
+    "@vue-macros/jsx-directive": "^0.10.1",
+    "unplugin-vue-jsx-vapor": "^1.2.3"
   }
 }

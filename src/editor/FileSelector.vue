@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
-import { importMapFile, stripSrcPrefix, tsconfigFile } from '../store'
+import {
+  importMapFile,
+  stripSrcPrefix,
+  tsMacroConfigFile,
+  tsconfigFile,
+  viteConfigFile,
+} from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
-const { store, showTsConfig, showImportMap } = inject(injectKeyProps)!
+const { store, showTsConfig, showHidden, showImportMap } =
+  inject(injectKeyProps)!
 
 /**
  * When `true`: indicates adding a new file
@@ -15,27 +22,31 @@ const pending = ref<boolean | string>(false)
  * Text shown in the input box when editing a file's name
  * This is a display name so it should always strip off the `src/` prefix.
  */
-const pendingFilename = ref('Comp.vue')
+const pendingFilename = ref('Comp.tsx')
 
 const files = computed(() =>
   Object.entries(store.value.files)
     .filter(
       ([name, file]) =>
-        name !== importMapFile && name !== tsconfigFile && !file.hidden,
+        name !== importMapFile &&
+        name !== tsconfigFile &&
+        name !== tsMacroConfigFile &&
+        name !== viteConfigFile &&
+        (showHidden?.value ? true : !file.hidden),
     )
     .map(([name]) => name),
 )
 
 function startAddFile() {
   let i = 0
-  let name = `Comp.vue`
+  let name = `Comp.tsx`
 
   while (true) {
     let hasConflict = false
     for (const filename in store.value.files) {
       if (stripSrcPrefix(filename) === name) {
         hasConflict = true
-        name = `Comp${++i}.vue`
+        name = `Comp${++i}.tsx`
         break
       }
     }
@@ -154,7 +165,23 @@ function horizontalScroll(e: WheelEvent) {
 
     <div class="import-map-wrapper">
       <div
-        v-if="showTsConfig && store.files[tsconfigFile]"
+        v-if="store.files[viteConfigFile]"
+        class="file"
+        :class="{ active: store.activeFile.filename === viteConfigFile }"
+        @click="store.setActive(viteConfigFile)"
+      >
+        <span class="label">{{ viteConfigFile }}</span>
+      </div>
+      <div
+        v-if="store.files[tsMacroConfigFile]"
+        class="file"
+        :class="{ active: store.activeFile.filename === tsMacroConfigFile }"
+        @click="store.setActive(tsMacroConfigFile)"
+      >
+        <span class="label">{{ tsMacroConfigFile }}</span>
+      </div>
+      <div
+        v-if="showHidden && showTsConfig && store.files[tsconfigFile]"
         class="file"
         :class="{ active: store.activeFile.filename === tsconfigFile }"
         @click="store.setActive(tsconfigFile)"

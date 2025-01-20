@@ -241,15 +241,14 @@ async function updatePreview() {
     ]
 
     // if main file is a vue file, mount it.
-    if (mainFile.endsWith('.vue')) {
+    if (mainFile.endsWith('.tsx')) {
       codeToEval.push(
         `import { ${
-          isSSR ? `createSSRApp` : `createApp`
-        } as _createApp } from "vue"
+          isSSR ? `createSSRApp` : `createVaporApp`
+        } as _createApp } from "vue/vapor"
         ${previewOptions.value?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
-          AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
             app.config.unwrapInjectedRef = true

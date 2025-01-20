@@ -20,20 +20,22 @@ import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
-import welcomeSFCCode from './template/welcome.vue?raw'
-import newSFCCode from './template/new-sfc.vue?raw'
+import welcomeCode from './template/welcome.tsx?raw'
+import newCode from './template/new?raw'
 
 export const importMapFile = 'import-map.json'
 export const tsconfigFile = 'tsconfig.json'
+export const viteConfigFile = 'vite.config.ts'
+export const tsMacroConfigFile = 'tsm.config.ts'
 
 export function useStore(
   {
     files = ref(Object.create(null)),
     activeFilename = undefined!, // set later
-    mainFile = ref('src/App.vue'),
+    mainFile = ref('src/App.tsx'),
     template = ref({
-      welcomeSFC: welcomeSFCCode,
-      newSFC: newSFCCode,
+      welcomeSFC: welcomeCode,
+      newSFC: newCode,
     }),
     builtinImportMap = undefined!, // set later
 
@@ -48,6 +50,9 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
+
+    tsMacroConfigCode = ref(`export default { plugins: [] }`),
+    viteConfigCode = ref(`export default { plugins: [] }`),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -63,13 +68,22 @@ export function useStore(
     setImportMap(importMap)
   }
 
-  function init() {
+  async function init() {
+    if (!files.value[viteConfigFile]) {
+      files.value[viteConfigFile] = new File(
+        viteConfigFile,
+        viteConfigCode.value,
+      )
+    }
+    await getViteConfig()
+
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
     })
 
     watch(
       () => [
+        files.value[tsMacroConfigFile]?.code,
         files.value[tsconfigFile]?.code,
         typescriptVersion.value,
         locale.value,
@@ -78,6 +92,16 @@ export function useStore(
       ],
       () => reloadLanguageTools.value?.(),
       { deep: true },
+    )
+
+    watch(
+      () => files.value[viteConfigFile]?.code,
+      async () => {
+        await getViteConfig()
+        for (const [_, file] of Object.entries(files.value)) {
+          compileFile(store, file).then((errs) => errors.value.push(...errs))
+        }
+      },
     )
 
     watch(
@@ -133,6 +157,13 @@ export function useStore(
       )
     }
 
+    if (!files.value[tsMacroConfigFile]) {
+      files.value[tsMacroConfigFile] = new File(
+        tsMacroConfigFile,
+        tsMacroConfigCode.value,
+      )
+    }
+
     // compile rest of the files
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
@@ -166,7 +197,7 @@ export function useStore(
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.vue') ? template.value.newSFC : '',
+        fileOrFilename.endsWith('.tsx') ? template.value.newSFC : '',
       )
     } else {
       file = fileOrFilename
@@ -239,11 +270,27 @@ export function useStore(
       return {}
     }
   }
+
+  const getTsMacroConfig: Store['getTsMacroConfig'] = () => {
+    return (
+      'data:text/javascript;charset=utf-8,' +
+      encodeURIComponent(files.value[tsMacroConfigFile]?.code)
+    )
+  }
+
+  const viteConfig = ref({} as ViteConfig)
+  const getViteConfig = async () => {
+    return (store.viteConfig = await import(
+      'data:text/javascript;charset=utf-8,' +
+        encodeURIComponent(files.value[viteConfigFile]?.code)
+    ).then((i) => i.default))
+  }
+
   const serialize: ReplStore['serialize'] = () => {
     const files = getFiles()
     const importMap = files[importMapFile]
     if (importMap) {
-      const parsed = JSON.parse(importMap)
+      const parsed = JSON.parse(importMap.code)
       const builtin = builtinImportMap.value.imports || {}
 
       if (parsed.imports) {
@@ -260,11 +307,12 @@ export function useStore(
         delete parsed.scopes
       }
       if (Object.keys(parsed).length) {
-        files[importMapFile] = JSON.stringify(parsed, null, 2)
+        files[importMapFile] = { code: JSON.stringify(parsed, null, 2) }
       } else {
         delete files[importMapFile]
       }
     }
+    // @ts-ignore
     if (vueVersion.value) files._version = vueVersion.value
     return '#' + utoa(JSON.stringify(files))
   }
@@ -283,15 +331,20 @@ export function useStore(
       if (filename === '_version') {
         vueVersion.value = saved[filename]
       } else {
-        setFile(files.value, filename, saved[filename])
+        setFile(
+          files.value,
+          filename,
+          saved[filename].code,
+          saved[filename].hidden,
+        )
       }
     }
   }
   const getFiles: ReplStore['getFiles'] = () => {
-    const exported: Record<string, string> = {}
+    const exported: Record<string, { code: string; hidden?: boolean }> = {}
     for (const [filename, file] of Object.entries(files.value)) {
       const normalized = stripSrcPrefix(filename)
-      exported[normalized] = file.code
+      exported[normalized] = { code: file.code, hidden: file.hidden }
     }
     return exported
   }
@@ -303,7 +356,7 @@ export function useStore(
 
     mainFile = addSrcPrefix(mainFile)
     if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value.welcomeSFC || welcomeSFCCode)
+      setFile(files, mainFile, template.value.welcomeSFC || welcomeCode)
     }
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
@@ -324,7 +377,7 @@ export function useStore(
     setFile(
       files.value,
       mainFile.value,
-      template.value.welcomeSFC || welcomeSFCCode,
+      template.value.welcomeSFC || welcomeCode,
     )
   }
 
@@ -361,6 +414,9 @@ export function useStore(
     typescriptVersion,
     dependencyVersion,
     reloadLanguageTools,
+    viteConfig,
+    viteConfigCode,
+    tsMacroConfigCode,
 
     init,
     setActive,
@@ -369,6 +425,7 @@ export function useStore(
     renameFile,
     getImportMap,
     getTsConfig,
+    getTsMacroConfig,
     serialize,
     deserialize,
     getFiles,
@@ -424,12 +481,28 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
+
+  viteConfigCode: string
+  tsMacroConfigCode: string
 }>
+
+type ViteConfig = {
+  plugins: {
+    name?: string
+    resolveId?: (id: string) => string | null | undefined
+    load?: (id: string) => string | null | undefined
+    transform: (
+      code: string,
+      id: string,
+    ) => string | { code: string; map: any } | null | undefined
+  }[]
+}
 
 export interface ReplStore extends UnwrapRef<StoreState> {
   activeFile: File
   /** Loading compiler */
   loading: boolean
+  viteConfig: ViteConfig
   init(): void
   setActive(filename: string): void
   addFile(filename: string | File): void
@@ -437,9 +510,10 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   renameFile(oldFilename: string, newFilename: string): void
   getImportMap(): ImportMap
   getTsConfig(): Record<string, any>
+  getTsMacroConfig(): string
   serialize(): string
   deserialize(serializedState: string): void
-  getFiles(): Record<string, string>
+  getFiles(): Record<string, { code: string; hidden?: boolean }>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
 }
 
@@ -465,6 +539,8 @@ export type Store = Pick<
   | 'renameFile'
   | 'getImportMap'
   | 'getTsConfig'
+  | 'viteConfig'
+  | 'getTsMacroConfig'
 >
 
 export class File {
@@ -498,9 +574,11 @@ export class File {
   }
 }
 
-function addSrcPrefix(file: string) {
+export function addSrcPrefix(file: string) {
   return file === importMapFile ||
     file === tsconfigFile ||
+    file === viteConfigFile ||
+    file === tsMacroConfigFile ||
     file.startsWith('src/')
     ? file
     : `src/${file}`
@@ -518,7 +596,8 @@ function setFile(
   files: Record<string, File>,
   filename: string,
   content: string,
+  hidden = false,
 ) {
   const normalized = addSrcPrefix(filename)
-  files[normalized] = new File(normalized, content)
+  files[normalized] = new File(normalized, content, hidden)
 }
