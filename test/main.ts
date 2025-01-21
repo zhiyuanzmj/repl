@@ -27,18 +27,19 @@ const App = {
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'preview'),
         viteConfigCode: ref(
-          `import { transformVueJsxVapor, helperId, helperCode} from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor${import.meta.env.PROD ? '.js' : ''}'
-import { transformJsxDirective } from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vite-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
+          `import { transformVueJsxVapor, helperId, helperCode } from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor${import.meta.env.PROD ? '.js' : ''}'
+import transformJsxDirective from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vite-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
 
 export default {
   plugins: [
-    { transform: transformJsxDirective },
+    transformJsxDirective,
     {
+      name: 'unplugin-vue-jsx-vapor',
       resolveId(id) {
-        if(id === helperId) return helperId
+        if (id === helperId) return helperId
       },
       load(id) {
-        if(id === helperId) return helperCode
+        if (id === helperId) return helperCode
       },
       transform: transformVueJsxVapor
     }
@@ -48,10 +49,12 @@ export default {
         ),
         tsMacroConfigCode: ref(
           `import jsxDirective from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/volar-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
+import jsxRef from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/volar-plugin-jsx-ref${import.meta.env.PROD ? '.js' : ''}'
 
 export default {
   plugins: [
-    jsxDirective()
+    jsxDirective(),
+    jsxRef()
   ]
 }`,
         ),

@@ -240,12 +240,15 @@ async function updatePreview() {
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
     ]
 
+    const isVapor = codeToEval.join('').includes('vue/vapor')
+    store.value.isVapor = isVapor
+
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.tsx')) {
       codeToEval.push(
         `import { ${
-          isSSR ? `createSSRApp` : `createVaporApp`
-        } as _createApp } from "vue/vapor"
+          isSSR ? `createSSRApp` : isVapor ? `createVaporApp` : `createApp`
+        } as _createApp } from "vue${isVapor ? '/vapor' : ''}"
         ${previewOptions.value?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"]?.default

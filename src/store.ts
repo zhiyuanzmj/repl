@@ -44,12 +44,14 @@ export function useStore(
 
     tsMacroConfigCode = ref(`export default { plugins: [] }`),
     viteConfigCode = ref(`export default { plugins: [] }`),
+    isVapor = ref(false),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
     ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
       vueVersion: vueVersion.value,
+      isVapor: isVapor.value,
     }))
   }
 
@@ -79,6 +81,14 @@ export function useStore(
       )
     }
     await getViteConfig()
+
+    watch(isVapor, () => {
+      ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
+        vueVersion: vueVersion.value,
+        isVapor: isVapor.value,
+      }))
+      applyBuiltinImportMap()
+    })
 
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
@@ -361,6 +371,7 @@ export function useStore(
     viteConfig,
     viteConfigCode,
     tsMacroConfigCode,
+    isVapor,
 
     init,
     setActive,
@@ -418,6 +429,7 @@ export type StoreState = ToRefs<{
 
   viteConfigCode: string
   tsMacroConfigCode: string
+  isVapor: boolean
 }>
 
 type ViteConfig = {
@@ -425,7 +437,7 @@ type ViteConfig = {
     name?: string
     resolveId?: (id: string) => string | null | undefined
     load?: (id: string) => string | null | undefined
-    transform: (
+    transform?: (
       code: string,
       id: string,
     ) => string | { code: string; map: any } | null | undefined
@@ -471,6 +483,7 @@ export type Store = Pick<
   | 'getTsConfig'
   | 'viteConfig'
   | 'getTsMacroConfig'
+  | 'isVapor'
 >
 
 export class File {

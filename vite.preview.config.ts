@@ -24,6 +24,7 @@ export default defineConfig({
         'index.html',
         'src/vue-jsx-vapor.ts',
         'src/volar-plugin-jsx-directive.ts',
+        'src/volar-plugin-jsx-ref.ts',
         'src/vite-plugin-jsx-directive.ts',
       ],
       name: 'lib',
