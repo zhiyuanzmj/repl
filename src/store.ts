@@ -206,7 +206,7 @@ export function useStore(
   }
   const getImportMap: Store['getImportMap'] = () => {
     try {
-      return JSON.parse(files.value[importMapFile].code)
+      return JSON.parse(files.value[importMapFile]?.code || '{}')
     } catch (e) {
       errors.value = [
         `Syntax error in ${importMapFile}: ${(e as Error).message}`,

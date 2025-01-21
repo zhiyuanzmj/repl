@@ -57,7 +57,7 @@ export async function compileFile(
         if (!loaded) continue
 
         const fileName = addSrcPrefix('unplugin-vue-jsx-vapor/helper.js')
-        if (!store.files[fileName]) {
+        if (!store.files[fileName] || store.files[fileName].code !== loaded) {
           store.files[fileName] = new File(fileName, loaded, true)
           compileFile(store, store.files[fileName])
         }

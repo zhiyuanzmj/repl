@@ -35,7 +35,7 @@ export default {
     { transform: transformJsxDirective },
     {
       resolveId(id) {
-        if(id === helperId) return id
+        if(id === helperId) return helperId
       },
       load(id) {
         if(id === helperId) return helperCode
