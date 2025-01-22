@@ -440,16 +440,17 @@ export type StoreState = ToRefs<{
   isVapor: boolean
 }>
 
-type ViteConfig = {
-  plugins: {
-    name?: string
-    resolveId?: (id: string) => string | null | undefined
-    load?: (id: string) => string | null | undefined
-    transform?: (
-      code: string,
-      id: string,
-    ) => string | { code: string; map: any } | null | undefined
-  }[]
+export type VitePlugin = {
+  name?: string
+  resolveId?: (id: string) => string | null | undefined
+  load?: (id: string) => string | null | undefined
+  transform?: (
+    code: string,
+    id: string,
+  ) => string | { code: string; map: any } | null | undefined
+}
+export type ViteConfig = {
+  plugins: VitePlugin[]
 }
 
 export interface ReplStore extends UnwrapRef<StoreState> {

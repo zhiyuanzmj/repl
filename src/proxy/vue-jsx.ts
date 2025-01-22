@@ -1,5 +1,6 @@
 import { transform } from '@babel/standalone'
 import jsx from '@vue/babel-plugin-jsx'
+import { VitePlugin } from '../store'
 
 export default {
   name: 'vue-jsx',
@@ -8,4 +9,4 @@ export default {
       plugins: [jsx],
     }).code!
   },
-}
+} as VitePlugin
