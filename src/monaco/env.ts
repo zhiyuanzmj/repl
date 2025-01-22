@@ -84,7 +84,7 @@ export async function reloadLanguageTools(store: Store) {
     host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
-      tsMacroConfig: store.getTsMacroConfig?.() || {},
+      tsMacroConfig: store.getTsMacroConfig?.() || '{}',
       dependencies,
     } satisfies CreateData,
   })

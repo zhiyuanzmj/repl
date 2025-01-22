@@ -45,9 +45,14 @@ watch(showMessage, () => {
 
     <div class="editor-floating">
       <ToggleButton
+        v-if="editorOptions?.isVaporText !== false"
+        v-model="store.isVapor"
+        :text="editorOptions?.isVaporText || 'Vapor Mode'"
+      />
+      <ToggleButton
         v-if="editorOptions?.showHiddenText !== false"
         v-model="showHidden"
-        :text="editorOptions?.showHiddenText || 'Show Error'"
+        :text="editorOptions?.showHiddenText || 'Hidden Files'"
       />
       <ToggleButton
         v-if="editorOptions?.showErrorText !== false"

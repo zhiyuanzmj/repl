@@ -44,7 +44,7 @@ export function useStore(
 
     tsMacroConfigCode = ref(`export default { plugins: [] }`),
     viteConfigCode = ref(`export default { plugins: [] }`),
-    isVapor = ref(false),
+    isVapor = ref(true),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -87,7 +87,8 @@ export function useStore(
         vueVersion: vueVersion.value,
         isVapor: isVapor.value,
       }))
-      applyBuiltinImportMap()
+      const importMap = mergeImportMap(getImportMap(), builtinImportMap.value)
+      setImportMap(importMap)
     })
 
     watchEffect(() => {
@@ -233,17 +234,27 @@ export function useStore(
   }
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = () => {
-    return (
-      'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(files.value[tsMacroConfigFile]?.code)
-    )
+    let code = files.value[tsMacroConfigFile]?.code
+    for (let name in store.builtinImportMap.imports) {
+      code = code.replaceAll(
+        new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
+        store.builtinImportMap.imports[name] as string,
+      )
+    }
+    return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code)
   }
 
   const viteConfig = ref({} as ViteConfig)
   const getViteConfig = async () => {
+    let code = files.value[viteConfigFile]?.code
+    for (let name in store.builtinImportMap.imports) {
+      code = code.replaceAll(
+        new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
+        store.builtinImportMap.imports[name] as string,
+      )
+    }
     return (store.viteConfig = await import(
-      'data:text/javascript;charset=utf-8,' +
-        encodeURIComponent(files.value[viteConfigFile]?.code)
+      'data:text/javascript;charset=utf-8,' + encodeURIComponent(code)
     ).then((i) => i.default))
   }
 
@@ -398,9 +409,6 @@ const tsconfig = {
     module: 'ESNext',
     moduleResolution: 'Bundler',
     allowImportingTsExtensions: true,
-  },
-  vueCompilerOptions: {
-    target: 3.4,
   },
 }
 

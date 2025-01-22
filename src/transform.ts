@@ -16,6 +16,8 @@ function transformTS(src: string, isJSX?: boolean) {
   }).code
 }
 
+const resolveRE = /from\s+['"]([^'"]+)['"]/g
+
 export async function compileFile(
   store: Store,
   { filename, code, compiled }: File,
@@ -37,12 +39,17 @@ export async function compileFile(
     }
 
     const { plugins } = store.viteConfig
-    for (const plugin of plugins) {
+    // const jsxPlugin = store.isVapor
+    //   ? await import('./vue-jsx-vapor').then((i) => i.default)
+    //   : await import('./jsx').then(
+    //       (i) => ({ transform: i.transformJSX }) as any,
+    //     )
+    for (const plugin of [...plugins]) {
       const result = plugin.transform?.(code, filename)
       code = typeof result === 'string' ? result : result?.code || code
       if (!plugin.resolveId) continue
 
-      for (const match of code.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+      for (const match of code.matchAll(resolveRE)) {
         const [_, id] = match
         const resolvedId = plugin.resolveId(id)
         if (!resolvedId) continue
@@ -57,9 +64,6 @@ export async function compileFile(
           compileFile(store, store.files[fileName])
         }
       }
-    }
-    if (isJSX && !code.includes('vue/vapor')) {
-      code = await import('./jsx').then((i) => i.transformJSX(code))
     }
     compiled.js = compiled.ssr = code
     return []

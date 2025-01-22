@@ -28,7 +28,7 @@ export function useVueImportMap(
 
     const vueVapor = import.meta.env.PROD
       ? 'https://cdn.jsdelivr.net/npm/@vue-vapor/runtime-vapor@3.20240714.0-6608bb3/dist/runtime-vapor.esm-browser.prod.js'
-      : location.origin + `/src/vue-vapor-dev-proxy`
+      : location.origin + `/src/proxy/vue-vapor`
 
     const serverRenderer =
       (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||

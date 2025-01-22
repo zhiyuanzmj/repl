@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
-import { type OutputModes, Repl, useStore, useVueImportMap } from '../src'
+import {
+  mergeImportMap,
+  type OutputModes,
+  Repl,
+  useStore,
+  useVueImportMap,
+} from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
@@ -11,45 +17,50 @@ window.process = { env: {} }
 
 const App = {
   setup() {
+    const isVapor = ref(true)
     const query = new URLSearchParams(location.search)
     const { importMap: builtinImportMap, vueVersion } = useVueImportMap({
       runtimeDev: import.meta.env.PROD
         ? undefined
-        : `${location.origin}/src/vue-dev-proxy`,
+        : `${location.origin}/src/proxy/vue`,
       serverRenderer: import.meta.env.PROD
         ? undefined
-        : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+        : `${location.origin}/src/proxy/vue-server-renderer`,
+      isVapor: isVapor.value,
     })
+    const prefix = `${location.origin}${import.meta.env.PROD ? '' : '/src/proxy'}`
+    const suffix = import.meta.env.PROD ? '.js' : ''
+    const ImportMap = ref(
+      mergeImportMap(builtinImportMap.value, {
+        imports: {
+          '@vue-macros/jsx-directive.js': `${prefix}/vite-plugin-jsx-directive${suffix}`,
+          '@vue-macros/volar/jsx-directive.js': `${prefix}/volar-plugin-jsx-directive${suffix}`,
+          '@vue-macros/volar/jsx-ref.js': `${prefix}/volar-plugin-jsx-ref${suffix}`,
+        },
+      }),
+    )
     const store = (window.store = useStore(
       {
-        builtinImportMap,
+        builtinImportMap: ImportMap,
         vueVersion,
+        isVapor,
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'preview'),
         viteConfigCode: ref(
-          `import { transformVueJsxVapor, helperId, helperCode } from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vue-jsx-vapor${import.meta.env.PROD ? '.js' : ''}'
-import transformJsxDirective from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/vite-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
+          `// @ts-nocheck
+import transformJsxDirective from '@vue-macros/jsx-directive.js'
 
 export default {
   plugins: [
     transformJsxDirective,
-    {
-      name: 'unplugin-vue-jsx-vapor',
-      resolveId(id) {
-        if (id === helperId) return helperId
-      },
-      load(id) {
-        if (id === helperId) return helperCode
-      },
-      transform: transformVueJsxVapor
-    }
   ]
 }
 `,
         ),
         tsMacroConfigCode: ref(
-          `import jsxDirective from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/volar-plugin-jsx-directive${import.meta.env.PROD ? '.js' : ''}'
-import jsxRef from '${location.origin}${import.meta.env.PROD ? '' : '/src'}/volar-plugin-jsx-ref${import.meta.env.PROD ? '.js' : ''}'
+          `// @ts-nocheck
+import jsxDirective from '@vue-macros/volar/jsx-directive.js'
+import jsxRef from '@vue-macros/volar/jsx-ref.js'
 
 export default {
   plugins: [
@@ -97,6 +108,7 @@ export default {
         editorOptions: {
           autoSaveText: 'Auto Save',
           showHiddenText: 'Hidden Files',
+          isVaporText: 'Vapor Mode',
           monacoOptions: {
             // wordWrap: 'on',
           },

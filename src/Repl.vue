@@ -38,6 +38,7 @@ export interface Props {
   editorOptions?: {
     showErrorText?: string | false
     showHiddenText?: string | false
+    isVaporText?: string | false
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
