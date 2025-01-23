@@ -13,6 +13,11 @@ import reactWelcomeCode from './react/welcome.tsx?raw'
 import reactNewCode from './react/new.tsx?raw'
 import reactViteConfCode from './react/vite.config.ts?raw'
 
+import solidHtml from './solid/index.html?raw'
+import solidWelcomeCode from './solid/welcome.tsx?raw'
+import solidNewCode from './solid/new.tsx?raw'
+import solidViteConfCode from './solid/vite.config.ts?raw'
+
 export const defaultPresets = {
   'vue-jsx': {
     indexHtml: vueJsxHtml,
@@ -32,4 +37,10 @@ export const defaultPresets = {
     new: reactNewCode,
     viteConfig: reactViteConfCode,
   },
+  solid: {
+    indexHtml: solidHtml,
+    welcome: solidWelcomeCode,
+    new: solidNewCode,
+    viteConfig: solidViteConfCode,
+  }
 }

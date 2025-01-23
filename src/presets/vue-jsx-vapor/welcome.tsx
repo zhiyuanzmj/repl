@@ -1,6 +1,6 @@
-import { defineComponent, ref, shallowRef as useRef } from 'vue/vapor'
+import { ref, shallowRef as useRef } from 'vue/vapor'
 
-export default defineComponent(() => {
+export default () => {
   const count = ref(0)
 
   const buttonRef = useRef()
@@ -20,4 +20,4 @@ export default defineComponent(() => {
       <div v-else>lt {count.value}</div>
     </>
   )
-})
+}

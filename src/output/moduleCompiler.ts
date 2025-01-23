@@ -325,7 +325,6 @@ function processHtmlFile(
 ) {
   const deps: string[] = []
   let jsCode = ''
-  console.log(src, store.importMap, '...html')
   src = addEsmPrefix(src, store.importMap)
   const html = src
     .replace(scriptModuleRE, (_, content) => {
