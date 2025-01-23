@@ -10,6 +10,7 @@ import {
 } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 import type * as monaco from 'monaco-editor-core'
+import { useRouteQuery } from './utils'
 
 export interface Props {
   theme?: 'dark' | 'light'
@@ -38,7 +39,6 @@ export interface Props {
   editorOptions?: {
     showErrorText?: string | false
     showHiddenText?: string | false
-    isVaporText?: string | false
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
@@ -49,7 +49,7 @@ export interface Props {
 }
 
 const autoSave = defineModel<boolean>({ default: true })
-const showHidden = defineModel<boolean>('showHidden', { default: false })
+const showHidden = useRouteQuery<boolean>('showHidden', false)
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,

@@ -1,4 +1,4 @@
-import type { File, Store } from '../store'
+import { indexHtmlFile, type File, type Store } from '../store'
 import {
   MagicString,
   babelParse,
@@ -9,11 +9,12 @@ import {
   walkIdentifiers,
 } from 'vue/compiler-sfc'
 import type { ExportSpecifier, Identifier, Node } from '@babel/types'
+import { addEsmPrefix } from '../utils'
 
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
   const processed: string[] = []
-  processFile(store, store.files[store.mainFile], processed, seen, isSSR)
+  processFile(store, store.files[indexHtmlFile], processed, seen, isSSR)
 
   if (!isSSR) {
     // also add css files that are not imported
@@ -103,6 +104,7 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
+  src = addEsmPrefix(src, store.importMap)
   const s = new MagicString(src)
 
   const ast = babelParse(src, {
@@ -323,6 +325,8 @@ function processHtmlFile(
 ) {
   const deps: string[] = []
   let jsCode = ''
+  console.log(src, store.importMap, '...html')
+  src = addEsmPrefix(src, store.importMap)
   const html = src
     .replace(scriptModuleRE, (_, content) => {
       const { code, importedFiles, hasDynamicImport } = processModule(

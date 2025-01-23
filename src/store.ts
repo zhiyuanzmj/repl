@@ -8,33 +8,31 @@ import {
   watchEffect,
 } from 'vue'
 import { compileFile } from './transform'
-import { atou, utoa } from './utils'
+import { addEsmPrefix, atou, useRouteQuery, utoa } from './utils'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
-import welcomeCode from './template/welcome.tsx?raw'
-import newCode from './template/new?raw'
+import { defaultPresets } from './presets'
 
 export const importMapFile = 'import-map.json'
 export const tsconfigFile = 'tsconfig.json'
 export const viteConfigFile = 'vite.config.ts'
 export const tsMacroConfigFile = 'tsm.config.ts'
+export const indexHtmlFile = 'src/index.html'
+export const welcomeFile = 'src/App.tsx'
 
 export function useStore(
   {
     files = ref(Object.create(null)),
     activeFilename = undefined!, // set later
-    mainFile = ref('src/App.tsx'),
-    template = ref({
-      welcome: welcomeCode,
-      new: newCode,
-    }),
-    builtinImportMap = undefined!, // set later
+    activeConfigFilename = ref(viteConfigFile), // set later
+    mainFile = ref(welcomeFile),
+    builtinImportMap = undefined!,
 
     errors = ref([]),
     showOutput = ref(false),
-    outputMode = ref('preview'),
+    outputMode = ref('js'),
     vueVersion = ref(null),
 
     locale = ref(),
@@ -43,36 +41,25 @@ export function useStore(
     reloadLanguageTools = ref(),
 
     tsMacroConfigCode = ref(`export default { plugins: [] }`),
-    viteConfigCode = ref(`export default { plugins: [] }`),
-    isVapor = ref(true),
+    preset = useRouteQuery<string>('preset', 'vue-jsx', false),
+    presets = ref(defaultPresets),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
     ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
       vueVersion: vueVersion.value,
-      isVapor: isVapor.value,
     }))
   }
+  const template = computed(() => presets.value[preset.value])
 
+  let importMap = ref({} as ImportMap)
   function applyBuiltinImportMap() {
-    const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
-    setImportMap(importMap)
+    importMap.value = mergeImportMap(builtinImportMap.value, getImportMap())
+    setImportMap(importMap.value)
   }
 
   async function init() {
-    if (!files.value[viteConfigFile]) {
-      files.value[viteConfigFile] = new File(
-        viteConfigFile,
-        viteConfigCode.value,
-      )
-    }
-    if (!files.value[tsMacroConfigFile]) {
-      files.value[tsMacroConfigFile] = new File(
-        tsMacroConfigFile,
-        tsMacroConfigCode.value,
-      )
-    }
     // init tsconfig
     if (!files.value[tsconfigFile]) {
       files.value[tsconfigFile] = new File(
@@ -80,19 +67,27 @@ export function useStore(
         JSON.stringify(tsconfig, undefined, 2),
       )
     }
-    await getViteConfig()
 
-    watch(isVapor, () => {
-      ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
-        vueVersion: vueVersion.value,
-        isVapor: isVapor.value,
-      }))
-      const importMap = mergeImportMap(getImportMap(), builtinImportMap.value)
-      setImportMap(importMap)
+    watch(preset, () => {
+      setFiles(
+        {
+          [indexHtmlFile]: template.value.indexHtml,
+          [welcomeFile]: template.value.welcome,
+          [viteConfigFile]: template.value.viteConfig,
+          [tsMacroConfigFile]: tsMacroConfigCode.value,
+          [tsconfigFile]: JSON.stringify(tsconfig, undefined, 2),
+        },
+        welcomeFile,
+      )
     })
+
+    await getViteConfig()
 
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+      compileFile(store, activeConfigFile.value).then(
+        (errs) => (errors.value = errs),
+      )
     })
 
     watch(
@@ -152,7 +147,13 @@ export function useStore(
   }
 
   const setActive: Store['setActive'] = (filename) => {
-    activeFilename.value = filename
+    if (
+      [viteConfigFile, tsMacroConfigFile, tsconfigFile, importMapFile].includes(
+        filename,
+      )
+    )
+      activeConfigFilename.value = filename
+    else activeFilename.value = filename
   }
   const addFile: Store['addFile'] = (fileOrFilename) => {
     let file: File
@@ -225,6 +226,7 @@ export function useStore(
       return {}
     }
   }
+
   const getTsConfig: Store['getTsConfig'] = () => {
     try {
       return JSON.parse(files.value[tsconfigFile].code)
@@ -241,7 +243,10 @@ export function useStore(
         store.builtinImportMap.imports[name] as string,
       )
     }
-    return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code)
+    return (
+      'data:text/javascript;charset=utf-8,' +
+      encodeURIComponent(addEsmPrefix(code, importMap.value))
+    )
   }
 
   const viteConfig = ref({} as ViteConfig)
@@ -254,7 +259,8 @@ export function useStore(
       )
     }
     return (store.viteConfig = await import(
-      'data:text/javascript;charset=utf-8,' + encodeURIComponent(code)
+      'data:text/javascript;charset=utf-8,' +
+        encodeURIComponent(addEsmPrefix(code, importMap.value))
     ).then((i) => i.default))
   }
 
@@ -328,7 +334,7 @@ export function useStore(
 
     mainFile = addSrcPrefix(mainFile)
     if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value.welcome || welcomeCode)
+      setFile(files, mainFile, template.value.welcome!)
     }
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
@@ -346,7 +352,10 @@ export function useStore(
     setActive(store.mainFile)
   }
   const setDefaultFile = (): void => {
-    setFile(files.value, mainFile.value, template.value.welcome || welcomeCode)
+    setFile(files.value, indexHtmlFile, template.value.indexHtml, true)
+    setFile(files.value, welcomeFile, template.value.welcome)
+    setFile(files.value, viteConfigFile, template.value.viteConfig)
+    setFile(files.value, tsMacroConfigFile, tsMacroConfigCode.value)
   }
 
   if (serializedState) {
@@ -355,10 +364,13 @@ export function useStore(
     setDefaultFile()
   }
   if (!files.value[mainFile.value]) {
-    mainFile.value = Object.keys(files.value)[0]
+    mainFile.value = Object.keys(files.value).find((i) => i.endsWith('.tsx'))!
   }
   activeFilename ||= ref(mainFile.value)
   const activeFile = computed(() => files.value[activeFilename.value])
+  const activeConfigFile = computed(
+    () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
+  )
 
   applyBuiltinImportMap()
 
@@ -366,6 +378,8 @@ export function useStore(
     files,
     activeFile,
     activeFilename,
+    activeConfigFile,
+    activeConfigFilename,
     mainFile,
     template,
     builtinImportMap,
@@ -380,9 +394,10 @@ export function useStore(
     dependencyVersion,
     reloadLanguageTools,
     viteConfig,
-    viteConfigCode,
     tsMacroConfigCode,
-    isVapor,
+    preset,
+    presets,
+    importMap,
 
     init,
     setActive,
@@ -412,14 +427,18 @@ const tsconfig = {
   },
 }
 
+type Template = {
+  indexHtml: string
+  welcome: string
+  new: string
+  viteConfig: string
+}
+
 export type StoreState = ToRefs<{
   files: Record<string, File>
   activeFilename: string
+  activeConfigFilename: string
   mainFile: string
-  template: {
-    welcome?: string
-    new?: string
-  }
   builtinImportMap: ImportMap
 
   // output
@@ -427,6 +446,7 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   vueVersion: string | null
+  importMap: ImportMap
 
   // volar-related
   locale: string | undefined
@@ -435,9 +455,9 @@ export type StoreState = ToRefs<{
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
 
-  viteConfigCode: string
   tsMacroConfigCode: string
-  isVapor: boolean
+  preset: string
+  presets: Record<string, Template>
 }>
 
 export type VitePlugin = {
@@ -455,6 +475,7 @@ export type ViteConfig = {
 
 export interface ReplStore extends UnwrapRef<StoreState> {
   activeFile: File
+  activeConfigFile: File
   viteConfig: ViteConfig
   init(): void
   setActive(filename: string): void
@@ -474,6 +495,7 @@ export type Store = Pick<
   ReplStore,
   | 'files'
   | 'activeFile'
+  | 'activeConfigFile'
   | 'mainFile'
   | 'errors'
   | 'showOutput'
@@ -492,7 +514,9 @@ export type Store = Pick<
   | 'getTsConfig'
   | 'viteConfig'
   | 'getTsMacroConfig'
-  | 'isVapor'
+  | 'preset'
+  | 'presets'
+  | 'importMap'
 >
 
 export class File {

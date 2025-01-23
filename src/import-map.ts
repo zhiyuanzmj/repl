@@ -6,7 +6,6 @@ export function useVueImportMap(
     runtimeProd?: string | (() => string)
     serverRenderer?: string | (() => string)
     vueVersion?: string | null
-    isVapor?: boolean
   } = {},
 ) {
   function normalizeDefaults(defaults?: string | (() => string)) {
@@ -26,20 +25,19 @@ export function useVueImportMap(
         vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
+    // const serverRenderer =
+    //   (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
+    //   `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${vueVersion.value || currentVersion
+    //   }/dist/server-renderer.esm-browser.js`
+
     const vueVapor = import.meta.env.PROD
       ? 'https://cdn.jsdelivr.net/npm/@vue-vapor/runtime-vapor@3.20240714.0-6608bb3/dist/runtime-vapor.esm-browser.prod.js'
       : location.origin + `/src/proxy/vue-vapor`
-
-    const serverRenderer =
-      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
-        vueVersion.value || currentVersion
-      }/dist/server-renderer.esm-browser.js`
     return {
       imports: {
-        vue: defaults.isVapor ? vueVapor : vue,
+        vue,
         'vue/vapor': vueVapor,
-        'vue/server-renderer': serverRenderer,
+        // 'vue/server-renderer': serverRenderer,
       },
     }
   })

@@ -153,9 +153,11 @@ export function loadMonacoEnv(store: Store) {
   languages.register({ id: 'javascript', extensions: ['.js'] })
   languages.register({ id: 'typescript', extensions: ['.ts'] })
   languages.register({ id: 'css', extensions: ['.css'] })
+  languages.register({ id: 'html', extensions: ['.html'] })
   languages.setLanguageConfiguration('javascript', languageConfigs.js)
   languages.setLanguageConfiguration('typescript', languageConfigs.ts)
   languages.setLanguageConfiguration('css', languageConfigs.css)
+  languages.setLanguageConfiguration('html', languageConfigs.html)
 
   let languageToolsPromise: Promise<void> | undefined
   store.reloadLanguageTools = debounce(async () => {

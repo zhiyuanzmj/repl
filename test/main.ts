@@ -1,62 +1,23 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
-import {
-  mergeImportMap,
-  type OutputModes,
-  Repl,
-  useStore,
-  useVueImportMap,
-} from '../src'
+import { type OutputModes, Repl, useStore } from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
 import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
+
+import 'uno.css'
 
 const window = globalThis.window as any
 window.process = { env: {} }
 
 const App = {
   setup() {
-    const isVapor = ref(true)
     const query = new URLSearchParams(location.search)
-    const { importMap: builtinImportMap, vueVersion } = useVueImportMap({
-      runtimeDev: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/proxy/vue`,
-      serverRenderer: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/proxy/vue-server-renderer`,
-      isVapor: isVapor.value,
-    })
-    const prefix = `${location.origin}${import.meta.env.PROD ? '' : '/src/proxy'}`
-    const suffix = import.meta.env.PROD ? '.js' : ''
-    const ImportMap = ref(
-      mergeImportMap(builtinImportMap.value, {
-        imports: {
-          '@vue-macros/jsx-directive.js': `${prefix}/vite-plugin-jsx-directive${suffix}`,
-          '@vue-macros/volar/jsx-directive.js': `${prefix}/volar-plugin-jsx-directive${suffix}`,
-          '@vue-macros/volar/jsx-ref.js': `${prefix}/volar-plugin-jsx-ref${suffix}`,
-        },
-      }),
-    )
     const store = (window.store = useStore(
       {
-        builtinImportMap: ImportMap,
-        vueVersion,
-        isVapor,
         showOutput: ref(query.has('so')),
-        outputMode: ref((query.get('om') as OutputModes) || 'preview'),
-        viteConfigCode: ref(
-          `// @ts-nocheck
-import transformJsxDirective from '@vue-macros/jsx-directive.js'
-
-export default {
-  plugins: [
-    transformJsxDirective,
-  ]
-}
-`,
-        ),
+        outputMode: ref((query.get('om') as OutputModes) || 'js'),
         tsMacroConfigCode: ref(
           `// @ts-nocheck
 import jsxDirective from '@vue-macros/volar/jsx-directive.js'
@@ -72,7 +33,6 @@ export default {
       },
       location.hash,
     ))
-    console.info(store)
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
@@ -91,9 +51,7 @@ export default {
 
     // store.vueVersion = '3.4.1'
     const theme = ref<'light' | 'dark'>('dark')
-    window.theme = theme
     const previewTheme = ref(false)
-    window.previewTheme = previewTheme
 
     return () =>
       h(Repl, {
@@ -101,14 +59,13 @@ export default {
         theme: theme.value,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
-        // layout: 'vertical',
+        layout: 'vertical',
         ssr: false,
         // showCompileOutput: false,
         // showImportMap: false
         editorOptions: {
           autoSaveText: 'Auto Save',
           showHiddenText: 'Hidden Files',
-          isVaporText: 'Vapor Mode',
           monacoOptions: {
             // wordWrap: 'on',
           },

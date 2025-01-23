@@ -19,6 +19,10 @@ const onChange = debounce((code: string) => {
   store.value.activeFile.code = code
 }, 250)
 
+const onConfigChange = debounce((code: string) => {
+  store.value.activeConfigFile.code = code
+}, 250)
+
 function setItem() {
   localStorage.setItem(SHOW_ERROR_KEY, showMessage.value ? 'true' : 'false')
 }
@@ -36,19 +40,24 @@ watch(showMessage, () => {
 <template>
   <FileSelector />
   <div class="editor-container">
-    <props.editorComponent
-      :value="store.activeFile.code"
-      :filename="store.activeFile.filename"
-      @change="onChange"
-    />
+    <div class="flex h-full">
+      <props.editorComponent
+        class="flex-1"
+        :value="store.activeFile.code"
+        :filename="store.activeFile.filename"
+        @change="onChange"
+      />
+      <props.editorComponent
+        class="flex-1"
+        :value="store.activeConfigFile.code"
+        :filename="store.activeConfigFile.filename"
+        @change="onConfigChange"
+      />
+    </div>
+
     <Message v-show="showMessage" :err="store.errors[0]" />
 
     <div class="editor-floating">
-      <ToggleButton
-        v-if="editorOptions?.isVaporText !== false"
-        v-model="store.isVapor"
-        :text="editorOptions?.isVaporText || 'Vapor Mode'"
-      />
       <ToggleButton
         v-if="editorOptions?.showHiddenText !== false"
         v-model="showHidden"

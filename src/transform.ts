@@ -39,10 +39,7 @@ export async function compileFile(
     }
 
     const { plugins } = store.viteConfig
-    const jsxPlugin = store.isVapor
-      ? await import('./proxy/vue-jsx-vapor').then((i) => i.default)
-      : await import('./proxy/vue-jsx').then((i) => i.default)
-    for (const plugin of [...plugins, jsxPlugin]) {
+    for (const plugin of plugins) {
       const result = plugin.transform?.(code, filename)
       code = typeof result === 'string' ? result : result?.code || code
       if (!plugin.resolveId) continue
@@ -56,7 +53,7 @@ export async function compileFile(
         const loaded = plugin.load?.(resolvedId)
         if (!loaded) continue
 
-        const fileName = addSrcPrefix('unplugin-vue-jsx-vapor/helper.js')
+        const fileName = addSrcPrefix(resolvedId)
         if (!store.files[fileName] || store.files[fileName].code !== loaded) {
           store.files[fileName] = new File(fileName, loaded, true)
           compileFile(store, store.files[fileName])

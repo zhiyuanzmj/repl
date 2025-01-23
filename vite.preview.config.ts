@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 import { globby } from 'globby'
+import Unocss from 'unocss/vite'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), Unocss()],
   resolve: {
     alias: {
       '@vue/compiler-dom': '@vue/compiler-dom/dist/compiler-dom.cjs.js',

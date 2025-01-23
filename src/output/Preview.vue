@@ -188,37 +188,6 @@ async function updatePreview() {
   }
 
   try {
-    const { mainFile } = store.value
-
-    // if SSR, generate the SSR bundle and eval it to render the HTML
-    if (isSSR && mainFile.endsWith('.vue')) {
-      const ssrModules = compileModulesForPreview(store.value, true)
-      console.info(
-        `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`,
-      )
-      await proxy.eval([
-        `const __modules__ = {};`,
-        ...ssrModules,
-        `import { renderToString as _renderToString } from 'vue/server-renderer'
-         import { createSSRApp as _createApp } from 'vue'
-         const AppComponent = __modules__["${mainFile}"].default
-         AppComponent.name = 'Repl'
-         const app = _createApp(AppComponent)
-         if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
-           app.config.unwrapInjectedRef = true
-         }
-         app.config.warnHandler = () => {}
-         window.__ssr_promise__ = _renderToString(app).then(html => {
-           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
-             previewOptions.value?.bodyHTML || ''
-           }\`
-         }).catch(err => {
-           console.error("SSR Error", err)
-         })
-        `,
-      ])
-    }
-
     // compile code to simulated module system
     const modules = compileModulesForPreview(store.value)
     console.info(
@@ -229,46 +198,11 @@ async function updatePreview() {
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
-        `if (window.__app__) window.__app__.unmount();` +
-        (isSSR
-          ? ``
-          : `document.body.innerHTML = '<div id="app"></div>' + \`${
-              previewOptions.value?.bodyHTML || ''
-            }\``),
+        `if (window.__app__) window.__app__.unmount();`,
       ...modules,
       `document.querySelectorAll('style[css]').forEach(el => el.remove())
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
     ]
-
-    // if main file is a vue file, mount it.
-    if (mainFile.endsWith('.tsx')) {
-      codeToEval.push(
-        `import { ${
-          isSSR
-            ? `createSSRApp`
-            : store.value.isVapor
-              ? `createVaporApp`
-              : `createApp`
-        } as _createApp } from "vue${store.value.isVapor ? '/vapor' : ''}"
-        ${previewOptions.value?.customCode?.importCode || ''}
-        const _mount = () => {
-          const AppComponent = __modules__["${mainFile}"]?.default
-          if(!AppComponent) return
-          const app = window.__app__ = _createApp(AppComponent)
-          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
-            app.config.unwrapInjectedRef = true
-          }
-          app.config.errorHandler = e => console.error(e)
-          ${previewOptions.value?.customCode?.useCode || ''}
-          app.mount('#app')
-        }
-        if (window.__ssr_promise__) {
-          window.__ssr_promise__.then(_mount)
-        } else {
-          _mount()
-        }`,
-      )
-    }
 
     // eval code in sandbox
     await proxy.eval(codeToEval)

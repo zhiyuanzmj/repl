@@ -1,70 +1,70 @@
 import { languages } from 'monaco-editor-core'
 
-// export const html: languages.LanguageConfiguration = {
-//   comments: {
-//     blockComment: ['<!--', '-->'],
-//   },
-//   brackets: [
-//     ['<!--', '-->'],
-//     ['{', '}'],
-//     ['(', ')'],
-//   ],
-//   autoClosingPairs: [
-//     { open: '{', close: '}' },
-//     { open: '[', close: ']' },
-//     { open: '(', close: ')' },
-//     { open: "'", close: "'" },
-//     { open: '"', close: '"' },
-//     { open: '<!--', close: '-->', notIn: ['comment', 'string'] },
-//   ],
-//   surroundingPairs: [
-//     { open: "'", close: "'" },
-//     { open: '"', close: '"' },
-//     { open: '{', close: '}' },
-//     { open: '[', close: ']' },
-//     { open: '(', close: ')' },
-//     { open: '<', close: '>' },
-//   ],
-//   colorizedBracketPairs: [],
-//   folding: {
-//     markers: {
-//       start: /^\s*<!--\s*#region\b.*-->/,
-//       end: /^\s*<!--\s*#endregion\b.*-->/,
-//     },
-//   },
-//   wordPattern: new RegExp(
-//     '(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\$\\^\\&\\*\\(\\)\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\\'\\"\\,\\.\\<\\>\\/\\s]+)',
-//   ),
-//   onEnterRules: [
-//     {
-//       beforeText: new RegExp(
-//         '<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^\'"/>]|"[^"]*"|\'[^\']*\')*?(?!\\/)>)[^<]*$',
-//         'i',
-//       ),
-//       afterText: new RegExp('^<\\/([_:\\w][_:\\w-.\\d]*)\\s*>', 'i'),
-//       action: {
-//         indentAction: languages.IndentAction.IndentOutdent,
-//       },
-//     },
-//     {
-//       beforeText: new RegExp(
-//         '<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^\'"/>]|"[^"]*"|\'[^\']*\')*?(?!\\/)>)[^<]*$',
-//         'i',
-//       ),
-//       action: {
-//         indentAction: languages.IndentAction.Indent,
-//       },
-//     },
-//   ],
-//   indentationRules: {
-//     increaseIndentPattern: new RegExp(
-//       '<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|keygen|link|menuitem|meta|param|source|track|wbr)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}"\']*$',
-//     ),
-//     decreaseIndentPattern: new RegExp(
-//       '^\\s*(<\\/(?!html)[-_\\.A-Za-z0-9]+\\b[^>]*>|-->|\\})',
-//     ),
-//   },
-// }
+export const html: languages.LanguageConfiguration = {
+  comments: {
+    blockComment: ['<!--', '-->'],
+  },
+  brackets: [
+    ['<!--', '-->'],
+    ['{', '}'],
+    ['(', ')'],
+  ],
+  autoClosingPairs: [
+    { open: '{', close: '}' },
+    { open: '[', close: ']' },
+    { open: '(', close: ')' },
+    { open: "'", close: "'" },
+    { open: '"', close: '"' },
+    { open: '<!--', close: '-->', notIn: ['comment', 'string'] },
+  ],
+  surroundingPairs: [
+    { open: "'", close: "'" },
+    { open: '"', close: '"' },
+    { open: '{', close: '}' },
+    { open: '[', close: ']' },
+    { open: '(', close: ')' },
+    { open: '<', close: '>' },
+  ],
+  colorizedBracketPairs: [],
+  folding: {
+    markers: {
+      start: /^\s*<!--\s*#region\b.*-->/,
+      end: /^\s*<!--\s*#endregion\b.*-->/,
+    },
+  },
+  wordPattern: new RegExp(
+    '(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\$\\^\\&\\*\\(\\)\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\\'\\"\\,\\.\\<\\>\\/\\s]+)',
+  ),
+  onEnterRules: [
+    {
+      beforeText: new RegExp(
+        '<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^\'"/>]|"[^"]*"|\'[^\']*\')*?(?!\\/)>)[^<]*$',
+        'i',
+      ),
+      afterText: new RegExp('^<\\/([_:\\w][_:\\w-.\\d]*)\\s*>', 'i'),
+      action: {
+        indentAction: languages.IndentAction.IndentOutdent,
+      },
+    },
+    {
+      beforeText: new RegExp(
+        '<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^\'"/>]|"[^"]*"|\'[^\']*\')*?(?!\\/)>)[^<]*$',
+        'i',
+      ),
+      action: {
+        indentAction: languages.IndentAction.Indent,
+      },
+    },
+  ],
+  indentationRules: {
+    increaseIndentPattern: new RegExp(
+      '<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|keygen|link|menuitem|meta|param|source|track|wbr)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}"\']*$',
+    ),
+    decreaseIndentPattern: new RegExp(
+      '^\\s*(<\\/(?!html)[-_\\.A-Za-z0-9]+\\b[^>]*>|-->|\\})',
+    ),
+  },
+}
 
 export const css: languages.LanguageConfiguration = {
   comments: {

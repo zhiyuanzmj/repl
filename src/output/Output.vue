@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
 import { computed, inject, useTemplateRef } from 'vue'
-import githubIcon from '../assets/svg/github.svg'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -17,16 +16,14 @@ const props = defineProps<{
 const { store } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
 const modes = computed(() =>
-  props.showCompileOutput
-    ? (['preview', 'js', 'css', 'ssr'] as const)
-    : (['preview'] as const),
+  props.showCompileOutput ? (['js', 'css'] as const) : ([] as const),
 )
 
 const mode = computed<OutputModes>({
   get: () =>
     (modes.value as readonly string[]).includes(store.value.outputMode)
       ? store.value.outputMode
-      : 'preview',
+      : 'js',
   set(value) {
     if ((modes.value as readonly string[]).includes(store.value.outputMode)) {
       store.value.outputMode = value
@@ -46,33 +43,46 @@ defineExpose({ reload, previewRef })
 </script>
 
 <template>
-  <div class="tab-buttons">
-    <button
-      v-for="m of modes"
-      :key="m"
-      :class="{ active: mode === m }"
-      @click="mode = m"
-    >
-      <span>{{ m }}</span>
-    </button>
+  <div class="flex">
+    <div class="tab-buttons flex-1">
+      <button
+        v-for="m of modes"
+        :key="m"
+        :class="{ active: mode === m }"
+        @click="mode = m"
+      >
+        <span>{{ m }}</span>
+      </button>
+    </div>
+    <div class="tab-buttons flex-1">
+      <button class="active">
+        <span>preview</span>
+      </button>
 
-    <button
-      style="margin-left: auto; margin-right: 8px; margin-top: 4px"
-      @click="jumpToGithub"
-    >
-      <img :src="githubIcon" />
-    </button>
+      <select
+        v-model="store.preset"
+        class="ml-auto h-6 my-auto bg-black text-white rounded outline-none px-1"
+      >
+        <option v-for="(_, name) in store.presets" :key="name">
+          {{ name }}
+        </option>
+      </select>
+
+      <button
+        class="i-custom:github w-6 h-full mx-2! mt-3"
+        @click="jumpToGithub"
+      />
+    </div>
   </div>
 
   <div class="output-container">
-    <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
-      v-if="mode !== 'preview'"
       readonly
       :filename="store.activeFile.filename"
       :value="store.activeFile.compiled[mode]"
       :mode="mode"
     />
+    <Preview ref="preview" :show="true" :ssr="ssr" />
   </div>
 </template>
 
@@ -80,6 +90,7 @@ defineExpose({ reload, previewRef })
 .output-container {
   height: calc(100% - var(--header-height));
   overflow: hidden;
+  display: flex;
   position: relative;
 }
 

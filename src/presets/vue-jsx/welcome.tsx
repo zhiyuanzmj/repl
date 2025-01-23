@@ -1,14 +1,14 @@
-import { ref, shallowRef as useRef } from 'vue'
+import { defineComponent, ref, shallowRef as useRef } from 'vue'
 
-export default () => {
+export default defineComponent(() => {
   const count = ref(0)
 
-  const buttonRef = useRef()
+  const buttonRef = useRef(null)
   setTimeout(() => {
-    buttonRef.value?.click()
+    buttonRef.value && buttonRef.value.click()
   }, 1000)
 
-  return (
+  return () => (
     <>
       <button onClick={() => count.value++} ref={buttonRef}>
         +
@@ -20,4 +20,4 @@ export default () => {
       <div v-else>lt {count.value}</div>
     </>
   )
-}
+})

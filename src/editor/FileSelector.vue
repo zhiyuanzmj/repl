@@ -2,6 +2,7 @@
 import { injectKeyProps } from '../../src/types'
 import {
   importMapFile,
+  indexHtmlFile,
   stripSrcPrefix,
   tsMacroConfigFile,
   tsconfigFile,
@@ -135,10 +136,16 @@ function horizontalScroll(e: WheelEvent) {
         class="file"
         :class="{ active: store.activeFile.filename === file }"
         @click="store.setActive(file)"
-        @dblclick="i > 0 && editFileName(file)"
+        @dblclick="
+          ![store.mainFile, indexHtmlFile].includes(file) && editFileName(file)
+        "
       >
         <span class="label">{{ stripSrcPrefix(file) }}</span>
-        <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
+        <span
+          v-if="![store.mainFile, indexHtmlFile].includes(file)"
+          class="remove"
+          @click.stop="store.deleteFile(file)"
+        >
           <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
             <line stroke="#999" x1="18" y1="6" x2="6" y2="18" />
             <line stroke="#999" x1="6" y1="6" x2="18" y2="18" />
@@ -167,7 +174,7 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="store.files[viteConfigFile]"
         class="file"
-        :class="{ active: store.activeFile.filename === viteConfigFile }"
+        :class="{ active: store.activeConfigFile.filename === viteConfigFile }"
         @click="store.setActive(viteConfigFile)"
       >
         <span class="label">{{ viteConfigFile }}</span>
@@ -175,7 +182,9 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="store.files[tsMacroConfigFile]"
         class="file"
-        :class="{ active: store.activeFile.filename === tsMacroConfigFile }"
+        :class="{
+          active: store.activeConfigFile.filename === tsMacroConfigFile,
+        }"
         @click="store.setActive(tsMacroConfigFile)"
       >
         <span class="label">{{ tsMacroConfigFile }}</span>
@@ -183,7 +192,7 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="showHidden && showTsConfig && store.files[tsconfigFile]"
         class="file"
-        :class="{ active: store.activeFile.filename === tsconfigFile }"
+        :class="{ active: store.activeConfigFile.filename === tsconfigFile }"
         @click="store.setActive(tsconfigFile)"
       >
         <span class="label">tsconfig.json</span>
@@ -191,7 +200,7 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="showHidden && showImportMap"
         class="file"
-        :class="{ active: store.activeFile.filename === importMapFile }"
+        :class="{ active: store.activeConfigFile.filename === importMapFile }"
         @click="store.setActive(importMapFile)"
       >
         <span class="label">Import Map</span>

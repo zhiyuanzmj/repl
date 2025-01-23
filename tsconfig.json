@@ -19,5 +19,5 @@
     "skipLibCheck": true
   },
   "include": ["src", "test", "vite.config.ts"],
-  "exclude": ["src/template"]
+  "exclude": ["src/presets"]
 }
