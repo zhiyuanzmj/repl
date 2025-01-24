@@ -1,17 +1,17 @@
-# @vue/repl
+# jsx-repl
 
-Vue SFC REPL as a Vue 3 component.
+JSX REPL, support Vite plugins and Volar plugins.
 
 ## Basic Usage
 
-**Note: `@vue/repl` >= 2 now supports Monaco Editor, but also requires explicitly passing in the editor to be used for tree-shaking.**
+**Note: `jsx-repl` supports Monaco Editor, but also requires explicitly passing in the editor to be used for tree-shaking.**
 
 ```ts
 // vite.config.ts
 import { defineConfig } from 'vite'
 export default defineConfig({
   optimizeDeps: {
-    exclude: ['@vue/repl'],
+    exclude: ['jsx-repl'],
   },
   // ...
 })
@@ -23,10 +23,8 @@ Basic editing experience with no intellisense. Lighter weight, fewer network req
 
 ```vue
 <script setup>
-import { Repl } from '@vue/repl'
-import CodeMirror from '@vue/repl/codemirror-editor'
-// import '@vue/repl/style.css'
-// ^ no longer needed after 3.0
+import { Repl } from 'jsx-repl'
+import CodeMirror from 'jsx-repl/codemirror-editor'
 </script>
 
 <template>
@@ -40,10 +38,8 @@ With Volar support, autocomplete, type inference, and semantic highlighting. Hea
 
 ```vue
 <script setup>
-import { Repl } from '@vue/repl'
-import Monaco from '@vue/repl/monaco-editor'
-// import '@vue/repl/style.css'
-// ^ no longer needed after 3.0
+import { Repl } from 'jsx-repl'
+import Monaco from 'jsx-repl/monaco-editor'
 </script>
 
 <template>
@@ -60,8 +56,8 @@ See [v4 Migration Guide](https://github.com/vuejs/repl/releases/tag/v4.0.0)
 ```vue
 <script setup>
 import { watchEffect, ref } from 'vue'
-import { Repl, useStore, useVueImportMap } from '@vue/repl'
-import Monaco from '@vue/repl/monaco-editor'
+import { Repl, useStore, useVueImportMap } from 'jsx-repl'
+import Monaco from 'jsx-repl/monaco-editor'
 
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search)

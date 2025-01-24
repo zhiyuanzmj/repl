@@ -41,8 +41,7 @@ function dragMove(e: MouseEvent) {
       ? containerRef.value.offsetHeight
       : containerRef.value.offsetWidth
     const dp = position - startPosition
-    const offset = +((dp / totalSize) * 100).toFixed(2)
-    state.split = isVertical.value ? startSplit - offset : startSplit + offset
+    state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
 
     changeViewSize()
   }
@@ -160,7 +159,7 @@ function changeViewSize() {
 /* vertical */
 @media (min-width: 721px) {
   .split-pane.vertical {
-    flex-direction: column-reverse;
+    display: block;
   }
 
   .split-pane.vertical.dragging {
@@ -168,12 +167,12 @@ function changeViewSize() {
   }
 
   .vertical .dragger {
-    top: -5px;
+    top: auto;
     height: 10px;
     width: 100%;
     left: 0;
     right: 0;
-    bottom: auto;
+    bottom: -5px;
     cursor: ns-resize;
   }
 

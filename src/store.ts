@@ -21,6 +21,7 @@ export const viteConfigFile = 'vite.config.ts'
 export const tsMacroConfigFile = 'tsm.config.ts'
 export const indexHtmlFile = 'src/index.html'
 export const welcomeFile = 'src/App.tsx'
+export const configFileNames = [importMapFile, tsconfigFile, tsMacroConfigFile, viteConfigFile]
 
 export function useStore(
   {
@@ -47,7 +48,7 @@ export function useStore(
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
-    ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
+    ; ({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
       vueVersion: vueVersion.value,
     }))
   }
@@ -147,11 +148,7 @@ export function useStore(
   }
 
   const setActive: Store['setActive'] = (filename) => {
-    if (
-      [viteConfigFile, tsMacroConfigFile, tsconfigFile, importMapFile].includes(
-        filename,
-      )
-    )
+    if (configFileNames.includes(filename))
       activeConfigFilename.value = filename
     else activeFilename.value = filename
   }
@@ -260,7 +257,7 @@ export function useStore(
     }
     return (store.viteConfig = await import(
       'data:text/javascript;charset=utf-8,' +
-        encodeURIComponent(addEsmPrefix(code, importMap.value))
+      encodeURIComponent(addEsmPrefix(code, importMap.value))
     ).then((i) => i.default))
   }
 
@@ -352,7 +349,7 @@ export function useStore(
     setActive(store.mainFile)
   }
   const setDefaultFile = (): void => {
-    setFile(files.value, indexHtmlFile, template.value.indexHtml, true)
+    setFile(files.value, indexHtmlFile, template.value.indexHtml)
     setFile(files.value, welcomeFile, template.value.welcome)
     setFile(files.value, viteConfigFile, template.value.viteConfig)
     setFile(files.value, tsMacroConfigFile, tsMacroConfigCode.value)
@@ -531,7 +528,7 @@ export class File {
     public filename: string,
     public code = '',
     public hidden = false,
-  ) {}
+  ) { }
 
   get language() {
     if (this.filename.endsWith('.vue')) {
@@ -551,10 +548,7 @@ export class File {
 }
 
 export function addSrcPrefix(file: string) {
-  return file === importMapFile ||
-    file === tsconfigFile ||
-    file === viteConfigFile ||
-    file === tsMacroConfigFile ||
+  return configFileNames.includes(file) ||
     file.startsWith('src/')
     ? file
     : `src/${file}`

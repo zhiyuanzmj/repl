@@ -191,7 +191,7 @@ async function updatePreview() {
     // compile code to simulated module system
     const modules = compileModulesForPreview(store.value)
     console.info(
-      `[@vue/repl] successfully compiled ${modules.length} module${
+      `[jsx-repl] successfully compiled ${modules.length} module${
         modules.length > 1 ? `s` : ``
       }.`,
     )

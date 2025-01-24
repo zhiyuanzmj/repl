@@ -2,9 +2,11 @@
 import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import ToggleButton from './ToggleButton.vue'
 import { type EditorComponentType, injectKeyProps } from '../types'
+import { type File, configFileNames } from '../store'
+import SplitPane from '../SplitPane.vue'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
 
@@ -12,7 +14,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store, autoSave, showHidden, editorOptions } = inject(injectKeyProps)!
+const { store, autoSave, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
@@ -35,51 +37,69 @@ function getItem() {
 watch(showMessage, () => {
   setItem()
 })
+
+
+const resolvedFiles = computed(()=>{
+  const result =[{},{}] as Record<string,File>[]
+  for(const [name,file] of Object.entries(store.value.files)){
+    if(configFileNames.includes(name)){
+      result[1][name]=file
+    }else{
+      result[0][name]=file
+    }
+  }
+  return result
+})
 </script>
 
 <template>
-  <FileSelector />
-  <div class="editor-container">
-    <div class="flex h-full">
-      <props.editorComponent
-        class="flex-1"
-        :value="store.activeFile.code"
-        :filename="store.activeFile.filename"
-        @change="onChange"
-      />
-      <props.editorComponent
-        class="flex-1"
-        :value="store.activeConfigFile.code"
-        :filename="store.activeConfigFile.filename"
-        @change="onConfigChange"
-      />
-    </div>
+  <SplitPane layout="vertical">
+    <template #left>
+      <div class="editor-container">
+        <FileSelector :files="resolvedFiles[0]" :active-file="store.activeFile" />
+        <props.editorComponent
+          :value="store.activeFile.code"
+          :filename="store.activeFile.filename"
+          @change="onChange"
+        />
+      </div>
+    </template>
+    <template #right>
+      <div class="editor-container">
+        <FileSelector :files="resolvedFiles[1]" :active-file="store.activeConfigFile" disabled />
+        <props.editorComponent
+          :value="store.activeConfigFile.code"
+          :filename="store.activeConfigFile.filename"
+          @change="onConfigChange"
+        />
+      </div>
+    </template>
+  </SplitPane>
 
-    <Message v-show="showMessage" :err="store.errors[0]" />
+  <Message v-show="showMessage" :err="store.errors[0]" />
 
-    <div class="editor-floating">
-      <ToggleButton
-        v-if="editorOptions?.showHiddenText !== false"
-        v-model="showHidden"
-        :text="editorOptions?.showHiddenText || 'Hidden Files'"
-      />
-      <ToggleButton
-        v-if="editorOptions?.showErrorText !== false"
-        v-model="showMessage"
-        :text="editorOptions?.showErrorText || 'Show Error'"
-      />
-      <ToggleButton
-        v-if="editorOptions?.autoSaveText !== false"
-        v-model="autoSave"
-        :text="editorOptions?.autoSaveText || 'Auto Save'"
-      />
-    </div>
+  <div class="editor-floating">
+    <ToggleButton
+      v-if="editorOptions?.virtualFilesText !== false"
+      v-model="virtualFiles"
+      :text="editorOptions?.virtualFilesText || 'Virtual Files'"
+    />
+    <ToggleButton
+      v-if="editorOptions?.showErrorText !== false"
+      v-model="showMessage"
+      :text="editorOptions?.showErrorText || 'Show Error'"
+    />
+    <ToggleButton
+      v-if="editorOptions?.autoSaveText !== false"
+      v-model="autoSave"
+      :text="editorOptions?.autoSaveText || 'Auto Save'"
+    />
   </div>
 </template>
 
 <style scoped>
 .editor-container {
-  height: calc(100% - var(--header-height));
+  height: 100%;
   overflow: hidden;
   position: relative;
 }

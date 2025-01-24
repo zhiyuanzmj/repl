@@ -14,9 +14,6 @@ importers:
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.17.0
-      '@iconify/utils':
-        specifier: ^2.2.1
-        version: 2.2.1
       '@rollup/plugin-replace':
         specifier: ^6.0.2
         version: 6.0.2(rollup@4.29.1)

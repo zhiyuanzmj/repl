@@ -6,6 +6,8 @@ import {
   type OutputModes,
   injectKeyProps,
 } from '../types'
+import SplitPane from '../SplitPane.vue';
+import githubIcon from '../assets/svg/github.svg'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -43,63 +45,66 @@ defineExpose({ reload, previewRef })
 </script>
 
 <template>
-  <div class="flex">
-    <div class="tab-buttons flex-1">
-      <button
-        v-for="m of modes"
-        :key="m"
-        :class="{ active: mode === m }"
-        @click="mode = m"
-      >
-        <span>{{ m }}</span>
-      </button>
-    </div>
-    <div class="tab-buttons flex-1">
-      <button class="active">
-        <span>preview</span>
-      </button>
+  <SplitPane layout="vertical">
+    <template #left>
+      <div class="flex-1 h-full">
+        <div class="tab-buttons">
+          <button class="active">
+            <span>preview</span>
+          </button>
 
-      <select
-        v-model="store.preset"
-        class="ml-auto h-6 my-auto bg-black text-white rounded outline-none px-1"
-      >
-        <option v-for="(_, name) in store.presets" :key="name">
-          {{ name }}
-        </option>
-      </select>
+          <div class="ml-auto flex items-center gap-2 pr-2">
+            <select
+              v-model="store.preset"
+              class="ml-auto h-6 my-auto bg-black text-white rounded outline-none px-1"
+            >
+              <option v-for="(_, name) in store.presets" :key="name">
+                {{ name }}
+              </option>
+            </select>
 
-      <button
-        class="i-custom:github w-6 h-full mx-2! mt-3"
-        @click="jumpToGithub"
-      />
-    </div>
-  </div>
+            <button
+              @click="jumpToGithub"
+            >
+              <img class="h7 mt-1" :src="githubIcon" />
+            </button>
+          </div>
+        </div>
+        <Preview ref="preview" show :ssr="ssr" />
+      </div>
+    </template>
 
-  <div class="output-container">
-    <props.editorComponent
-      readonly
-      :filename="store.activeFile.filename"
-      :value="store.activeFile.compiled[mode]"
-      :mode="mode"
-    />
-    <Preview ref="preview" :show="true" :ssr="ssr" />
-  </div>
+    <template #right>
+      <div class="flex h-full flex-1 flex-col overflow-hidden">
+        <div class="tab-buttons">
+          <button
+            v-for="m of modes"
+            :key="m"
+            :class="{ active: mode === m }"
+            @click="mode = m"
+          >
+            <span>{{ m }}</span>
+          </button>
+        </div>
+
+        <props.editorComponent
+          readonly
+          :filename="store.activeFile.filename"
+          :value="store.activeFile.compiled[mode]"
+          :mode="mode"
+        />
+      </div>
+    </template>
+  </SplitPane>
 </template>
 
 <style scoped>
-.output-container {
-  height: calc(100% - var(--header-height));
-  overflow: hidden;
-  display: flex;
-  position: relative;
-}
-
 .tab-buttons {
   display: flex;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
-  height: var(--header-height);
+  min-height: var(--header-height);
   overflow: hidden;
 }
 .tab-buttons button {

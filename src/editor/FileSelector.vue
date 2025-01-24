@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
 import {
-  importMapFile,
+  type File,
   indexHtmlFile,
   stripSrcPrefix,
-  tsMacroConfigFile,
-  tsconfigFile,
-  viteConfigFile,
 } from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
-const { store, showTsConfig, showHidden, showImportMap } =
+const { store, virtualFiles } =
   inject(injectKeyProps)!
 
 /**
@@ -25,15 +22,18 @@ const pending = ref<boolean | string>(false)
  */
 const pendingFilename = ref('Comp.tsx')
 
+const props =defineProps<{
+  files: Record<string,File>
+    activeFile: File
+    disabled?: boolean
+}>()
+
+
 const files = computed(() =>
-  Object.entries(store.value.files)
+  Object.entries(props.files)
     .filter(
-      ([name, file]) =>
-        name !== importMapFile &&
-        name !== tsconfigFile &&
-        name !== tsMacroConfigFile &&
-        name !== viteConfigFile &&
-        (showHidden?.value ? true : !file.hidden),
+      ([_, file]) =>
+        (virtualFiles?.value ? true : !file.hidden),
     )
     .map(([name]) => name),
 )
@@ -127,14 +127,13 @@ function horizontalScroll(e: WheelEvent) {
   <div
     ref="fileSelector"
     class="file-selector"
-    :class="{ 'has-import-map': showImportMap }"
     @wheel="horizontalScroll"
   >
     <template v-for="(file, i) in files" :key="file">
       <div
         v-if="pending !== file"
         class="file"
-        :class="{ active: store.activeFile.filename === file }"
+        :class="{ active: activeFile.filename === file }"
         @click="store.setActive(file)"
         @dblclick="
           ![store.mainFile, indexHtmlFile].includes(file) && editFileName(file)
@@ -142,7 +141,7 @@ function horizontalScroll(e: WheelEvent) {
       >
         <span class="label">{{ stripSrcPrefix(file) }}</span>
         <span
-          v-if="![store.mainFile, indexHtmlFile].includes(file)"
+          v-if="![store.mainFile, indexHtmlFile].includes(file) && !disabled"
           class="remove"
           @click.stop="store.deleteFile(file)"
         >
@@ -168,44 +167,7 @@ function horizontalScroll(e: WheelEvent) {
         />
       </div>
     </template>
-    <button class="add" @click="startAddFile">+</button>
-
-    <div class="import-map-wrapper">
-      <div
-        v-if="store.files[viteConfigFile]"
-        class="file"
-        :class="{ active: store.activeConfigFile.filename === viteConfigFile }"
-        @click="store.setActive(viteConfigFile)"
-      >
-        <span class="label">{{ viteConfigFile }}</span>
-      </div>
-      <div
-        v-if="store.files[tsMacroConfigFile]"
-        class="file"
-        :class="{
-          active: store.activeConfigFile.filename === tsMacroConfigFile,
-        }"
-        @click="store.setActive(tsMacroConfigFile)"
-      >
-        <span class="label">{{ tsMacroConfigFile }}</span>
-      </div>
-      <div
-        v-if="showHidden && showTsConfig && store.files[tsconfigFile]"
-        class="file"
-        :class="{ active: store.activeConfigFile.filename === tsconfigFile }"
-        @click="store.setActive(tsconfigFile)"
-      >
-        <span class="label">tsconfig.json</span>
-      </div>
-      <div
-        v-if="showHidden && showImportMap"
-        class="file"
-        :class="{ active: store.activeConfigFile.filename === importMapFile }"
-        @click="store.setActive(importMapFile)"
-      >
-        <span class="label">Import Map</span>
-      </div>
-    </div>
+    <button v-if="!disabled" class="add" @click="startAddFile">+</button>
   </div>
 </template>
 
@@ -232,10 +194,6 @@ function horizontalScroll(e: WheelEvent) {
 
 .file-selector::-webkit-scrollbar-thumb {
   background-color: var(--color-branding);
-}
-
-.file-selector.has-import-map .add {
-  margin-right: 10px;
 }
 
 .file {
@@ -298,25 +256,5 @@ function horizontalScroll(e: WheelEvent) {
 }
 .icon {
   margin-top: -1px;
-}
-.import-map-wrapper {
-  position: sticky;
-  margin-left: auto;
-  top: 0;
-  right: 0;
-  padding-left: 30px;
-  background-color: var(--bg);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 1) 25%
-  );
-}
-.dark .import-map-wrapper {
-  background: linear-gradient(
-    90deg,
-    rgba(26, 26, 26, 0) 0%,
-    rgba(26, 26, 26, 1) 25%
-  );
 }
 </style>

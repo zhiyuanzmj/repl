@@ -19,8 +19,6 @@ export interface Props {
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
-  showImportMap?: boolean
-  showTsConfig?: boolean
   clearConsole?: boolean
   layout?: 'horizontal' | 'vertical'
   layoutReverse?: boolean
@@ -38,7 +36,7 @@ export interface Props {
   }
   editorOptions?: {
     showErrorText?: string | false
-    showHiddenText?: string | false
+    virtualFilesText?: string | false
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
@@ -49,15 +47,13 @@ export interface Props {
 }
 
 const autoSave = defineModel<boolean>({ default: true })
-const showHidden = useRouteQuery<boolean>('showHidden', false)
+const virtualFiles = useRouteQuery<boolean>('virtual-files', false)
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
   showCompileOutput: true,
-  showImportMap: true,
-  showTsConfig: true,
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
@@ -81,7 +77,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 provide(injectKeyProps, {
   ...toRefs(props),
   autoSave,
-  showHidden,
+  virtualFiles,
 })
 provide(
   injectKeyPreviewRef,

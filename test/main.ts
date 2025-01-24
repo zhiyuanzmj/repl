@@ -59,13 +59,12 @@ export default {
         theme: theme.value,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
-        layout: 'vertical',
+        // layout: 'vertical',
         ssr: false,
         // showCompileOutput: false,
-        // showImportMap: false
         editorOptions: {
           autoSaveText: 'Auto Save',
-          showHiddenText: 'Hidden Files',
+          virtualFilesText: 'Virtual Files',
           monacoOptions: {
             // wordWrap: 'on',
           },
