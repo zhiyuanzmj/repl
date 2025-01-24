@@ -15,7 +15,7 @@ import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { injectKeyProps } from '../../src/types'
 
-const props = defineProps<{ show: boolean; ssr: boolean }>()
+defineProps<{ show: boolean; ssr: boolean }>()
 
 const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
