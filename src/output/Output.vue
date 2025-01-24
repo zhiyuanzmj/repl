@@ -6,7 +6,7 @@ import {
   type OutputModes,
   injectKeyProps,
 } from '../types'
-import SplitPane from '../SplitPane.vue';
+import SplitPane from '../SplitPane.vue'
 import githubIcon from '../assets/svg/github.svg'
 
 const props = defineProps<{
@@ -63,9 +63,7 @@ defineExpose({ reload, previewRef })
               </option>
             </select>
 
-            <button
-              @click="jumpToGithub"
-            >
+            <button @click="jumpToGithub">
               <img class="h7 mt-1" :src="githubIcon" />
             </button>
           </div>

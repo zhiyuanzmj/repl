@@ -21,7 +21,12 @@ export const viteConfigFile = 'vite.config.ts'
 export const tsMacroConfigFile = 'tsm.config.ts'
 export const indexHtmlFile = 'src/index.html'
 export const welcomeFile = 'src/App.tsx'
-export const configFileNames = [importMapFile, tsconfigFile, tsMacroConfigFile, viteConfigFile]
+export const configFileNames = [
+  importMapFile,
+  tsconfigFile,
+  tsMacroConfigFile,
+  viteConfigFile,
+]
 
 export function useStore(
   {
@@ -48,7 +53,7 @@ export function useStore(
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
-    ; ({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
+    ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
       vueVersion: vueVersion.value,
     }))
   }
@@ -257,7 +262,7 @@ export function useStore(
     }
     return (store.viteConfig = await import(
       'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(addEsmPrefix(code, importMap.value))
+        encodeURIComponent(addEsmPrefix(code, importMap.value))
     ).then((i) => i.default))
   }
 
@@ -528,7 +533,7 @@ export class File {
     public filename: string,
     public code = '',
     public hidden = false,
-  ) { }
+  ) {}
 
   get language() {
     if (this.filename.endsWith('.vue')) {
@@ -548,8 +553,7 @@ export class File {
 }
 
 export function addSrcPrefix(file: string) {
-  return configFileNames.includes(file) ||
-    file.startsWith('src/')
+  return configFileNames.includes(file) || file.startsWith('src/')
     ? file
     : `src/${file}`
 }

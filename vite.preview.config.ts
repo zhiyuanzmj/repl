@@ -16,18 +16,6 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
   build: {
-    rollupOptions: {
-      external: ['node:worker_threads', 'unconfig'],
-      plugins: [
-        {
-          name: 'remove unconfig',
-          renderChunk(code) {
-            return code.replaceAll(/import\s+["']unconfig["'];?\n?/g, '')
-          },
-        },
-      ],
-      treeshake: true,
-    },
     lib: {
       entry: ['index.html', ...(await globby(['./src/proxy/*.ts']))],
       name: 'lib',

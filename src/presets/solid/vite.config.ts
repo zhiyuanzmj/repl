@@ -13,11 +13,9 @@ export default {
       name: 'vite-plugin-solid',
       transform(src, id) {
         if (id.match(/\.[jt]sx$/))
-          return (
-            transform(src, {
-              presets: [jsx],
-            }).code
-          )
+          return transform(src, {
+            presets: [jsx],
+          }).code
       },
     },
   ],

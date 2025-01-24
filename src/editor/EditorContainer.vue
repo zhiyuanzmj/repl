@@ -38,14 +38,13 @@ watch(showMessage, () => {
   setItem()
 })
 
-
-const resolvedFiles = computed(()=>{
-  const result =[{},{}] as Record<string,File>[]
-  for(const [name,file] of Object.entries(store.value.files)){
-    if(configFileNames.includes(name)){
-      result[1][name]=file
-    }else{
-      result[0][name]=file
+const resolvedFiles = computed(() => {
+  const result = [{}, {}] as Record<string, File>[]
+  for (const [name, file] of Object.entries(store.value.files)) {
+    if (configFileNames.includes(name)) {
+      result[1][name] = file
+    } else {
+      result[0][name] = file
     }
   }
   return result
@@ -56,7 +55,10 @@ const resolvedFiles = computed(()=>{
   <SplitPane layout="vertical">
     <template #left>
       <div class="editor-container">
-        <FileSelector :files="resolvedFiles[0]" :active-file="store.activeFile" />
+        <FileSelector
+          :files="resolvedFiles[0]"
+          :active-file="store.activeFile"
+        />
         <props.editorComponent
           :value="store.activeFile.code"
           :filename="store.activeFile.filename"
@@ -66,7 +68,11 @@ const resolvedFiles = computed(()=>{
     </template>
     <template #right>
       <div class="editor-container">
-        <FileSelector :files="resolvedFiles[1]" :active-file="store.activeConfigFile" disabled />
+        <FileSelector
+          :files="resolvedFiles[1]"
+          :active-file="store.activeConfigFile"
+          disabled
+        />
         <props.editorComponent
           :value="store.activeConfigFile.code"
           :filename="store.activeConfigFile.filename"

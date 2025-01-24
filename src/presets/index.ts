@@ -42,5 +42,5 @@ export const defaultPresets = {
     welcome: solidWelcomeCode,
     new: solidNewCode,
     viteConfig: solidViteConfCode,
-  }
+  },
 }

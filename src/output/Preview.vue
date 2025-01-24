@@ -173,7 +173,6 @@ async function updatePreview() {
   runtimeError.value = undefined
   runtimeWarning.value = undefined
 
-  let isSSR = props.ssr
   if (store.value.vueVersion) {
     const [major, minor, patch] = store.value.vueVersion
       .split('.')
@@ -183,7 +182,6 @@ async function updatePreview() {
         `The selected version of Vue (${store.value.vueVersion}) does not support in-browser SSR.` +
           ` Rendering in client mode instead.`,
       )
-      isSSR = false
     }
   }
 

@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
-import {
-  type File,
-  indexHtmlFile,
-  stripSrcPrefix,
-} from '../store'
+import { type File, indexHtmlFile, stripSrcPrefix } from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
-const { store, virtualFiles } =
-  inject(injectKeyProps)!
+const { store, virtualFiles } = inject(injectKeyProps)!
 
 /**
  * When `true`: indicates adding a new file
@@ -22,19 +17,15 @@ const pending = ref<boolean | string>(false)
  */
 const pendingFilename = ref('Comp.tsx')
 
-const props =defineProps<{
-  files: Record<string,File>
-    activeFile: File
-    disabled?: boolean
+const props = defineProps<{
+  files: Record<string, File>
+  activeFile: File
+  disabled?: boolean
 }>()
-
 
 const files = computed(() =>
   Object.entries(props.files)
-    .filter(
-      ([_, file]) =>
-        (virtualFiles?.value ? true : !file.hidden),
-    )
+    .filter(([_, file]) => (virtualFiles?.value ? true : !file.hidden))
     .map(([name]) => name),
 )
 
@@ -124,11 +115,7 @@ function horizontalScroll(e: WheelEvent) {
 </script>
 
 <template>
-  <div
-    ref="fileSelector"
-    class="file-selector"
-    @wheel="horizontalScroll"
-  >
+  <div ref="fileSelector" class="file-selector" @wheel="horizontalScroll">
     <template v-for="(file, i) in files" :key="file">
       <div
         v-if="pending !== file"
