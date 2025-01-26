@@ -4,6 +4,7 @@ import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
 
 const REGEX_JS = /\.[jt]sx?$/
+const extRE = /\.[^.]+$/
 function testTs(filename: string | undefined | null) {
   return !!(filename && /(\.|\b)tsx?$/.test(filename))
 }
@@ -41,12 +42,7 @@ export async function compileFile(
     return []
   }
 
-  const noExt = !filename.includes('.')
-  if (REGEX_JS.test(filename) || noExt) {
-    const isJSX = testJsx(filename)
-    if (testTs(filename) || noExt) {
-      code = transformTS(code, isJSX)
-    }
+  if (REGEX_JS.test(filename) || !extRE.test(filename)) {
 
     compiled.js = compiled.ssr = await transformVitePlugin(code, filename, compiled, store)
 
@@ -111,6 +107,9 @@ async function transformVitePlugin(code: string, id: string, compiled: File['com
     }
   }
 
+  if (testTs(id) || !extRE.test(id)) {
+    code = await transformTS(code, testJsx(id))
+  }
   return code
 }
 

@@ -461,7 +461,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   activeFile: File
   activeConfigFile: File
   viteConfig: ViteConfig
-  init(): void
+  init(): Promise<void>
   setActive(filename: string): void
   addFile(filename: string | File): void
   deleteFile(filename: string): void

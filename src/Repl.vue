@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef } from 'vue'
+import { computed, provide, ref, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
@@ -69,7 +69,8 @@ if (!props.editor) {
 
 const outputRef = useTemplateRef('output')
 
-props.store.init()
+const done = ref(false)
+props.store.init().then(() => done.value = true)
 
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
@@ -102,9 +103,7 @@ defineExpose({ reload })
       </template>
       <template #[outputSlotName]>
         <Output
-          ref="output"
-          :editor-component="editor"
-          :show-compile-output="props.showCompileOutput"
+          v-if="done" ref="output" :editor-component="editor" :show-compile-output="props.showCompileOutput"
           :ssr="!!props.ssr"
         />
       </template>
