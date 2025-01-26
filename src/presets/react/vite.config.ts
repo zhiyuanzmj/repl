@@ -1,10 +1,14 @@
 // @ts-nocheck
+import transformJsxMacros from '@vue-macros/jsx-macros/api.js'
 import { transformJsxDirective } from '@vue-macros/jsx-directive/api.js'
 import { transform } from '@babel/standalone'
 import jsx from '@babel/plugin-transform-react-jsx'
 
 export default {
   plugins: [
+    transformJsxMacros({
+      lib: 'react'
+    }),
     {
       name: '@vue-macros/jsx-directive',
       transform: transformJsxDirective,

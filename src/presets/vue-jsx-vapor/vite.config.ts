@@ -1,4 +1,5 @@
 // @ts-nocheck
+import transformJsxMacros from '@vue-macros/jsx-macros/api.js'
 import { transformJsxDirective } from '@vue-macros/jsx-directive/api.js'
 import {
   helperCode,
@@ -8,6 +9,9 @@ import {
 
 export default {
   plugins: [
+    transformJsxMacros({
+      lib: 'vue/vapor'
+    }),
     {
       name: '@vue-macros/jsx-directive',
       transform: transformJsxDirective,
@@ -20,7 +24,10 @@ export default {
       load(id) {
         if (id === helperId) return helperCode
       },
-      transform: transformVueJsxVapor,
+      transform(code, id) {
+        if (id.match(/\.[jt]sx$/))
+          return transformVueJsxVapor(code, id)
+      }
     },
   ],
 }

@@ -7,7 +7,7 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import { compileFile } from './transform'
+import { compileFile, cssRE } from './transform'
 import { addEsmPrefix, atou, useRouteQuery, utoa } from './utils'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
@@ -46,52 +46,47 @@ export function useStore(
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
 
-    tsMacroConfigCode = ref(`export default { plugins: [] }`),
     preset = useRouteQuery<string>('preset', 'vue-jsx', false),
     presets = ref(defaultPresets),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
   if (!builtinImportMap) {
-    ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
-      vueVersion: vueVersion.value,
+    ; ({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
+      vueVersion: vueVersion.value
     }))
   }
   const template = computed(() => presets.value[preset.value])
 
-  let importMap = ref({} as ImportMap)
   function applyBuiltinImportMap() {
-    importMap.value = mergeImportMap(builtinImportMap.value, getImportMap())
-    setImportMap(importMap.value)
+    builtinImportMap.value = mergeImportMap(builtinImportMap.value, getImportMap())
+    setImportMap(builtinImportMap.value)
   }
 
   async function init() {
-    // init tsconfig
-    if (!files.value[tsconfigFile]) {
-      files.value[tsconfigFile] = new File(
-        tsconfigFile,
-        JSON.stringify(tsconfig, undefined, 2),
-      )
-    }
-
     watch(preset, () => {
       setFiles(
         {
           [indexHtmlFile]: template.value.indexHtml,
           [welcomeFile]: template.value.welcome,
           [viteConfigFile]: template.value.viteConfig,
-          [tsMacroConfigFile]: tsMacroConfigCode.value,
-          [tsconfigFile]: JSON.stringify(tsconfig, undefined, 2),
+          [tsMacroConfigFile]: template.value.tsmConfig,
+          [tsconfigFile]: template.value.tsconfig,
         },
         welcomeFile,
-      )
+      );
+      if (!builtinImportMap.value.imports) return
+      if (preset.value === 'vue-jsx-vapor')
+        builtinImportMap.value.imports['vue'] = builtinImportMap.value.imports['vue/vapor']
+      else
+        delete builtinImportMap.value.imports['vue']
     })
 
     await getViteConfig()
 
-    watchEffect(() => {
-      compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
-      compileFile(store, activeConfigFile.value).then(
+    watchEffect(async () => {
+      await compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+      await compileFile(store, activeConfigFile.value).then(
         (errs) => (errors.value = errs),
       )
     })
@@ -114,24 +109,23 @@ export function useStore(
       async () => {
         await getViteConfig()
         for (const [_, file] of Object.entries(files.value)) {
-          compileFile(store, file).then((errs) => errors.value.push(...errs))
+          await compileFile(store, file).then((errs) => errors.value.push(...errs))
         }
       },
     )
 
     watch(
-      builtinImportMap,
+      () => files.value[importMapFile]?.code,
       () => {
-        setImportMap(mergeImportMap(getImportMap(), builtinImportMap.value))
+        builtinImportMap.value = getImportMap()
       },
-      { deep: true },
     )
 
     // compile rest of the files
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
       if (filename !== mainFile.value) {
-        compileFile(store, file).then((errs) => errors.value.push(...errs))
+        await compileFile(store, file).then((errs) => errors.value.push(...errs))
       }
     }
   }
@@ -171,18 +165,18 @@ export function useStore(
     if (!file.hidden) setActive(file.filename)
   }
   const deleteFile: Store['deleteFile'] = (filename) => {
-    if (
-      !confirm(`Are you sure you want to delete ${stripSrcPrefix(filename)}?`)
-    ) {
-      return
-    }
+    // if (
+    //   !confirm(`Are you sure you want to delete ${stripSrcPrefix(filename)}?`)
+    // ) {
+    //   return
+    // }
 
     if (activeFilename.value === filename) {
       activeFilename.value = mainFile.value
     }
     delete files.value[filename]
   }
-  const renameFile: Store['renameFile'] = (oldFilename, newFilename) => {
+  const renameFile: Store['renameFile'] = async (oldFilename, newFilename) => {
     const file = files.value[oldFilename]
 
     if (!file) {
@@ -215,7 +209,7 @@ export function useStore(
     if (activeFilename.value === oldFilename) {
       activeFilename.value = newFilename
     } else {
-      compileFile(store, file).then((errs) => (errors.value = errs))
+      await compileFile(store, file).then((errs) => (errors.value = errs))
     }
   }
   const getImportMap: Store['getImportMap'] = () => {
@@ -247,7 +241,7 @@ export function useStore(
     }
     return (
       'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(addEsmPrefix(code, importMap.value))
+      encodeURIComponent(addEsmPrefix(code, builtinImportMap.value))
     )
   }
 
@@ -262,7 +256,7 @@ export function useStore(
     }
     return (store.viteConfig = await import(
       'data:text/javascript;charset=utf-8,' +
-        encodeURIComponent(addEsmPrefix(code, importMap.value))
+      encodeURIComponent(addEsmPrefix(code, builtinImportMap.value))
     ).then((i) => i.default))
   }
 
@@ -357,7 +351,8 @@ export function useStore(
     setFile(files.value, indexHtmlFile, template.value.indexHtml)
     setFile(files.value, welcomeFile, template.value.welcome)
     setFile(files.value, viteConfigFile, template.value.viteConfig)
-    setFile(files.value, tsMacroConfigFile, tsMacroConfigCode.value)
+    setFile(files.value, tsMacroConfigFile, template.value.tsmConfig)
+    setFile(files.value, tsconfigFile, template.value.tsconfig)
   }
 
   if (serializedState) {
@@ -396,10 +391,8 @@ export function useStore(
     dependencyVersion,
     reloadLanguageTools,
     viteConfig,
-    tsMacroConfigCode,
     preset,
     presets,
-    importMap,
 
     init,
     setActive,
@@ -417,23 +410,13 @@ export function useStore(
   return store
 }
 
-const tsconfig = {
-  compilerOptions: {
-    allowJs: true,
-    checkJs: true,
-    jsx: 'Preserve',
-    target: 'ESNext',
-    module: 'ESNext',
-    moduleResolution: 'Bundler',
-    allowImportingTsExtensions: true,
-  },
-}
-
 type Template = {
   indexHtml: string
   welcome: string
   new: string
   viteConfig: string
+  tsmConfig: string
+  tsconfig: string
 }
 
 export type StoreState = ToRefs<{
@@ -448,7 +431,6 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   vueVersion: string | null
-  importMap: ImportMap
 
   // volar-related
   locale: string | undefined
@@ -457,7 +439,6 @@ export type StoreState = ToRefs<{
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
 
-  tsMacroConfigCode: string
   preset: string
   presets: Record<string, Template>
 }>
@@ -466,6 +447,7 @@ export type VitePlugin = {
   name?: string
   resolveId?: (id: string) => string | null | undefined
   load?: (id: string) => string | null | undefined
+  transformInclude?: (id: string) => boolean
   transform?: (
     code: string,
     id: string,
@@ -518,7 +500,7 @@ export type Store = Pick<
   | 'getTsMacroConfig'
   | 'preset'
   | 'presets'
-  | 'importMap'
+  | 'builtinImportMap'
 >
 
 export class File {
@@ -533,7 +515,7 @@ export class File {
     public filename: string,
     public code = '',
     public hidden = false,
-  ) {}
+  ) { }
 
   get language() {
     if (this.filename.endsWith('.vue')) {
@@ -542,7 +524,7 @@ export class File {
     if (this.filename.endsWith('.html')) {
       return 'html'
     }
-    if (this.filename.endsWith('.css')) {
+    if (cssRE.test(this.filename)) {
       return 'css'
     }
     if (this.filename.endsWith('.ts')) {
@@ -553,9 +535,10 @@ export class File {
 }
 
 export function addSrcPrefix(file: string) {
+  const sep = file.startsWith('/') ? '' : '/'
   return configFileNames.includes(file) || file.startsWith('src/')
     ? file
-    : `src/${file}`
+    : `src${sep}${file}`
 }
 
 export function stripSrcPrefix(file: string) {

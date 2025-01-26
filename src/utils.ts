@@ -1,4 +1,5 @@
 import { strFromU8, strToU8, unzlibSync, zlibSync } from 'fflate'
+import { MagicString } from 'vue/compiler-sfc'
 
 export function debounce(fn: Function, n = 100) {
   let handle: any
@@ -66,20 +67,14 @@ export function useRouteQuery<T extends string | boolean>(
   }) as unknown as Ref<T>
 }
 
-const esmRE = /(?<=from\s+['"])(?!http|\.|\/)[^'"]+(?=['"])/
-export function addEsmPrefix(code: string, importMap: ImportMap) {
-  const match = code.match(esmRE)
-  if (match) {
-    if (importMap?.imports?.[match[0]]) {
-      code =
-        code.slice(0, match.index) +
-        importMap.imports[match[0]] +
-        code.slice(match.index! + match[0].length)
-    } else {
-      code =
-        code.slice(0, match.index) + 'https://esm.sh/' + code.slice(match.index)
+const esmRE = /(?<=(?:from|import)\s+['"])(?!http|\.|\/)[^'"]+(?=['"])/g
+export function addEsmPrefix(code: string, importMap?: ImportMap) {
+  const s = new MagicString(code)
+  const matches = code.matchAll(esmRE)
+  for (let match of matches) {
+    if (!importMap?.imports?.[match[0]]) {
+      s.appendLeft(match.index, 'https://esm.sh/')
     }
-    return addEsmPrefix(code, importMap)
   }
-  return code
+  return s.toString()
 }

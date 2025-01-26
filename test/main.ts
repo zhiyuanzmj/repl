@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
-import { type OutputModes, Repl, useStore } from '../src'
+import { mergeImportMap, type OutputModes, Repl, useStore, useVueImportMap } from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
@@ -14,22 +14,23 @@ window.process = { env: {} }
 const App = {
   setup() {
     const query = new URLSearchParams(location.search)
+    const { importMap: builtinImportMap, vueVersion } = useVueImportMap()
+    const prefix = `${location.origin}${import.meta.env.PROD ? '' : '/src/proxy'}`
+    const suffix = import.meta.env.PROD ? '.js' : ''
+    const ImportMap = ref(
+      mergeImportMap(builtinImportMap.value, {
+        imports: {
+          '@vue-macros/jsx-macros/api.js': `${prefix}/vite-plugin-jsx-macros${suffix}`,
+          '@vue-macros/volar/jsx-macros.js': `${prefix}/volar-plugin-jsx-macros${suffix}`,
+        },
+      }),
+    )
     const store = (window.store = useStore(
       {
+        builtinImportMap: ImportMap,
+        vueVersion,
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'js'),
-        tsMacroConfigCode: ref(
-          `// @ts-nocheck
-import jsxDirective from '@vue-macros/volar/jsx-directive.js'
-import jsxRef from '@vue-macros/volar/jsx-ref.js'
-
-export default {
-  plugins: [
-    jsxDirective(),
-    jsxRef()
-  ]
-}`,
-        ),
       },
       location.hash,
     ))

@@ -10,6 +10,7 @@ import {
 } from 'vue/compiler-sfc'
 import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 import { addEsmPrefix } from '../utils'
+import { cssRE } from '../transform'
 
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
@@ -19,7 +20,7 @@ export function compileModulesForPreview(store: Store, isSSR = false) {
   if (!isSSR) {
     // also add css files that are not imported
     for (const filename in store.files) {
-      if (filename.endsWith('.css')) {
+      if (cssRE.test(filename)) {
         const file = store.files[filename]
         if (!seen.has(file)) {
           processed.push(
@@ -104,7 +105,7 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
-  src = addEsmPrefix(src, store.importMap)
+  src = addEsmPrefix(src, store.builtinImportMap)
   const s = new MagicString(src)
 
   const ast = babelParse(src, {
@@ -325,7 +326,7 @@ function processHtmlFile(
 ) {
   const deps: string[] = []
   let jsCode = ''
-  src = addEsmPrefix(src, store.importMap)
+  src = addEsmPrefix(src, store.builtinImportMap)
   const html = src
     .replace(scriptModuleRE, (_, content) => {
       const { code, importedFiles, hasDynamicImport } = processModule(

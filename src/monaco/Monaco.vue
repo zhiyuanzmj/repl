@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
 <style>
 .editor {
   position: relative;
-  height: 100%;
+  height: calc(100% - 38px);
   width: 100%;
   overflow: hidden;
 }

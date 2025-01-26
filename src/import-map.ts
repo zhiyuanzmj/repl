@@ -21,8 +21,7 @@ export function useVueImportMap(
         normalizeDefaults(
           productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
         )) ||
-      `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
-        vueVersion.value || currentVersion
+      `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
     // const serverRenderer =
@@ -31,11 +30,12 @@ export function useVueImportMap(
     //   }/dist/server-renderer.esm-browser.js`
 
     const vueVapor = import.meta.env.PROD
-      ? 'https://cdn.jsdelivr.net/npm/@vue-vapor/runtime-vapor@3.20240714.0-6608bb3/dist/runtime-vapor.esm-browser.prod.js'
+      ? location.origin + '/vue-vapor.js'
       : location.origin + `/src/proxy/vue-vapor`
+    const query = new URLSearchParams(location.search)
     return {
       imports: {
-        vue,
+        vue: query.get('preset') == 'vue-jsx-vapor' ? vueVapor : vue,
         'vue/vapor': vueVapor,
         // 'vue/server-renderer': serverRenderer,
       },
