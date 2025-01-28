@@ -73,6 +73,10 @@ export async function compileFile(
 }
 
 async function transformVitePlugin(code: string, id: string, compiled: File['compiled'], store: Store) {
+  if (testTs(id) || !extRE.test(id)) {
+    code = await transformTS(code, testJsx(id))
+  }
+
   const { plugins } = store.viteConfig
   for (const plugin of plugins.flat()) {
     if (plugin.transformInclude) {
@@ -107,9 +111,6 @@ async function transformVitePlugin(code: string, id: string, compiled: File['com
     }
   }
 
-  if (testTs(id) || !extRE.test(id)) {
-    code = await transformTS(code, testJsx(id))
-  }
   return code
 }
 
