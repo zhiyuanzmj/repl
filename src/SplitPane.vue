@@ -182,7 +182,6 @@ function changeViewSize() {
   }
   .vertical .left {
     border-right: none;
-    border-bottom: 1px solid var(--border);
   }
 }
 

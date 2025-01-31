@@ -15,9 +15,9 @@ import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { injectKeyProps } from '../../src/types'
 
-defineProps<{ show: boolean; ssr: boolean }>()
+defineProps<{ ssr: boolean }>()
 
-const { store, clearConsole, theme, previewTheme, previewOptions } =
+const { store, clearConsole, previewTheme, previewOptions } =
   inject(injectKeyProps)!
 
 const containerRef = useTemplateRef('container')
@@ -49,7 +49,7 @@ function switchPreviewTheme() {
 
   const html = sandbox.contentDocument?.documentElement
   if (html) {
-    html.className = theme.value
+    html.className = store.value.theme
   } else {
     // re-create sandbox
     createSandbox()
@@ -57,7 +57,7 @@ function switchPreviewTheme() {
 }
 
 // reset theme
-watch([theme, previewTheme], switchPreviewTheme)
+watch(() => [store.value.theme, previewTheme.value], switchPreviewTheme)
 
 onUnmounted(() => {
   proxy.destroy()
@@ -90,7 +90,7 @@ function createSandbox() {
   const sandboxSrc = srcdoc
     .replace(
       /<html>/,
-      `<html class="${previewTheme.value ? theme.value : ''}">`,
+      `<html class="${previewTheme.value ? store.value.theme : ''}">`,
     )
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
@@ -180,7 +180,7 @@ async function updatePreview() {
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.value.vueVersion}) does not support in-browser SSR.` +
-          ` Rendering in client mode instead.`,
+        ` Rendering in client mode instead.`,
       )
     }
   }
@@ -189,14 +189,13 @@ async function updatePreview() {
     // compile code to simulated module system
     const modules = compileModulesForPreview(store.value)
     console.info(
-      `[jsx-repl] successfully compiled ${modules.length} module${
-        modules.length > 1 ? `s` : ``
+      `[jsx-repl] successfully compiled ${modules.length} module${modules.length > 1 ? `s` : ``
       }.`,
     )
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
-        `if (window.__app__) window.__app__.unmount();`,
+      `if (window.__app__) window.__app__.unmount();`,
       ...modules,
       `document.querySelectorAll('style[css]').forEach(el => el.remove())
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
@@ -221,17 +220,9 @@ defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
-  <div
-    v-show="show"
-    ref="container"
-    class="iframe-container"
-    :class="{ [theme]: previewTheme }"
-  />
+  <div ref="container" class="iframe-container" :class="{ [store.theme]: previewTheme }" />
   <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
-  <Message
-    v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
-    :warn="runtimeWarning"
-  />
+  <Message v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)" :warn="runtimeWarning" />
 </template>
 
 <style scoped>
@@ -242,6 +233,7 @@ defineExpose({ reload, container: containerRef })
   border: none;
   background-color: #fff;
 }
+
 .iframe-container.dark :deep(iframe) {
   background-color: #1e1e1e;
 }

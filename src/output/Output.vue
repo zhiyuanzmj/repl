@@ -7,7 +7,7 @@ import {
   injectKeyProps,
 } from '../types'
 import SplitPane from '../SplitPane.vue'
-import githubIcon from '../assets/svg/github.svg'
+import Devtools from './Devtools.vue'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -16,9 +16,9 @@ const props = defineProps<{
 }>()
 
 const { store } = inject(injectKeyProps)!
-const previewRef = useTemplateRef('preview')
+const previewRef = useTemplateRef<InstanceType<typeof Preview>>('preview')
 const modes = computed(() =>
-  props.showCompileOutput ? (['js', 'css'] as const) : ([] as const),
+  props.showCompileOutput ? (['js', 'css', 'devtools'] as const) : ([] as const),
 )
 
 const mode = computed<OutputModes>({
@@ -42,6 +42,13 @@ function reload() {
 }
 
 defineExpose({ reload, previewRef })
+
+const iframe = computed(() => previewRef.value?.container?.firstChild as HTMLIFrameElement | undefined)
+
+const toggleDark = () => {
+  document.documentElement.classList.toggle('dark')
+  store.value.theme = store.value.theme === 'dark' ? 'light' : 'dark'
+}
 </script>
 
 <template>
@@ -55,41 +62,42 @@ defineExpose({ reload, previewRef })
 
           <div class="ml-auto flex items-center gap-2 pr-2">
             <select
-              v-model="store.preset"
-              class="ml-auto h-6 my-auto bg-black text-white rounded outline-none px-1"
+              v-model="store.preset" class="ml-auto h-6 my-auto bg-transparent rounded outline-none px-1"
+              :class="store.theme === 'dark' ? 'text-white' : ''"
             >
               <option v-for="(_, name) in store.presets" :key="name">
                 {{ name }}
               </option>
             </select>
 
-            <button @click="jumpToGithub">
-              <img class="h7 mt-1" :src="githubIcon" />
-            </button>
+            <button
+              class="text-xl"
+              :class="store.theme === 'dark' ? 'i-carbon:moon bg-white!' : 'i-carbon:light bg-black!'"
+              @click="toggleDark"
+            />
+
+            <button
+              class="i-carbon:logo-github text-2xl" :class="store.theme === 'dark' ? 'bg-white!' : 'bg-black!'"
+              @click="jumpToGithub"
+            />
           </div>
         </div>
-        <Preview ref="preview" show :ssr="ssr" />
+        <Preview ref="preview" :ssr="ssr" />
       </div>
     </template>
 
     <template #right>
       <div class="flex h-full flex-1 flex-col overflow-hidden">
         <div class="tab-buttons">
-          <button
-            v-for="m of modes"
-            :key="m"
-            :class="{ active: mode === m }"
-            @click="mode = m"
-          >
+          <button v-for="m of modes" :key="m" :class="{ active: mode === m }" @click="mode = m">
             <span>{{ m }}</span>
           </button>
         </div>
 
+        <Devtools v-if="mode === 'devtools'" :theme="store.theme" :iframe="iframe" />
         <props.editorComponent
-          readonly
-          :filename="store.activeFile.filename"
-          :value="store.activeFile.compiled[mode]"
-          :mode="mode"
+          v-else readonly :filename="store.activeFile.filename"
+          :value="store.activeFile.compiled[mode]" :mode="mode"
         />
       </div>
     </template>
@@ -100,15 +108,18 @@ defineExpose({ reload, previewRef })
 .tab-buttons {
   display: flex;
   box-sizing: border-box;
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
   min-height: var(--header-height);
   overflow: hidden;
 }
+
 .tab-buttons button {
   padding: 0;
   box-sizing: border-box;
 }
+
 .tab-buttons span {
   font-size: 13px;
   font-family: var(--font-code);
@@ -118,6 +129,7 @@ defineExpose({ reload, previewRef })
   padding: 8px 16px 6px;
   line-height: 20px;
 }
+
 button.active {
   color: var(--color-branding-dark);
   border-bottom: 3px solid var(--color-branding-dark);

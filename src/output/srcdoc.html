@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <script src="https://cdn.jsdelivr.net/npm/chobitsu"></script>
     <style>
       html.dark {
         color-scheme: dark;
@@ -30,8 +31,16 @@
           return Promise.resolve(window.__modules__[key])
         }
 
+        chobitsu.setOnMessage((message) => {
+          window.parent.postMessage(message, '*');
+        });
         async function handle_message(ev) {
-          let { action, cmd_id } = ev.data
+          let { action, cmd_id, event, data } = ev.data
+          if(event === 'DEV'){
+            chobitsu.sendRawMessage(data)
+            return
+          }
+
           const send_message = (payload) =>
             parent.postMessage({ ...payload }, ev.origin)
           const send_reply = (payload) => send_message({ ...payload, cmd_id })

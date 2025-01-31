@@ -38,7 +38,6 @@ const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
 const {
   store,
   autoSave,
-  theme: replTheme,
   editorOptions,
 } = inject(injectKeyProps)!
 
@@ -62,7 +61,7 @@ onMounted(() => {
       : { model: null }),
     fontSize: 13,
     tabSize: 2,
-    theme: replTheme.value === 'light' ? theme.light : theme.dark,
+    theme: store.value.theme === 'light' ? theme.light : theme.dark,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,
@@ -159,7 +158,7 @@ onMounted(() => {
   )
 
   // update theme
-  watch(replTheme, (n) => {
+  watch(() => store.value.theme, (n) => {
     editorInstance.updateOptions({
       theme: n === 'light' ? theme.light : theme.dark,
     })
@@ -173,9 +172,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    ref="container"
-    class="editor"
-    @keydown.ctrl.s.prevent="emitChangeEvent"
+    ref="container" class="editor" @keydown.ctrl.s.prevent="emitChangeEvent"
     @keydown.meta.s.prevent="emitChangeEvent"
   />
 </template>

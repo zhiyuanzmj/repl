@@ -40,6 +40,7 @@ export function useStore(
     showOutput = ref(false),
     outputMode = ref('js'),
     vueVersion = ref(null),
+    theme = ref('dark'),
 
     locale = ref(),
     typescriptVersion = ref('latest'),
@@ -385,6 +386,7 @@ export function useStore(
     showOutput,
     outputMode,
     vueVersion,
+    theme,
 
     locale,
     typescriptVersion,
@@ -431,6 +433,7 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   vueVersion: string | null
+  theme: 'light' | 'dark'
 
   // volar-related
   locale: string | undefined
@@ -501,6 +504,7 @@ export type Store = Pick<
   | 'preset'
   | 'presets'
   | 'builtinImportMap'
+  | 'theme'
 >
 
 export class File {

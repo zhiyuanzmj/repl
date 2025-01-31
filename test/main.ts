@@ -22,7 +22,6 @@ const App = {
         imports: {
           '@vue-macros/jsx-macros/api.js': `${prefix}/vite-plugin-jsx-macros${suffix}`,
           '@vue-macros/volar/jsx-macros.js': `${prefix}/volar-plugin-jsx-macros${suffix}`,
-          '@vue-macros/jsx-directive/api.js': `${prefix}/vite-plugin-jsx-directive${suffix}`,
         },
       }),
     )
@@ -38,27 +37,11 @@ const App = {
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
-    // setTimeout(() => {
-    //   store.setFiles(
-    //     {
-    //       'src/index.html': '<h1>yo</h1>',
-    //       'src/main.js': 'document.body.innerHTML = "<h1>hello</h1>"',
-    //       'src/foo.js': 'document.body.innerHTML = "<h1>hello</h1>"',
-    //       'src/bar.js': 'document.body.innerHTML = "<h1>hello</h1>"',
-    //       'src/baz.js': 'document.body.innerHTML = "<h1>hello</h1>"',
-    //     },
-    //     'src/index.html',
-    //   )
-    // }, 1000)
-
-    // store.vueVersion = '3.4.1'
-    const theme = ref<'light' | 'dark'>('dark')
     const previewTheme = ref(false)
 
     return () =>
       h(Repl, {
         store,
-        theme: theme.value,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
         // layout: 'vertical',

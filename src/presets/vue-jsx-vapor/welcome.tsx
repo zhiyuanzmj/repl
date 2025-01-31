@@ -15,7 +15,7 @@ const For = (props: { count: number }) => {
   return (
     <fieldset>
       <legend>For</legend>
-      <div v-for={i in props.count}>{1}</div>
+      <div v-for={i in props.count}>{i}</div>
     </fieldset>
   )
 }
@@ -69,8 +69,8 @@ export default () => {
 
       <For count={count.value} />
 
-      <Slots count={count.value} v-slot={scope}>
-        {scope.foo}
+      <Slots count={count.value} v-slot={{ foo }}>  
+        {foo}
       </Slots>
 
       <Expose ref={exposeRef} count={count.value + ''}>

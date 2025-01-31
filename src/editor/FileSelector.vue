@@ -162,6 +162,7 @@ function horizontalScroll(e: WheelEvent) {
 .file-selector {
   display: flex;
   box-sizing: border-box;
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
   overflow-y: hidden;

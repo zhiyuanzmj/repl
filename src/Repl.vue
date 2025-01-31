@@ -13,7 +13,6 @@ import type * as monaco from 'monaco-editor-core'
 import { useRouteQuery } from './utils'
 
 export interface Props {
-  theme?: 'dark' | 'light'
   previewTheme?: boolean
   editor: EditorComponentType
   store?: Store
@@ -49,7 +48,6 @@ export interface Props {
 const autoSave = defineModel<boolean>({ default: true })
 const virtualFiles = useRouteQuery<boolean>('virtual-files', false)
 const props = withDefaults(defineProps<Props>(), {
-  theme: 'light',
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
