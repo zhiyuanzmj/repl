@@ -85,6 +85,7 @@
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
     "@vue-macros/jsx-macros": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@abf00c1",
+    "@vue-macros/jsx-directive": "latest",
     "@vue-macros/volar": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/volar@abf00c1",
     "assert": "^2.1.0",
     "bumpp": "^9.9.2",

@@ -22,6 +22,7 @@ const App = {
         imports: {
           '@vue-macros/jsx-macros/api.js': `${prefix}/vite-plugin-jsx-macros${suffix}`,
           '@vue-macros/volar/jsx-macros.js': `${prefix}/volar-plugin-jsx-macros${suffix}`,
+          '@vue-macros/jsx-directive/api.js': `${prefix}/vite-plugin-jsx-directive${suffix}`,
         },
       }),
     )
