@@ -1,6 +1,6 @@
 // @ts-nocheck
 import JsxMacros from '@vue-macros/jsx-macros/api.js'
-import JsxDirective from '@vue-macros/jsx-directive/api.js'
+import { transformJsxDirective } from '@vue-macros/jsx-directive/api.js'
 import { transform } from '@babel/standalone'
 import jsx from '@babel/plugin-transform-react-jsx'
 
@@ -9,7 +9,12 @@ export default {
     JsxMacros({
       lib: 'react'
     }),
-    JsxDirective(),
+    {
+      name: '@vue-macros/jsx-directive',
+      transform(code, id) {
+        return transformJsxDirective(code, id, { lib: 'react', version: 19, prefix: 'v-' })
+       }
+    },
     {
       name: 'vite-plugin-react',
       transform(src, id) {

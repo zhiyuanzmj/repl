@@ -1,13 +1,18 @@
 // @ts-nocheck
 import JsxMacros from '@vue-macros/jsx-macros/api.js'
-import JsxDirective from '@vue-macros/jsx-directive/api.js'
+import { transformJsxDirective } from '@vue-macros/jsx-directive/api.js'
 import { transform } from '@babel/standalone'
 import jsx from 'babel-preset-solid'
 
 export default {
   plugins: [
     JsxMacros(),
-    JsxDirective(),
+    {
+      name: '@vue-macros/jsx-directive',
+      transform(code, id) {
+        return transformJsxDirective(code, id, { lib: 'solid', version: 1.9, prefix: 'v-' })
+       }
+    },
     {
       name: 'vite-plugin-solid',
       transform(src, id) {
