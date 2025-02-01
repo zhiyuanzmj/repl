@@ -105,7 +105,7 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
-  src = addEsmPrefix(src, store.builtinImportMap)
+  src = addEsmPrefix(src, store.importMap)
   const s = new MagicString(src)
 
   const ast = babelParse(src, {
@@ -326,7 +326,7 @@ function processHtmlFile(
 ) {
   const deps: string[] = []
   let jsCode = ''
-  src = addEsmPrefix(src, store.builtinImportMap)
+  src = addEsmPrefix(src, store.importMap)
   const html = src
     .replace(scriptModuleRE, (_, content) => {
       const { code, importedFiles, hasDynamicImport } = processModule(

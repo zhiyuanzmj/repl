@@ -10,8 +10,12 @@ export default {
     {
       name: '@vue-macros/jsx-directive',
       transform(code, id) {
-        return transformJsxDirective(code, id, { lib: 'solid', version: 1.9, prefix: 'v-' })
-       }
+        return transformJsxDirective(code, id, {
+          lib: 'solid',
+          version: 1.9,
+          prefix: 'v-',
+        })
+      },
     },
     {
       name: 'vite-plugin-solid',

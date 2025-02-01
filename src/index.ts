@@ -6,8 +6,8 @@ export {
   type StoreState,
   type Store,
   type ReplStore,
+  type ImportMap,
 } from './store'
-export { useVueImportMap, mergeImportMap, type ImportMap } from './import-map'
 export { compileFile } from './transform'
 export type { Props as ReplProps } from './Repl.vue'
 export type { OutputModes } from './types'

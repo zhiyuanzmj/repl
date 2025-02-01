@@ -32,11 +32,11 @@
         }
 
         chobitsu.setOnMessage((message) => {
-          window.parent.postMessage(message, '*');
-        });
+          window.parent.postMessage(message, '*')
+        })
         async function handle_message(ev) {
           let { action, cmd_id, event, data } = ev.data
-          if(event === 'DEV'){
+          if (event === 'DEV') {
             chobitsu.sendRawMessage(data)
             return
           }

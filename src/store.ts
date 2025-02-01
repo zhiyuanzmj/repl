@@ -11,7 +11,6 @@ import { compileFile, cssRE } from './transform'
 import { addEsmPrefix, atou, useRouteQuery, utoa } from './utils'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
-import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
 import { defaultPresets } from './presets'
 
@@ -20,7 +19,7 @@ export const tsconfigFile = 'tsconfig.json'
 export const viteConfigFile = 'vite.config.ts'
 export const tsMacroConfigFile = 'tsm.config.ts'
 export const indexHtmlFile = 'src/index.html'
-export const welcomeFile = 'src/App.tsx'
+export const appFile = 'src/App.tsx'
 export const configFileNames = [
   importMapFile,
   tsconfigFile,
@@ -33,13 +32,11 @@ export function useStore(
     files = ref(Object.create(null)),
     activeFilename = undefined!, // set later
     activeConfigFilename = ref(viteConfigFile), // set later
-    mainFile = ref(welcomeFile),
-    builtinImportMap = undefined!,
+    mainFile = ref(appFile),
 
     errors = ref([]),
     showOutput = ref(false),
     outputMode = ref('js'),
-    vueVersion = ref(null),
     theme = ref('dark'),
 
     locale = ref(),
@@ -52,41 +49,29 @@ export function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
-  if (!builtinImportMap) {
-    ; ({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
-      vueVersion: vueVersion.value
-    }))
-  }
   const template = computed(() => presets.value[preset.value])
-
-  function applyBuiltinImportMap() {
-    builtinImportMap.value = mergeImportMap(builtinImportMap.value, getImportMap())
-    setImportMap(builtinImportMap.value)
-  }
 
   async function init() {
     watch(preset, () => {
       setFiles(
         {
           [indexHtmlFile]: template.value.indexHtml,
-          [welcomeFile]: template.value.welcome,
+          [appFile]: template.value.app,
           [viteConfigFile]: template.value.viteConfig,
           [tsMacroConfigFile]: template.value.tsmConfig,
           [tsconfigFile]: template.value.tsconfig,
+          [importMapFile]: template.value.importMap,
         },
-        welcomeFile,
-      );
-      if (!builtinImportMap.value.imports) return
-      if (preset.value === 'vue-jsx-vapor')
-        builtinImportMap.value.imports['vue'] = builtinImportMap.value.imports['vue/vapor']
-      else
-        delete builtinImportMap.value.imports['vue']
+        appFile,
+      )
     })
 
     await getViteConfig()
 
     watchEffect(async () => {
-      await compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+      await compileFile(store, activeFile.value).then(
+        (errs) => (errors.value = errs),
+      )
       await compileFile(store, activeConfigFile.value).then(
         (errs) => (errors.value = errs),
       )
@@ -99,7 +84,6 @@ export function useStore(
         typescriptVersion.value,
         locale.value,
         dependencyVersion.value,
-        vueVersion.value,
       ],
       () => reloadLanguageTools.value?.(),
       { deep: true },
@@ -110,15 +94,10 @@ export function useStore(
       async () => {
         await getViteConfig()
         for (const [_, file] of Object.entries(files.value)) {
-          await compileFile(store, file).then((errs) => errors.value.push(...errs))
+          await compileFile(store, file).then((errs) =>
+            errors.value.push(...errs),
+          )
         }
-      },
-    )
-
-    watch(
-      () => files.value[importMapFile]?.code,
-      () => {
-        builtinImportMap.value = getImportMap()
       },
     )
 
@@ -126,24 +105,10 @@ export function useStore(
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
       if (filename !== mainFile.value) {
-        await compileFile(store, file).then((errs) => errors.value.push(...errs))
+        await compileFile(store, file).then((errs) =>
+          errors.value.push(...errs),
+        )
       }
-    }
-  }
-
-  function setImportMap(map: ImportMap) {
-    if (map.imports)
-      for (const [key, value] of Object.entries(map.imports)) {
-        if (value) {
-          map.imports![key] = fixURL(value)
-        }
-      }
-
-    const code = JSON.stringify(map, undefined, 2)
-    if (files.value[importMapFile]) {
-      files.value[importMapFile].code = code
-    } else {
-      files.value[importMapFile] = new File(importMapFile, code)
     }
   }
 
@@ -166,17 +131,12 @@ export function useStore(
     if (!file.hidden) setActive(file.filename)
   }
   const deleteFile: Store['deleteFile'] = (filename) => {
-    // if (
-    //   !confirm(`Are you sure you want to delete ${stripSrcPrefix(filename)}?`)
-    // ) {
-    //   return
-    // }
-
     if (activeFilename.value === filename) {
       activeFilename.value = mainFile.value
     }
     delete files.value[filename]
   }
+
   const renameFile: Store['renameFile'] = async (oldFilename, newFilename) => {
     const file = files.value[oldFilename]
 
@@ -213,16 +173,26 @@ export function useStore(
       await compileFile(store, file).then((errs) => (errors.value = errs))
     }
   }
-  const getImportMap: Store['getImportMap'] = () => {
+
+  const importMap = computed<ImportMap>(() => {
     try {
-      return JSON.parse(files.value[importMapFile]?.code || '{}')
+      const result = JSON.parse(files.value[importMapFile]?.code || '{}')
+      if (result.imports)
+        for (const [key, value] of Object.entries(result.imports)) {
+          if (value) {
+            result.imports[key] = (value + '').startsWith('http')
+              ? value
+              : location.origin + value
+          }
+        }
+      return result
     } catch (e) {
       errors.value = [
         `Syntax error in ${importMapFile}: ${(e as Error).message}`,
       ]
-      return {}
+      return { imports: {}, scopes: {} }
     }
-  }
+  })
 
   const getTsConfig: Store['getTsConfig'] = () => {
     try {
@@ -234,61 +204,40 @@ export function useStore(
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = () => {
     let code = files.value[tsMacroConfigFile]?.code
-    for (let name in store.builtinImportMap.imports) {
+    for (let name in store.importMap.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        store.builtinImportMap.imports[name] as string,
+        store.importMap.imports[name] as string,
       )
     }
     return (
       'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(addEsmPrefix(code, builtinImportMap.value))
+      encodeURIComponent(addEsmPrefix(code, importMap.value))
     )
   }
 
   const viteConfig = ref({} as ViteConfig)
   const getViteConfig = async () => {
     let code = files.value[viteConfigFile]?.code
-    for (let name in store.builtinImportMap.imports) {
+    for (let name in store.importMap.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        store.builtinImportMap.imports[name] as string,
+        store.importMap.imports[name] as string,
       )
     }
-    return (store.viteConfig = await import(
-      'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(addEsmPrefix(code, builtinImportMap.value))
-    ).then((i) => i.default))
+    try {
+      store.viteConfig = await import(
+        'data:text/javascript;charset=utf-8,' +
+          encodeURIComponent(addEsmPrefix(code, importMap.value))
+      ).then((i) => i.default)
+    } catch {
+      store.viteConfig = { plugins: [] }
+    }
+    return store.viteConfig
   }
 
   const serialize: ReplStore['serialize'] = () => {
     const files = getFiles()
-    const importMap = files[importMapFile]
-    if (importMap) {
-      const parsed = JSON.parse(importMap.code)
-      const builtin = builtinImportMap.value.imports || {}
-
-      if (parsed.imports) {
-        for (const [key, value] of Object.entries(parsed.imports)) {
-          if (builtin[key] === value) {
-            delete parsed.imports[key]
-          }
-        }
-        if (parsed.imports && !Object.keys(parsed.imports).length) {
-          delete parsed.imports
-        }
-      }
-      if (parsed.scopes && !Object.keys(parsed.scopes).length) {
-        delete parsed.scopes
-      }
-      if (Object.keys(parsed).length) {
-        files[importMapFile] = { code: JSON.stringify(parsed, null, 2) }
-      } else {
-        delete files[importMapFile]
-      }
-    }
-    // @ts-ignore
-    if (vueVersion.value) files._version = vueVersion.value
     return '#' + utoa(JSON.stringify(files))
   }
   const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
@@ -303,16 +252,12 @@ export function useStore(
       return setDefaultFile()
     }
     for (const filename in saved) {
-      if (filename === '_version') {
-        vueVersion.value = saved[filename]
-      } else {
-        setFile(
-          files.value,
-          filename,
-          saved[filename].code,
-          saved[filename].hidden,
-        )
-      }
+      setFile(
+        files.value,
+        filename,
+        saved[filename].code,
+        saved[filename].hidden,
+      )
     }
   }
   const getFiles: ReplStore['getFiles'] = () => {
@@ -331,7 +276,7 @@ export function useStore(
 
     mainFile = addSrcPrefix(mainFile)
     if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value.welcome!)
+      setFile(files, mainFile, template.value.app!)
     }
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
@@ -345,15 +290,15 @@ export function useStore(
     store.mainFile = mainFile
     store.files = files
     store.errors = errors
-    applyBuiltinImportMap()
     setActive(store.mainFile)
   }
   const setDefaultFile = (): void => {
     setFile(files.value, indexHtmlFile, template.value.indexHtml)
-    setFile(files.value, welcomeFile, template.value.welcome)
+    setFile(files.value, appFile, template.value.app)
     setFile(files.value, viteConfigFile, template.value.viteConfig)
     setFile(files.value, tsMacroConfigFile, template.value.tsmConfig)
     setFile(files.value, tsconfigFile, template.value.tsconfig)
+    setFile(files.value, importMapFile, template.value.importMap)
   }
 
   if (serializedState) {
@@ -370,8 +315,6 @@ export function useStore(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
   )
 
-  applyBuiltinImportMap()
-
   const store: ReplStore = reactive({
     files,
     activeFile,
@@ -380,12 +323,11 @@ export function useStore(
     activeConfigFilename,
     mainFile,
     template,
-    builtinImportMap,
+    importMap,
 
     errors,
     showOutput,
     outputMode,
-    vueVersion,
     theme,
 
     locale,
@@ -401,7 +343,6 @@ export function useStore(
     addFile,
     deleteFile,
     renameFile,
-    getImportMap,
     getTsConfig,
     getTsMacroConfig,
     serialize,
@@ -412,13 +353,19 @@ export function useStore(
   return store
 }
 
+export interface ImportMap {
+  imports?: Record<string, string | undefined>
+  scopes?: Record<string, Record<string, string>>
+}
+
 type Template = {
   indexHtml: string
-  welcome: string
+  app: string
   new: string
   viteConfig: string
   tsmConfig: string
   tsconfig: string
+  importMap: string
 }
 
 export type StoreState = ToRefs<{
@@ -426,13 +373,12 @@ export type StoreState = ToRefs<{
   activeFilename: string
   activeConfigFilename: string
   mainFile: string
-  builtinImportMap: ImportMap
+  importMap: ImportMap
 
   // output
   errors: (string | Error)[]
   showOutput: boolean
   outputMode: OutputModes
-  vueVersion: string | null
   theme: 'light' | 'dark'
 
   // volar-related
@@ -469,7 +415,6 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   addFile(filename: string | File): void
   deleteFile(filename: string): void
   renameFile(oldFilename: string, newFilename: string): void
-  getImportMap(): ImportMap
   getTsConfig(): Record<string, any>
   getTsMacroConfig(): string
   serialize(): string
@@ -487,7 +432,6 @@ export type Store = Pick<
   | 'errors'
   | 'showOutput'
   | 'outputMode'
-  | 'vueVersion'
   | 'locale'
   | 'typescriptVersion'
   | 'dependencyVersion'
@@ -497,13 +441,12 @@ export type Store = Pick<
   | 'addFile'
   | 'deleteFile'
   | 'renameFile'
-  | 'getImportMap'
   | 'getTsConfig'
   | 'viteConfig'
   | 'getTsMacroConfig'
   | 'preset'
   | 'presets'
-  | 'builtinImportMap'
+  | 'importMap'
   | 'theme'
 >
 
@@ -519,7 +462,7 @@ export class File {
     public filename: string,
     public code = '',
     public hidden = false,
-  ) { }
+  ) {}
 
   get language() {
     if (this.filename.endsWith('.vue')) {
@@ -547,10 +490,6 @@ export function addSrcPrefix(file: string) {
 
 export function stripSrcPrefix(file: string) {
   return file.replace(/^src\//, '')
-}
-
-function fixURL(url: string) {
-  return url.replace('https://sfc.vuejs', 'https://play.vuejs')
 }
 
 function setFile(

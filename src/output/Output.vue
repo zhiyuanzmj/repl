@@ -18,7 +18,9 @@ const props = defineProps<{
 const { store } = inject(injectKeyProps)!
 const previewRef = useTemplateRef<InstanceType<typeof Preview>>('preview')
 const modes = computed(() =>
-  props.showCompileOutput ? (['js', 'css', 'devtools'] as const) : ([] as const),
+  props.showCompileOutput
+    ? (['js', 'css', 'devtools'] as const)
+    : ([] as const),
 )
 
 const mode = computed<OutputModes>({
@@ -43,7 +45,10 @@ function reload() {
 
 defineExpose({ reload, previewRef })
 
-const iframe = computed(() => previewRef.value?.container?.firstChild as HTMLIFrameElement | undefined)
+const iframe = computed(
+  () =>
+    previewRef.value?.container?.firstChild as HTMLIFrameElement | undefined,
+)
 
 const toggleDark = () => {
   document.documentElement.classList.toggle('dark')
@@ -62,7 +67,8 @@ const toggleDark = () => {
 
           <div class="ml-auto flex items-center gap-2 pr-2">
             <select
-              v-model="store.preset" class="ml-auto h-6 my-auto bg-transparent rounded outline-none px-1"
+              v-model="store.preset"
+              class="ml-auto h-6 my-auto bg-transparent rounded outline-none px-1"
               :class="store.theme === 'dark' ? 'text-white' : ''"
             >
               <option v-for="(_, name) in store.presets" :key="name">
@@ -72,12 +78,17 @@ const toggleDark = () => {
 
             <button
               class="text-xl"
-              :class="store.theme === 'dark' ? 'i-carbon:moon bg-white!' : 'i-carbon:light bg-black!'"
+              :class="
+                store.theme === 'dark'
+                  ? 'i-carbon:moon bg-white!'
+                  : 'i-carbon:light bg-black!'
+              "
               @click="toggleDark"
             />
 
             <button
-              class="i-carbon:logo-github text-2xl" :class="store.theme === 'dark' ? 'bg-white!' : 'bg-black!'"
+              class="i-carbon:logo-github text-2xl"
+              :class="store.theme === 'dark' ? 'bg-white!' : 'bg-black!'"
               @click="jumpToGithub"
             />
           </div>
@@ -89,15 +100,27 @@ const toggleDark = () => {
     <template #right>
       <div class="flex h-full flex-1 flex-col overflow-hidden">
         <div class="tab-buttons">
-          <button v-for="m of modes" :key="m" :class="{ active: mode === m }" @click="mode = m">
+          <button
+            v-for="m of modes"
+            :key="m"
+            :class="{ active: mode === m }"
+            @click="mode = m"
+          >
             <span>{{ m }}</span>
           </button>
         </div>
 
-        <Devtools v-if="mode === 'devtools'" :theme="store.theme" :iframe="iframe" />
+        <Devtools
+          v-if="mode === 'devtools'"
+          :theme="store.theme"
+          :iframe="iframe"
+        />
         <props.editorComponent
-          v-else readonly :filename="store.activeFile.filename"
-          :value="store.activeFile.compiled[mode]" :mode="mode"
+          v-else
+          readonly
+          :filename="store.activeFile.filename"
+          :value="store.activeFile.compiled[mode]"
+          :mode="mode"
         />
       </div>
     </template>

@@ -6,14 +6,18 @@ import VueJsxVapor from 'unplugin-vue-jsx-vapor/api.js'
 export default {
   plugins: [
     JsxMacros({
-      lib: 'vue/vapor'
+      lib: 'vue/vapor',
     }),
     {
       name: '@vue-macros/jsx-directive',
       transform(code, id) {
-       return transformJsxDirective(code, id, { lib: 'vue/vapor', version: 3, prefix: 'v-' })
-      }
+        return transformJsxDirective(code, id, {
+          lib: 'vue/vapor',
+          version: 3,
+          prefix: 'v-',
+        })
+      },
     },
-    VueJsxVapor()
+    VueJsxVapor(),
   ],
 }

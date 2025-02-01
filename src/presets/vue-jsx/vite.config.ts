@@ -10,8 +10,12 @@ export default {
     {
       name: '@vue-macros/jsx-directive',
       transform(code, id) {
-        return transformJsxDirective(code, id, { lib: 'vue', version: 3, prefix: 'v-' })
-       }
+        return transformJsxDirective(code, id, {
+          lib: 'vue',
+          version: 3,
+          prefix: 'v-',
+        })
+      },
     },
     {
       name: 'vite-plugin-vue-jsx',

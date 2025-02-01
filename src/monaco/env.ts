@@ -4,15 +4,15 @@ import editorWorker from 'monaco-editor-core/esm/vs/editor/editor.worker?worker'
 import { watchEffect } from 'vue'
 import type { Store } from '../store'
 import { getOrCreateModel } from './utils'
-import type { CreateData } from './vue.worker'
-import vueWorker from './vue.worker?worker'
+import type { CreateData } from './worker'
+import Worker from './worker?worker'
 import * as languageConfigs from './language-configs'
 import type { WorkerLanguageService } from '@volar/monaco/worker'
 import { debounce } from '../utils'
 
-let initted = false
+let initialized = false
 export function initMonaco(store: Store) {
-  if (initted) return
+  if (initialized) return
   loadMonacoEnv(store)
 
   watchEffect(() => {
@@ -39,7 +39,7 @@ export function initMonaco(store: Store) {
     }
   })
 
-  initted = true
+  initialized = true
 }
 
 export class WorkerHost {
@@ -56,21 +56,6 @@ export async function reloadLanguageTools(store: Store) {
     ...store.dependencyVersion,
   }
 
-  if (store.vueVersion) {
-    dependencies = {
-      ...dependencies,
-      vue: store.vueVersion,
-      '@vue/compiler-core': store.vueVersion,
-      '@vue/compiler-dom': store.vueVersion,
-      '@vue/compiler-sfc': store.vueVersion,
-      '@vue/compiler-ssr': store.vueVersion,
-      '@vue/reactivity': store.vueVersion,
-      '@vue/runtime-core': store.vueVersion,
-      '@vue/runtime-dom': store.vueVersion,
-      '@vue/shared': store.vueVersion,
-    }
-  }
-
   if (store.typescriptVersion) {
     dependencies = {
       ...dependencies,
@@ -79,7 +64,7 @@ export async function reloadLanguageTools(store: Store) {
   }
 
   const worker = editor.createWebWorker<WorkerLanguageService>({
-    moduleId: 'vs/language/vue/vueWorker',
+    moduleId: 'vs/language/jsx/worker',
     label: 'tsx',
     host: new WorkerHost(),
     createData: {
@@ -130,7 +115,7 @@ export function loadMonacoEnv(store: Store) {
   ;(self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
       if (label === 'tsx') {
-        const worker = new vueWorker()
+        const worker = new Worker()
         const init = new Promise<void>((resolve) => {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {

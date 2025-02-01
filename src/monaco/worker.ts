@@ -26,8 +26,11 @@ let tsMacroOptions: any
 self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   if (msg.data?.event === 'init') {
     try {
-      tsMacroOptions = await import(msg.data.tsMacroConfig).then((i) => i.default)
+      tsMacroOptions = await import(msg.data.tsMacroConfig).then(
+        (i) => i.default,
+      )
     } catch (e) {
+      tsMacroOptions = { plugins: [] }
       console.error(e)
     }
     locale = msg.data.tsLocale
@@ -93,7 +96,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
 
 async function importTsFromCdn(tsVersion: string) {
   const _module = globalThis.module
-    ; (globalThis as any).module = { exports: {} }
+  ;(globalThis as any).module = { exports: {} }
   const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
   await import(/* @vite-ignore */ tsUrl)
   const ts = globalThis.module.exports

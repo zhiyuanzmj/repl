@@ -33,7 +33,7 @@ onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
-  () => store.value.getImportMap(),
+  () => store.value.importMap,
   () => {
     try {
       createSandbox()
@@ -86,7 +86,7 @@ function createSandbox() {
     ].join(' '),
   )
 
-  const importMap = store.value.getImportMap()
+  const importMap = store.value.importMap
   const sandboxSrc = srcdoc
     .replace(
       /<html>/,
@@ -173,29 +173,18 @@ async function updatePreview() {
   runtimeError.value = undefined
   runtimeWarning.value = undefined
 
-  if (store.value.vueVersion) {
-    const [major, minor, patch] = store.value.vueVersion
-      .split('.')
-      .map((v) => parseInt(v, 10))
-    if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
-      alert(
-        `The selected version of Vue (${store.value.vueVersion}) does not support in-browser SSR.` +
-        ` Rendering in client mode instead.`,
-      )
-    }
-  }
-
   try {
     // compile code to simulated module system
     const modules = compileModulesForPreview(store.value)
     console.info(
-      `[jsx-repl] successfully compiled ${modules.length} module${modules.length > 1 ? `s` : ``
+      `[jsx-repl] successfully compiled ${modules.length} module${
+        modules.length > 1 ? `s` : ``
       }.`,
     )
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
-      `if (window.__app__) window.__app__.unmount();`,
+        `if (window.__app__) window.__app__.unmount();`,
       ...modules,
       `document.querySelectorAll('style[css]').forEach(el => el.remove())
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
@@ -220,9 +209,16 @@ defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
-  <div ref="container" class="iframe-container" :class="{ [store.theme]: previewTheme }" />
+  <div
+    ref="container"
+    class="iframe-container"
+    :class="{ [store.theme]: previewTheme }"
+  />
   <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
-  <Message v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)" :warn="runtimeWarning" />
+  <Message
+    v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
+    :warn="runtimeWarning"
+  />
 </template>
 
 <style scoped>

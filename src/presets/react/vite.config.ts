@@ -7,13 +7,17 @@ import jsx from '@babel/plugin-transform-react-jsx'
 export default {
   plugins: [
     JsxMacros({
-      lib: 'react'
+      lib: 'react',
     }),
     {
       name: '@vue-macros/jsx-directive',
       transform(code, id) {
-        return transformJsxDirective(code, id, { lib: 'react', version: 19, prefix: 'v-' })
-       }
+        return transformJsxDirective(code, id, {
+          lib: 'react',
+          version: 19,
+          prefix: 'v-',
+        })
+      },
     },
     {
       name: 'vite-plugin-react',

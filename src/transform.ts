@@ -43,8 +43,12 @@ export async function compileFile(
   }
 
   if (REGEX_JS.test(filename) || !extRE.test(filename)) {
-
-    compiled.js = compiled.ssr = await transformVitePlugin(code, filename, compiled, store)
+    compiled.js = compiled.ssr = await transformVitePlugin(
+      code,
+      filename,
+      compiled,
+      store,
+    )
 
     setTimeout(() => {
       compiled.css = ''
@@ -72,7 +76,12 @@ export async function compileFile(
   return []
 }
 
-async function transformVitePlugin(code: string, id: string, compiled: File['compiled'], store: Store) {
+async function transformVitePlugin(
+  code: string,
+  id: string,
+  compiled: File['compiled'],
+  store: Store,
+) {
   if (testTs(id) || !extRE.test(id)) {
     code = await transformTS(code, testJsx(id))
   }
@@ -91,7 +100,10 @@ async function transformVitePlugin(code: string, id: string, compiled: File['com
       const resolvedId = plugin.resolveId(id)
       if (!resolvedId) continue
 
-      code = code.replace(id, (resolvedId.startsWith('/') ? '.' : './') + resolvedId)
+      code = code.replace(
+        id,
+        (resolvedId.startsWith('/') ? '.' : './') + resolvedId,
+      )
       let loaded = plugin.load?.(resolvedId)
       if (!loaded) continue
       loaded = await transformVitePlugin(loaded, resolvedId, compiled, store)
@@ -121,20 +133,22 @@ export const cssRE = /\.(css|scss)$/
 async function transformCssModules(code: string, id: string) {
   if (code.startsWith('export default')) return
   if (sassRE.test(id)) {
-    code = await import('sass').then(i => i.compileString(code).css)
+    code = await import('sass').then((i) => i.compileString(code).css)
   }
   let resultJSON
   const plugins = []
   if (moduleCssRE.test(id)) {
-    plugins.push(postcssModules({
-      getJSON: (_, json) => {
-        resultJSON = json
-      }
-    }))
+    plugins.push(
+      postcssModules({
+        getJSON: (_, json) => {
+          resultJSON = json
+        },
+      }),
+    )
   }
   const { css } = await postcss(plugins).process(code)
   return {
     code: resultJSON ? `export default ${JSON.stringify(resultJSON)}` : '',
-    css
+    css,
   }
 }

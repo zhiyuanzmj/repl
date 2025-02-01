@@ -7,8 +7,8 @@ export default {
   plugins: [
     jsxDirective(),
     jsxMacros({
-      lib: 'vue/vapor'
+      lib: 'vue/vapor',
     }),
-    jsxRef()
-  ]
+    jsxRef(),
+  ],
 }

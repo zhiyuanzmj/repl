@@ -35,17 +35,20 @@ const emit = defineEmits<{
 
 const containerRef = useTemplateRef('container')
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const {
-  store,
-  autoSave,
-  editorOptions,
-} = inject(injectKeyProps)!
+const { store, autoSave, editorOptions } = inject(injectKeyProps)!
 
 initMonaco(store.value)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 let editorInstance: monaco.editor.IStandaloneCodeEditor
+
+monaco.languages.setLanguageConfiguration('javascript', {
+  comments: {
+    blockComment: ['{/*', '*/}'],
+  },
+})
+
 function emitChangeEvent() {
   emit('change', editorInstance.getValue())
 }
@@ -158,11 +161,14 @@ onMounted(() => {
   )
 
   // update theme
-  watch(() => store.value.theme, (n) => {
-    editorInstance.updateOptions({
-      theme: n === 'light' ? theme.light : theme.dark,
-    })
-  })
+  watch(
+    () => store.value.theme,
+    (n) => {
+      editorInstance.updateOptions({
+        theme: n === 'light' ? theme.light : theme.dark,
+      })
+    },
+  )
 })
 
 onBeforeUnmount(() => {
@@ -172,7 +178,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    ref="container" class="editor" @keydown.ctrl.s.prevent="emitChangeEvent"
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
     @keydown.meta.s.prevent="emitChangeEvent"
   />
 </template>

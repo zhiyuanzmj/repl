@@ -156,8 +156,8 @@ packages:
     resolution: {integrity: sha512-Ed61U6XJc3CVRfkERJWDz4dJwKe7iLmmJsbOGu9wSloNSFttHV0I8g6UAgb7qnK5ly5bGLPd4oXZlxCdANBOWQ==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/parser@7.26.5':
-    resolution: {integrity: sha512-SRJ4jYmXRqV1/Xc+TIVG84WjHBXKlxO9sHQnA2Pf12QQEAp1LOh6kDzNHXcUnbH1QI0FDoPPVOt+vyUDucxpaw==}
+  '@babel/parser@7.26.7':
+    resolution: {integrity: sha512-kEvgGGgEjRUutvdVvZhbn/BxVt+5VSpwXz1j3WYXQbXDo8KzFOPNG2GQbdAiNq8g6wn1yKk7C/qrke03a84V+w==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -165,8 +165,8 @@ packages:
     resolution: {integrity: sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/types@7.26.5':
-    resolution: {integrity: sha512-L6mZmwFDK6Cjh1nRCLXpa6no13ZIioJDz7mdkzHv399pThrTa/k0nUlNaenOeh2kWu/iaOQYElEpKPUswUa9Vg==}
+  '@babel/types@7.26.7':
+    resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
 
   '@conventional-changelog/git-client@1.0.1':
@@ -2988,16 +2988,16 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.25.9': {}
 
-  '@babel/parser@7.26.5':
+  '@babel/parser@7.26.7':
     dependencies:
-      '@babel/types': 7.26.5
+      '@babel/types': 7.26.7
 
   '@babel/types@7.26.3':
     dependencies:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@babel/types@7.26.5':
+  '@babel/types@7.26.7':
     dependencies:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
@@ -3919,7 +3919,7 @@ snapshots:
 
   '@vue/compiler-core@3.5.13':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.26.7
       '@vue/shared': 3.5.13
       entities: 4.5.0
       estree-walker: 2.0.2
@@ -3927,7 +3927,7 @@ snapshots:
 
   '@vue/compiler-core@https://pkg.pr.new/vuejs/vue-vapor/@vue/compiler-core@9f73dbf6c075ce11c28eac012e30d018ac8f2647':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.26.7
       '@vue/shared': https://pkg.pr.new/vuejs/vue-vapor/@vue/shared@9f73dbf6c075ce11c28eac012e30d018ac8f2647
       entities: 4.5.0
       estree-walker: 2.0.2
@@ -3945,7 +3945,7 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.13':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.26.7
       '@vue/compiler-core': 3.5.13
       '@vue/compiler-dom': 3.5.13
       '@vue/compiler-ssr': 3.5.13
@@ -3957,7 +3957,7 @@ snapshots:
 
   '@vue/compiler-sfc@https://pkg.pr.new/vuejs/vue-vapor/@vue/compiler-sfc@9f73dbf6c075ce11c28eac012e30d018ac8f2647':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.26.7
       '@vue/compiler-core': https://pkg.pr.new/vuejs/vue-vapor/@vue/compiler-core@9f73dbf6c075ce11c28eac012e30d018ac8f2647
       '@vue/compiler-dom': https://pkg.pr.new/vuejs/vue-vapor/@vue/compiler-dom@9f73dbf6c075ce11c28eac012e30d018ac8f2647
       '@vue/compiler-ssr': https://pkg.pr.new/vuejs/vue-vapor/@vue/compiler-ssr@9f73dbf6c075ce11c28eac012e30d018ac8f2647
@@ -4158,7 +4158,7 @@ snapshots:
 
   ast-kit@1.4.0:
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.26.7
       pathe: 2.0.2
 
   available-typed-arrays@1.0.7:

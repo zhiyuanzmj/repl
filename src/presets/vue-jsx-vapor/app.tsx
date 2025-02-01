@@ -69,7 +69,7 @@ export default () => {
 
       <For count={count.value} />
 
-      <Slots count={count.value} v-slot={{ foo }}>  
+      <Slots count={count.value} v-slot={{ foo }}>
         {foo}
       </Slots>
 

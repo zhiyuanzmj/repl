@@ -29,8 +29,13 @@ export default defineConfig({
       treeshake: true,
     },
     lib: {
-      entry: ['index.html', ...(await globby(['./src/proxy/*.ts']))],
-      name: 'lib',
+      entry: ['index.html', ...(await globby(['./proxy/*.ts']))],
+      fileName(_, name) {
+        if (name === 'index.html') {
+          return 'index.html'
+        }
+        return `proxy/${name}.js`
+      },
       formats: ['es'],
     },
     commonjsOptions: {

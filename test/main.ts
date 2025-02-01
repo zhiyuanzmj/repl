@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
-import { mergeImportMap, type OutputModes, Repl, useStore, useVueImportMap } from '../src'
+import { type OutputModes, Repl, useStore } from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
@@ -14,22 +14,8 @@ window.process = { env: {} }
 const App = {
   setup() {
     const query = new URLSearchParams(location.search)
-    const { importMap: builtinImportMap, vueVersion } = useVueImportMap()
-    const prefix = `${location.origin}${import.meta.env.PROD ? '' : '/src/proxy'}`
-    const suffix = import.meta.env.PROD ? '.js' : ''
-    const ImportMap = ref(
-      mergeImportMap(builtinImportMap.value, {
-        imports: {
-          '@vue-macros/jsx-macros/api.js': `${prefix}/vite-plugin-jsx-macros${suffix}`,
-          '@vue-macros/volar/jsx-macros.js': `${prefix}/volar-plugin-jsx-macros${suffix}`,
-          '@vue-macros/jsx-directive/api.js': `${prefix}/vite-plugin-jsx-directive${suffix}`,
-        },
-      }),
-    )
     const store = (window.store = useStore(
       {
-        builtinImportMap: ImportMap,
-        vueVersion,
         showOutput: ref(query.has('so')),
         outputMode: ref((query.get('om') as OutputModes) || 'js'),
       },
@@ -45,7 +31,6 @@ const App = {
         store,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
-        // layout: 'vertical',
         ssr: false,
         // showCompileOutput: false,
         editorOptions: {
@@ -55,7 +40,6 @@ const App = {
             // wordWrap: 'on',
           },
         },
-        // autoSave: false,
       })
   },
 }
