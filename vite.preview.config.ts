@@ -29,7 +29,7 @@ export default defineConfig({
       treeshake: true,
     },
     lib: {
-      entry: ['index.html', ...(await globby(['./proxy/*.ts']))],
+      entry: ['index.html', ...(await globby(['./proxy/*']))],
       fileName(_, name) {
         if (name === 'index.html') {
           return 'index.html'

@@ -1,10 +1,10 @@
 {
   "imports": {
-    "vue": "/proxy/vue-vapor",
-    "vue/vapor": "/proxy/vue-vapor",
-    "@vue-macros/jsx-macros/api.js": "/proxy/vite-plugin-jsx-macros",
-    "@vue-macros/volar/jsx-macros.js": "/proxy/volar-plugin-jsx-macros",
-    "@vue-macros/jsx-directive/api.js": "/proxy/vite-plugin-jsx-directive"
+    "vue": "/proxy/vue-vapor.js",
+    "vue/vapor": "/proxy/vue-vapor.js",
+    "@vue-macros/jsx-macros/api.js": "/proxy/vite-plugin-jsx-macros.js",
+    "@vue-macros/volar/jsx-macros.js": "/proxy/volar-plugin-jsx-macros.js",
+    "@vue-macros/jsx-directive/api.js": "/proxy/vite-plugin-jsx-directive.js"
   },
   "scopes": {}
 }
