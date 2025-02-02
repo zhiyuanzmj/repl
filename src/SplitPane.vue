@@ -67,6 +67,7 @@ function changeViewSize() {
       dragging: state.dragging,
       'show-output': store.showOutput,
       vertical: isVertical,
+      horizontal: !isVertical,
     }"
     @mousemove="dragMove"
     @mouseup="dragEnd"
@@ -157,62 +158,61 @@ function changeViewSize() {
 }
 
 /* vertical */
-@media (min-width: 721px) {
-  .split-pane.vertical {
-    display: block;
-  }
+.split-pane.vertical {
+  display: block;
+}
 
-  .split-pane.vertical.dragging {
-    cursor: ns-resize;
-  }
+.split-pane.vertical.dragging {
+  cursor: ns-resize;
+}
 
-  .vertical .dragger {
-    top: auto;
-    height: 10px;
-    width: 100%;
-    left: 0;
-    right: 0;
-    bottom: -5px;
-    cursor: ns-resize;
-  }
+.vertical .dragger {
+  top: auto;
+  height: 10px;
+  width: 100%;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  cursor: ns-resize;
+}
 
-  .vertical .left,
-  .vertical .right {
-    width: 100%;
-  }
-  .vertical .left {
-    border-right: none;
-  }
+.vertical .left,
+.vertical .right {
+  width: 100%;
+}
+.vertical .left {
+  border-right: none;
 }
 
 /* mobile */
 @media (max-width: 720px) {
-  .left,
-  .right {
+  .horizontal > .left,
+  .horizontal > .right {
     position: absolute;
     inset: 0;
     width: auto !important;
     height: auto !important;
   }
-  .dragger {
+  .horizontal > .dragger {
     display: none;
   }
-  .split-pane .toggler {
+
+  .split-pane.horizontal > .toggler {
     display: block;
   }
-  .split-pane .right {
+  .split-pane.horizontal > .right {
     z-index: -1;
     pointer-events: none;
   }
-  .split-pane .left {
+  .split-pane.horizontal > .left {
     z-index: 0;
     pointer-events: all;
   }
-  .split-pane.show-output .right {
+  .split-pane.show-output.horizontal > .right {
     z-index: 0;
     pointer-events: all;
   }
-  .split-pane.show-output .left {
+  .split-pane.show-output.horizontal > .left {
     z-index: -1;
     pointer-events: none;
   }

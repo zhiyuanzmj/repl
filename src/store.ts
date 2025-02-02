@@ -38,6 +38,7 @@ export function useStore(
     showOutput = ref(false),
     outputMode = ref('js'),
     theme = ref('dark'),
+    loading = ref(true),
 
     locale = ref(),
     typescriptVersion = ref('latest'),
@@ -110,6 +111,8 @@ export function useStore(
         )
       }
     }
+
+    loading.value = false
   }
 
   const setActive: Store['setActive'] = (filename) => {
@@ -272,6 +275,7 @@ export function useStore(
     newFiles,
     mainFile = store.mainFile,
   ) => {
+    loading.value = true
     const files: Record<string, File> = Object.create(null)
 
     mainFile = addSrcPrefix(mainFile)
@@ -291,6 +295,9 @@ export function useStore(
     store.files = files
     store.errors = errors
     setActive(store.mainFile)
+    setTimeout(() => {
+      loading.value = false
+    }, 1000)
   }
   const setDefaultFile = (): void => {
     setFile(files.value, indexHtmlFile, template.value.indexHtml)
@@ -329,6 +336,7 @@ export function useStore(
     showOutput,
     outputMode,
     theme,
+    loading,
 
     locale,
     typescriptVersion,
@@ -380,6 +388,7 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   theme: 'light' | 'dark'
+  loading: boolean
 
   // volar-related
   locale: string | undefined
@@ -448,6 +457,7 @@ export type Store = Pick<
   | 'presets'
   | 'importMap'
   | 'theme'
+  | 'loading'
 >
 
 export class File {

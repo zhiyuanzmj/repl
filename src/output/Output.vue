@@ -93,7 +93,11 @@ const toggleDark = () => {
             />
           </div>
         </div>
-        <Preview ref="preview" :ssr="ssr" />
+        <Preview v-if="!store.loading" ref="preview" :ssr="ssr" />
+        <div
+          v-else
+          class="i-carbon:rotate-180 text-gray h-full mt--4 w-10 m-auto animate-spin"
+        />
       </div>
     </template>
 

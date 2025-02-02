@@ -67,8 +67,7 @@ if (!props.editor) {
 
 const outputRef = useTemplateRef('output')
 
-const done = ref(false)
-props.store.init().then(() => (done.value = true))
+props.store.init()
 
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
@@ -101,7 +100,6 @@ defineExpose({ reload })
       </template>
       <template #[outputSlotName]>
         <Output
-          v-if="done"
           ref="output"
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
