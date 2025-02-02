@@ -233,7 +233,11 @@ export function useStore(
         'data:text/javascript;charset=utf-8,' +
           encodeURIComponent(addEsmPrefix(code, importMap.value))
       ).then((i) => i.default)
-    } catch {
+    } catch (e) {
+      errors.value = [
+        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
+      ]
+      console.error(e)
       store.viteConfig = { plugins: [] }
     }
     return store.viteConfig

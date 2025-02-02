@@ -1,23 +1,16 @@
 // @ts-nocheck
-import JsxMacros from '@vue-macros/jsx-macros/api.js'
-import { transformJsxDirective } from '@vue-macros/jsx-directive/api.js'
-import VueJsxVapor from 'unplugin-vue-jsx-vapor/api.js'
+import jsxMacros from '@vue-macros/jsx-macros/raw.js'
+import jsxDirective from '@vue-macros/jsx-directive/raw.js'
+import VueJsxVapor from 'unplugin-vue-jsx-vapor/raw.js'
 
 export default {
   plugins: [
-    JsxMacros({
+    jsxMacros({
       lib: 'vue/vapor',
     }),
-    {
-      name: '@vue-macros/jsx-directive',
-      transform(code, id) {
-        return transformJsxDirective(code, id, {
-          lib: 'vue/vapor',
-          version: 3,
-          prefix: 'v-',
-        })
-      },
-    },
+    jsxDirective({
+      lib: 'vue/vapor',
+    }),
     VueJsxVapor(),
   ],
 }
