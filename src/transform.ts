@@ -133,7 +133,8 @@ export const cssRE = /\.(css|scss)$/
 async function transformCssModules(code: string, id: string) {
   if (code.startsWith('export default')) return
   if (sassRE.test(id)) {
-    code = await import('sass').then((i) => i.compileString(code).css)
+    // @ts-ignore
+    code = await import('https://jspm.dev/sass').then((i) => i.compileString(code).css)
   }
   let resultJSON
   const plugins = []

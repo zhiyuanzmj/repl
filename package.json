@@ -100,7 +100,6 @@
     "postcss": "^8.5.1",
     "postcss-modules": "^6.0.1",
     "prettier": "^3.4.2",
-    "sass": "^1.83.4",
     "shiki": "^1.25.1",
     "simple-git-hooks": "^2.11.1",
     "sucrase": "^3.35.0",
