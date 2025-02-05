@@ -230,6 +230,10 @@ defineExpose({ reload, container: containerRef })
   background-color: #fff;
 }
 
+.iframe-container{
+  height: calc(100% - 38px);
+}
+
 .iframe-container.dark :deep(iframe) {
   background-color: #1e1e1e;
 }
