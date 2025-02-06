@@ -1,7 +1,7 @@
 // @ts-nocheck
 import jsxMacros from '@vue-macros/jsx-macros/raw.js'
 import jsxDirective from '@vue-macros/jsx-directive/raw.js'
-import { transform } from '@babel/standalone'
+import { transformSync } from '@babel/core'
 import jsx from 'babel-preset-solid'
 
 export default {
@@ -14,9 +14,9 @@ export default {
     }),
     {
       name: 'vite-plugin-solid',
-      transform(src, id) {
+      transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return transform(src, {
+          return transformSync(code, {
             presets: [jsx],
           }).code
       },

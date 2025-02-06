@@ -1,7 +1,7 @@
 // @ts-nocheck
 import jsxMacros from '@vue-macros/jsx-macros/raw.js'
 import jsxDirective from '@vue-macros/jsx-directive/raw.js'
-import { transform } from '@babel/standalone'
+import { transformSync } from '@babel/core'
 import jsx from '@vue/babel-plugin-jsx'
 
 export default {
@@ -10,9 +10,9 @@ export default {
     jsxDirective(),
     {
       name: 'vite-plugin-vue-jsx',
-      transform(src, id) {
+      transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return transform(src, {
+          return transformSync(code, {
             plugins: [jsx],
           }).code
       },

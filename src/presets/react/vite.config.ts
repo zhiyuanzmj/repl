@@ -1,7 +1,7 @@
 // @ts-nocheck
 import jsxMacros from '@vue-macros/jsx-macros/raw.js'
 import jsxDirective from '@vue-macros/jsx-directive/raw.js'
-import { transform } from '@babel/standalone'
+import { transformSync } from '@babel/core'
 import jsx from '@babel/plugin-transform-react-jsx'
 
 export default {
@@ -14,11 +14,11 @@ export default {
     }),
     {
       name: 'vite-plugin-react',
-      transform(src, id) {
+      transform(code, id) {
         if (id.match(/\.[jt]sx$/))
           return (
             'import React from "react"\n' +
-            transform(src, {
+            transformSync(code, {
               plugins: [jsx],
             }).code
           )
