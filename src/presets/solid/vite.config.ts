@@ -6,8 +6,12 @@ import jsx from 'babel-preset-solid'
 
 export default {
   plugins: [
-    jsxMacros(),
-    jsxDirective(),
+    jsxMacros({
+      lib: 'solid'
+    }),
+    jsxDirective({
+      lib: 'solid'
+    }),
     {
       name: 'vite-plugin-solid',
       transform(src, id) {

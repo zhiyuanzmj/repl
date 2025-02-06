@@ -3,8 +3,7 @@
     "vue": "/proxy/vue-vapor.js",
     "vue/vapor": "/proxy/vue-vapor.js",
     "@vue-macros/jsx-macros/raw.js": "/proxy/vite-plugin-jsx-macros.js",
-    "@vue-macros/volar/jsx-macros.js": "/proxy/volar-plugin-jsx-macros.js",
-    "@vue-macros/jsx-directive/raw.js": "/proxy/vite-plugin-jsx-directive.js"
+    "@vue-macros/volar/jsx-macros.js": "/proxy/volar-plugin-jsx-macros.js"
   },
   "scopes": {}
 }

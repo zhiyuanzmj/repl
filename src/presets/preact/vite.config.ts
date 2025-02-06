@@ -7,19 +7,22 @@ import jsx from '@babel/plugin-transform-react-jsx'
 export default {
   plugins: [
     jsxMacros({
-      lib: 'react',
+      lib: 'preact',
     }),
     jsxDirective({
-      lib: 'react'
+      lib: 'preact'
     }),
     {
-      name: 'vite-plugin-react',
+      name: 'vite-plugin-preact',
       transform(src, id) {
         if (id.match(/\.[jt]sx$/))
           return (
-            'import React from "react"\n' +
+            'import { h, Fragment } from "preact"\n' +
             transform(src, {
-              plugins: [jsx],
+              plugins: [[jsx, {
+                "pragma": "h",
+                "pragmaFrag": "Fragment",
+              }]],
             }).code
           )
       },

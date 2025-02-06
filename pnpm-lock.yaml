@@ -41,9 +41,6 @@ importers:
       '@volar/monaco':
         specifier: ~2.4.11
         version: 2.4.11
-      '@vue-macros/jsx-directive':
-        specifier: latest
-        version: 0.10.3(typescript@5.7.2)
       '@vue-macros/jsx-macros':
         specifier: https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@a2b1778
         version: https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@a2b1778(typescript@5.7.2)(vue@https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf(typescript@5.7.2))
@@ -1038,16 +1035,6 @@ packages:
     version: 0.5.5
     engines: {node: '>=16.14.0'}
 
-  '@vue-macros/common@1.16.1':
-    resolution: {integrity: sha512-Pn/AWMTjoMYuquepLZP813BIcq8DTZiNCoaceuNlvaYuOTd8DqBZWc5u0uOMQZMInwME1mdSmmBAcTluiV9Jtg==}
-    version: 1.16.1
-    engines: {node: '>=16.14.0'}
-    peerDependencies:
-      vue: ^2.7.0 || ^3.2.25
-    peerDependenciesMeta:
-      vue:
-        optional: true
-
   '@vue-macros/common@https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/common@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b':
     resolution: {tarball: https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/common@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b}
     version: 1.16.1
@@ -1061,10 +1048,6 @@ packages:
   '@vue-macros/config@https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/config@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b':
     resolution: {tarball: https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/config@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b}
     version: 0.6.0
-    engines: {node: '>=16.14.0'}
-
-  '@vue-macros/jsx-directive@0.10.3':
-    resolution: {integrity: sha512-yyobqxbBXar+QnbJNMgxky2Hwxp1PHWUrshg46kfBn9ZtRW2dOaup3Z85WxD9ShH/BytyCoFvkWCVjn/NWt+ew==}
     engines: {node: '>=16.14.0'}
 
   '@vue-macros/jsx-directive@https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-directive@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b':
@@ -3838,17 +3821,6 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@vue-macros/common@1.16.1(vue@https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf(typescript@5.7.2))':
-    dependencies:
-      '@vue/compiler-sfc': 3.5.13
-      ast-kit: 1.4.0
-      local-pkg: 1.0.0
-      magic-string-ast: 0.7.0
-      pathe: 2.0.2
-      picomatch: 4.0.2
-    optionalDependencies:
-      vue: https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf(typescript@5.7.2)
-
   '@vue-macros/common@https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/common@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b(vue@https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf(typescript@5.7.2))':
     dependencies:
       '@vue/compiler-sfc': 3.5.13
@@ -3868,15 +3840,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - vue
-
-  '@vue-macros/jsx-directive@0.10.3(typescript@5.7.2)':
-    dependencies:
-      '@vue-macros/common': 1.16.1(vue@https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf(typescript@5.7.2))
-      '@vue/compiler-core': 3.5.13
-      unplugin: 1.16.1
-      vue: 3.5.13(typescript@5.7.2)
-    transitivePeerDependencies:
-      - typescript
 
   '@vue-macros/jsx-directive@https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-directive@a2b17788d27b804e2c74bc9aaac86a7c4f28c34b(typescript@5.7.2)':
     dependencies:

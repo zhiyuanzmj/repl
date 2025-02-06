@@ -84,7 +84,6 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
-    "@vue-macros/jsx-directive": "latest",
     "@vue-macros/jsx-macros": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@a2b1778",
     "@vue-macros/volar": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/volar@a2b1778",
     "assert": "^2.1.0",

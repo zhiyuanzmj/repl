@@ -22,6 +22,14 @@ import reactTsmConfigCode from './react/tsm.config.ts?raw'
 import reactTsconfigCode from './react/tsconfig.json?raw'
 import reactImportMap from './react/import-map.json?raw'
 
+import preactHtml from './preact/index.html?raw'
+import preactAppCode from './preact/app.tsx?raw'
+import preactNewCode from './preact/new.tsx?raw'
+import preactViteConfCode from './preact/vite.config.ts?raw'
+import preactTsmConfigCode from './preact/tsm.config.ts?raw'
+import preactTsconfigCode from './preact/tsconfig.json?raw'
+import preactImportMap from './preact/import-map.json?raw'
+
 import solidHtml from './solid/index.html?raw'
 import solidAppCode from './solid/app.tsx?raw'
 import solidNewCode from './solid/new.tsx?raw'
@@ -57,6 +65,15 @@ export const defaultPresets = {
     tsmConfig: reactTsmConfigCode,
     tsconfig: reactTsconfigCode,
     importMap: reactImportMap,
+  },
+  preact: {
+    indexHtml: preactHtml,
+    app: preactAppCode,
+    new: preactNewCode,
+    viteConfig: preactViteConfCode,
+    tsmConfig: preactTsmConfigCode,
+    tsconfig: preactTsconfigCode,
+    importMap: preactImportMap,
   },
   solid: {
     indexHtml: solidHtml,
