@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import { computed, inject, useTemplateRef } from 'vue'
+import { computed, inject, ref, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -54,6 +54,8 @@ const toggleDark = () => {
   document.documentElement.classList.toggle('dark')
   store.value.theme = store.value.theme === 'dark' ? 'light' : 'dark'
 }
+
+const devtoolsLoaded = ref(false)
 </script>
 
 <template>
@@ -108,19 +110,25 @@ const toggleDark = () => {
             v-for="m of modes"
             :key="m"
             :class="{ active: mode === m }"
-            @click="mode = m"
+            @click="()=>{
+              mode = m
+              if(m==='devtools'){
+                devtoolsLoaded=true
+              }
+            }"
           >
             <span>{{ m }}</span>
           </button>
         </div>
 
         <Devtools
-          v-if="mode === 'devtools'"
+          v-if="devtoolsLoaded"
+          v-show="mode === 'devtools'"
           :theme="store.theme"
           :iframe="iframe"
         />
         <props.editorComponent
-          v-else
+          v-if="mode !== 'devtools'"
           readonly
           :filename="store.activeFile.filename"
           :value="store.activeFile.compiled[mode]"

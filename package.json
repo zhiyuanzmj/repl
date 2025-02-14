@@ -109,7 +109,7 @@
     "vite-plugin-dts": "^4.4.0",
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
-    "vue": "https://pkg.pr.new/vuejs/vue-vapor/vue@9f73dbf",
+    "vue": "https://pkg.pr.new/vuejs/vue-vapor/vue@6d5bc43",
     "vue-tsc": "~2.2.0"
   }
 }
