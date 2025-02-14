@@ -26,7 +26,7 @@ export default {
           return transformSync(code, {
             plugins: [jsx],
           }).code
-      }
+      },
     },
   ],
 }

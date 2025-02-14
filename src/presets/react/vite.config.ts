@@ -10,7 +10,7 @@ export default {
       lib: 'react',
     }),
     jsxDirective({
-      lib: 'react'
+      lib: 'react',
     }),
     {
       name: 'vite-plugin-react',

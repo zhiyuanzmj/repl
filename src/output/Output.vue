@@ -110,12 +110,14 @@ const devtoolsLoaded = ref(false)
             v-for="m of modes"
             :key="m"
             :class="{ active: mode === m }"
-            @click="()=>{
-              mode = m
-              if(m==='devtools'){
-                devtoolsLoaded=true
+            @click="
+              () => {
+                mode = m
+                if (m === 'devtools') {
+                  devtoolsLoaded = true
+                }
               }
-            }"
+            "
           >
             <span>{{ m }}</span>
           </button>

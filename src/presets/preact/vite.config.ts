@@ -10,7 +10,7 @@ export default {
       lib: 'preact',
     }),
     jsxDirective({
-      lib: 'preact'
+      lib: 'preact',
     }),
     {
       name: 'vite-plugin-preact',
@@ -19,10 +19,15 @@ export default {
           return (
             'import { h, Fragment } from "preact"\n' +
             transformSync(code, {
-              plugins: [[jsx, {
-                "pragma": "h",
-                "pragmaFrag": "Fragment",
-              }]],
+              plugins: [
+                [
+                  jsx,
+                  {
+                    pragma: 'h',
+                    pragmaFrag: 'Fragment',
+                  },
+                ],
+              ],
             }).code
           )
       },
