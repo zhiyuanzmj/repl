@@ -43,7 +43,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       tsMacroOptions = { plugins: [] }
       console.error(e)
     }
-    tsMacroOptions.plugins.push(getVirtualCode)
+    tsMacroOptions.plugins.push(getVirtualCode())
     locale = msg.data.tsLocale
     ts = await importTsFromCdn(msg.data.tsVersion)
     self.postMessage('inited')
