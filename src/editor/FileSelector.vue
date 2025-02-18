@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
-import { type File, indexHtmlFile, stripSrcPrefix, tsconfigFile } from '../store'
+import {
+  type File,
+  indexHtmlFile,
+  stripSrcPrefix,
+  tsconfigFile,
+} from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
 const { store, virtualFiles } = inject(injectKeyProps)!

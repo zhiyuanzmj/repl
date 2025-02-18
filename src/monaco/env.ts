@@ -120,6 +120,11 @@ export function loadMonacoEnv(store: Store) {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {
               resolve()
+            } else if (data.data?.filePath) {
+              const file = store.files[data.data.filePath.slice(1)]
+              if (file) {
+                file.compiled.volar = data.data.code
+              }
             }
           })
           worker.postMessage({

@@ -10,6 +10,16 @@ import { getLanguagePlugins } from '@ts-macro/language-plugin'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
+import { createPlugin, toString } from 'ts-macro'
+
+const getVirtualCode = createPlugin(() => ({
+  name: 'virtual-code',
+  resolveVirtualCode({ codes, filePath }) {
+    if (filePath.startsWith('/src')) {
+      self.postMessage({ filePath, code: toString(codes) })
+    }
+  },
+}))
 
 export interface CreateData {
   tsconfig: {
@@ -33,6 +43,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       tsMacroOptions = { plugins: [] }
       console.error(e)
     }
+    tsMacroOptions.plugins.push(getVirtualCode)
     locale = msg.data.tsLocale
     ts = await importTsFromCdn(msg.data.tsVersion)
     self.postMessage('inited')

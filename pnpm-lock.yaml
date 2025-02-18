@@ -24,8 +24,8 @@ importers:
         specifier: ^1.25.1
         version: 1.25.1
       '@ts-macro/language-plugin':
-        specifier: ^0.1.13
-        version: 0.1.13(rollup@4.29.1)(typescript@5.7.2)
+        specifier: ^0.1.17
+        version: 0.1.17(rollup@4.29.1)(typescript@5.7.2)
       '@types/codemirror':
         specifier: ^5.60.15
         version: 5.60.15
@@ -95,6 +95,9 @@ importers:
       sucrase:
         specifier: ^3.35.0
         version: 3.35.0
+      ts-macro:
+        specifier: ^0.1.17
+        version: 0.1.17(rollup@4.29.1)(typescript@5.7.2)
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -835,8 +838,8 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@ts-macro/language-plugin@0.1.13':
-    resolution: {integrity: sha512-TyfZmTtAbRQB6CjDYFGu8hA5zHT90GEot2Qh6AtVB/TjYTs0kPaoHsJhSJoUXAdnZE4pE2CjuroLjL4T+SF5FA==}
+  '@ts-macro/language-plugin@0.1.17':
+    resolution: {integrity: sha512-cXdkqsOJ3pJC0P37/Ek9ouS/jR8KUuG1paWb1v8kxMj4YjCBjrE7t2I5k9fy2vO33jZD/P1k08V2uIVB2ADPVw==}
 
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
@@ -2673,8 +2676,8 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  ts-macro@0.1.13:
-    resolution: {integrity: sha512-+ARGH+M/BIKG6MC9WL7rJw2A+VscCYAt7hPhG4PYCDqe6KcadG4z6RT3/478Rjoe//dXHmdUesZ1EVlnZJ68EQ==}
+  ts-macro@0.1.17:
+    resolution: {integrity: sha512-VAep+VT2oDb5KOrmaHvuRWOnkwJU0BR1XAqulCVPF3zO6VkmrH1xc1nS5SrNT4uQJVA3f35QfvCXQwLrCOSRcw==}
 
   tsx@4.19.2:
     resolution: {integrity: sha512-pOUl6Vo2LUq/bSa8S5q7b91cgNSjctn9ugq/+Mvow99qW6x/UZYwzxy/3NmqoT66eHYfCVvFvACC58UBPFf28g==}
@@ -3505,13 +3508,13 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@ts-macro/language-plugin@0.1.13(rollup@4.29.1)(typescript@5.7.2)':
+  '@ts-macro/language-plugin@0.1.17(rollup@4.29.1)(typescript@5.7.2)':
     dependencies:
       '@volar/language-core': 2.4.11
       '@volar/typescript': 2.4.11
       jiti: 2.4.2
       rollup-utils: 0.0.2(rollup@4.29.1)
-      ts-macro: 0.1.13(rollup@4.29.1)(typescript@5.7.2)
+      ts-macro: 0.1.17(rollup@4.29.1)(typescript@5.7.2)
       vscode-uri: 3.0.8
     transitivePeerDependencies:
       - rollup
@@ -3885,7 +3888,7 @@ snapshots:
       '@vue/compiler-dom': 3.5.13
       '@vue/language-core': 2.1.10(typescript@5.7.2)
       muggle-string: 0.4.1
-      ts-macro: 0.1.13(rollup@4.29.1)(typescript@5.7.2)
+      ts-macro: 0.1.17(rollup@4.29.1)(typescript@5.7.2)
     optionalDependencies:
       vue-tsc: 2.2.0(typescript@5.7.2)
     transitivePeerDependencies:
@@ -5651,7 +5654,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-macro@0.1.13(rollup@4.29.1)(typescript@5.7.2):
+  ts-macro@0.1.17(rollup@4.29.1)(typescript@5.7.2):
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
       '@volar/language-core': 2.4.11

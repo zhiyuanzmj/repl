@@ -144,7 +144,7 @@ export function useStore(
     ) {
       return
     }
-    
+
     if (activeFilename.value === filename) {
       activeFilename.value = mainFile.value
     }
@@ -485,6 +485,7 @@ export class File {
   compiled = {
     js: '',
     css: '',
+    volar: '',
     ssr: '',
   }
   editorViewState: editor.ICodeEditorViewState | null = null
