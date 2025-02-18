@@ -30,13 +30,13 @@ export const configFileNames = [
 export function useStore(
   {
     files = ref(Object.create(null)),
-    activeFilename = undefined!, // set later
-    activeConfigFilename = ref(viteConfigFile), // set later
+    activeFilename = useRouteQuery('main', appFile),
+    activeConfigFilename = useRouteQuery('config', viteConfigFile),
     mainFile = ref(appFile),
 
     errors = ref([]),
     showOutput = ref(false),
-    outputMode = ref('js'),
+    outputMode = useRouteQuery('output', 'js'),
     theme = ref('dark'),
     loading = ref(true),
 
@@ -45,7 +45,7 @@ export function useStore(
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
 
-    preset = useRouteQuery<string>('preset', 'vue-jsx', false),
+    preset = useRouteQuery<string>('preset', 'vue-jsx'),
     presets = ref(defaultPresets),
   }: Partial<StoreState> = {},
   serializedState?: string,
@@ -70,7 +70,7 @@ export function useStore(
     await getViteConfig()
 
     watchEffect(async () => {
-      await compileFile(store, activeFile.value).then(
+      await compileFile(store, files.value[mainFile.value]).then(
         (errs) => (errors.value = errs),
       )
       await compileFile(store, activeConfigFile.value).then(
@@ -205,7 +205,7 @@ export function useStore(
     }
   }
 
-  const getTsMacroConfig: Store['getTsMacroConfig'] =  async() => {
+  const getTsMacroConfig: Store['getTsMacroConfig'] = async () => {
     let code = files.value[tsMacroConfigFile]?.code
     for (let name in store.importMap.imports) {
       code = code.replaceAll(
@@ -231,7 +231,9 @@ export function useStore(
     try {
       store.viteConfig = await import(
         'data:text/javascript;charset=utf-8,' +
-          encodeURIComponent(await transformTS(addEsmPrefix(code, importMap.value)))
+          encodeURIComponent(
+            await transformTS(addEsmPrefix(code, importMap.value)),
+          )
       ).then((i) => i.default)
     } catch (e) {
       errors.value = [
@@ -320,7 +322,6 @@ export function useStore(
   if (!files.value[mainFile.value]) {
     mainFile.value = Object.keys(files.value).find((i) => i.endsWith('.tsx'))!
   }
-  activeFilename ||= ref(mainFile.value)
   const activeFile = computed(() => files.value[activeFilename.value])
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],

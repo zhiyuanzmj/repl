@@ -55,7 +55,7 @@ const toggleDark = () => {
   store.value.theme = store.value.theme === 'dark' ? 'light' : 'dark'
 }
 
-const devtoolsLoaded = ref(false)
+const devtoolsLoaded = ref(mode.value === 'devtools')
 </script>
 
 <template>

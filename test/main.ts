@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
-import { type OutputModes, Repl, useStore } from '../src'
+import { Repl, useStore } from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
@@ -17,7 +17,6 @@ const App = {
     const store = (window.store = useStore(
       {
         showOutput: ref(query.has('so')),
-        outputMode: ref((query.get('om') as OutputModes) || 'js'),
       },
       location.hash,
     ))
