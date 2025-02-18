@@ -50,6 +50,7 @@ monaco.languages.setLanguageConfiguration('javascript', {
 })
 
 function emitChangeEvent() {
+  store.value.fileCaches[props.filename] = ''
   emit('change', editorInstance.getValue())
 }
 
@@ -151,11 +152,14 @@ onMounted(() => {
   watch(
     autoSave,
     (autoSave) => {
-      if (autoSave) {
-        const disposable =
-          editorInstance.onDidChangeModelContent(emitChangeEvent)
-        onWatcherCleanup(() => disposable.dispose())
-      }
+      const disposable = editorInstance.onDidChangeModelContent(() => {
+        if (autoSave) {
+          emitChangeEvent()
+        } else {
+          store.value.fileCaches[props.filename] = editorInstance.getValue()
+        }
+      })
+      onWatcherCleanup(() => disposable.dispose())
     },
     { immediate: true },
   )

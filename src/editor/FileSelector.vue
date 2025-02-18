@@ -112,6 +112,14 @@ function horizontalScroll(e: WheelEvent) {
     left: el.scrollLeft + distance,
   })
 }
+
+const isUpdated = computed(
+  () => (file: string) =>
+    store.value.fileCaches[file] &&
+    store.value.files[file].code !== store.value.fileCaches[file]
+      ? '*'
+      : '',
+)
 </script>
 
 <template>
@@ -126,9 +134,14 @@ function horizontalScroll(e: WheelEvent) {
           ![store.mainFile, indexHtmlFile].includes(file) && editFileName(file)
         "
       >
-        <span class="label">{{ stripSrcPrefix(file) }}</span>
+        <span class="label">{{ stripSrcPrefix(file) }} </span>
+        <span v-if="isUpdated(file)" class="pl-1!">
+          {{ isUpdated(file) }}
+        </span>
         <span
-          v-if="![store.mainFile, indexHtmlFile].includes(file) && !disabled"
+          v-else-if="
+            ![store.mainFile, indexHtmlFile].includes(file) && !disabled
+          "
           class="remove"
           @click.stop="store.deleteFile(file)"
         >

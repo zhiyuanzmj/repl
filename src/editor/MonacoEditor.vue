@@ -19,7 +19,6 @@ const onChange = (code: string) => {
     :filename="filename"
     :value="value"
     :readonly="readonly"
-    :mode="'jsx'"
     @change="onChange"
   />
 </template>

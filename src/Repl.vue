@@ -45,7 +45,7 @@ export interface Props {
   }
 }
 
-const autoSave = defineModel<boolean>({ default: true })
+const autoSave = useRouteQuery<boolean>('auto-save', false)
 const virtualFiles = useRouteQuery<boolean>('virtual-files', false)
 const props = withDefaults(defineProps<Props>(), {
   previewTheme: false,

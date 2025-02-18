@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
-import { debounce } from '../utils'
-import { computed, inject, ref, watch } from 'vue'
+import { debounce, useRouteQuery } from '../utils'
+import { computed, inject } from 'vue'
 import ToggleButton from './ToggleButton.vue'
 import { type EditorComponentType, injectKeyProps } from '../types'
 import { type File, configFileNames } from '../store'
 import SplitPane from '../SplitPane.vue'
-
-const SHOW_ERROR_KEY = 'repl_show_error'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
 const { store, autoSave, virtualFiles, editorOptions } = inject(injectKeyProps)!
-const showMessage = ref(getItem())
+const showMessage = useRouteQuery('show-message', true)
 
 const onChange = debounce((code: string) => {
   store.value.activeFile.code = code
@@ -24,19 +22,6 @@ const onChange = debounce((code: string) => {
 const onConfigChange = debounce((code: string) => {
   store.value.activeConfigFile.code = code
 }, 250)
-
-function setItem() {
-  localStorage.setItem(SHOW_ERROR_KEY, showMessage.value ? 'true' : 'false')
-}
-
-function getItem() {
-  const item = localStorage.getItem(SHOW_ERROR_KEY)
-  return !(item === 'false')
-}
-
-watch(showMessage, () => {
-  setItem()
-})
 
 const resolvedFiles = computed(() => {
   const result = [{}, {}] as Record<string, File>[]

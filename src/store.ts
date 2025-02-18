@@ -70,13 +70,18 @@ export function useStore(
     await getViteConfig()
 
     watchEffect(async () => {
-      await compileFile(store, files.value[mainFile.value]).then(
+      await compileFile(store, activeFile.value).then(
         (errs) => (errors.value = errs),
       )
+    })
+    watchEffect(async () => {
       await compileFile(store, activeConfigFile.value).then(
         (errs) => (errors.value = errs),
       )
     })
+    await compileFile(store, files.value[mainFile.value]).then(
+      (errs) => (errors.value = errs),
+    )
 
     watch(
       () => [
@@ -327,8 +332,11 @@ export function useStore(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
   )
 
+  const fileCaches = ref(Object.create(null))
+
   const store: ReplStore = reactive({
     files,
+    fileCaches,
     activeFile,
     activeFilename,
     activeConfigFile,
@@ -383,6 +391,7 @@ type Template = {
 
 export type StoreState = ToRefs<{
   files: Record<string, File>
+  fileCaches: Record<string, string>
   activeFilename: string
   activeConfigFilename: string
   mainFile: string
@@ -440,6 +449,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
 export type Store = Pick<
   ReplStore,
   | 'files'
+  | 'fileCaches'
   | 'activeFile'
   | 'activeConfigFile'
   | 'mainFile'
