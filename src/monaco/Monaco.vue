@@ -152,7 +152,8 @@ onMounted(() => {
   watch(
     autoSave,
     (autoSave) => {
-      const disposable = editorInstance.onDidChangeModelContent(() => {
+      const disposable = editorInstance.onDidChangeModelContent((e) => {
+        if (e.isFlush) return
         if (autoSave) {
           emitChangeEvent()
         } else {

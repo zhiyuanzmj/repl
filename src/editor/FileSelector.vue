@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
-import { type File, indexHtmlFile, stripSrcPrefix } from '../store'
+import { type File, indexHtmlFile, stripSrcPrefix, tsconfigFile } from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
 const { store, virtualFiles } = inject(injectKeyProps)!
@@ -128,7 +128,10 @@ const isUpdated = computed(
       <div
         v-if="pending !== file"
         class="file"
-        :class="{ active: activeFile.filename === file }"
+        :class="{
+          active: activeFile.filename === file,
+          'ml-auto': file === tsconfigFile,
+        }"
         @click="store.setActive(file)"
         @dblclick="
           ![store.mainFile, indexHtmlFile].includes(file) && editFileName(file)
