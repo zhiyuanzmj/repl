@@ -139,6 +139,12 @@ export function useStore(
     if (!file.hidden) setActive(file.filename)
   }
   const deleteFile: Store['deleteFile'] = (filename) => {
+    if (
+      !confirm(`Are you sure you want to delete ${stripSrcPrefix(filename)}?`)
+    ) {
+      return
+    }
+    
     if (activeFilename.value === filename) {
       activeFilename.value = mainFile.value
     }
