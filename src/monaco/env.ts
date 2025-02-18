@@ -69,7 +69,7 @@ export async function reloadLanguageTools(store: Store) {
     host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
-      tsMacroConfig: store.getTsMacroConfig?.() || '{}',
+      tsMacroConfig: await store.getTsMacroConfig?.() || '{}',
       dependencies,
     } satisfies CreateData,
   })
@@ -116,7 +116,7 @@ export function loadMonacoEnv(store: Store) {
     async getWorker(_: any, label: string) {
       if (label === 'tsx') {
         const worker = new Worker()
-        const init = new Promise<void>((resolve) => {
+        const init = new Promise<void>(async (resolve) => {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {
               resolve()
@@ -126,7 +126,7 @@ export function loadMonacoEnv(store: Store) {
             event: 'init',
             tsVersion: store.typescriptVersion,
             tsLocale: store.locale,
-            tsMacroConfig: store.getTsMacroConfig?.(),
+            tsMacroConfig: await store.getTsMacroConfig?.(),
           } satisfies WorkerMessage)
         })
         await init

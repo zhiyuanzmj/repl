@@ -12,7 +12,7 @@ function testJsx(filename: string | undefined | null) {
   return !!(filename && /(\.|\b)[jt]sx$/.test(filename))
 }
 
-function transformTS(src: string, isJSX?: boolean) {
+export function transformTS(src: string, isJSX?: boolean) {
   return transform(src, {
     transforms: ['typescript', ...(isJSX ? (['jsx'] as Transform[]) : [])],
     jsxRuntime: 'preserve',

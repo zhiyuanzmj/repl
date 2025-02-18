@@ -7,7 +7,7 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import { compileFile, cssRE } from './transform'
+import { compileFile, cssRE, transformTS } from './transform'
 import { addEsmPrefix, atou, useRouteQuery, utoa } from './utils'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
@@ -205,7 +205,7 @@ export function useStore(
     }
   }
 
-  const getTsMacroConfig: Store['getTsMacroConfig'] = () => {
+  const getTsMacroConfig: Store['getTsMacroConfig'] =  async() => {
     let code = files.value[tsMacroConfigFile]?.code
     for (let name in store.importMap.imports) {
       code = code.replaceAll(
@@ -215,7 +215,7 @@ export function useStore(
     }
     return (
       'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(addEsmPrefix(code, importMap.value))
+      encodeURIComponent(await transformTS(addEsmPrefix(code, importMap.value)))
     )
   }
 
@@ -231,7 +231,7 @@ export function useStore(
     try {
       store.viteConfig = await import(
         'data:text/javascript;charset=utf-8,' +
-          encodeURIComponent(addEsmPrefix(code, importMap.value))
+          encodeURIComponent(await transformTS(addEsmPrefix(code, importMap.value)))
       ).then((i) => i.default)
     } catch (e) {
       errors.value = [
@@ -429,7 +429,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deleteFile(filename: string): void
   renameFile(oldFilename: string, newFilename: string): void
   getTsConfig(): Record<string, any>
-  getTsMacroConfig(): string
+  getTsMacroConfig(): Promise<string>
   serialize(): string
   deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
