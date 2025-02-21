@@ -1,3 +1,5 @@
+import { User } from "@prisma/client"
+
 export default defineEventHandler(async (event) => {
   return {
     data: await prisma.project.findMany({
@@ -9,7 +11,7 @@ export default defineEventHandler(async (event) => {
         },
       },
       where: {
-        userId: getRouterParam(event, 'id'),
+        userId: getSession<User>(event).id,
       },
     }),
   }
