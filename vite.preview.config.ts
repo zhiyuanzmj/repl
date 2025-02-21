@@ -16,6 +16,7 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
   build: {
+    outDir: './.vercel/output/static',
     rollupOptions: {
       external: ['node:worker_threads', 'unconfig'],
       plugins: [

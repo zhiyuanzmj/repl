@@ -45,6 +45,7 @@
     "dev": "vite",
     "server:dev": "nitro dev",
     "server:build": "prisma generate && prisma migrate deploy && nitro build",
+    "vercel:build": "pnpm server:build && pnpm build-preview",
     "postinstall": "prisma generate",
     "build": "vite build",
     "build-preview": "vite build -c vite.preview.config.ts",
