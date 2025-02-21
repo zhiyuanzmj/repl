@@ -44,9 +44,8 @@
   "scripts": {
     "dev": "vite",
     "server:dev": "nitro dev",
-    "server:build": "prisma generate && prisma migrate deploy && nitro build",
+    "server:build": "prisma generate --no-engine && prisma migrate deploy && nitro build",
     "vercel:build": "pnpm server:build && pnpm build-preview",
-    "postinstall": "prisma generate",
     "build": "vite build",
     "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
@@ -81,6 +80,7 @@
     "@eslint/js": "^9.17.0",
     "@iconify-json/carbon": "^1.2.5",
     "@prisma/client": "^6.4.1",
+    "@prisma/extension-accelerate": "^1.2.2",
     "@rollup/plugin-replace": "^6.0.2",
     "@shikijs/monaco": "^1.25.1",
     "@ts-macro/language-plugin": "^0.1.17",
