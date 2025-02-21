@@ -9,31 +9,18 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
+  id       String    @id @default(uuid())
   username String    @unique
   githubId Int       @unique
-  password String?
   avatar   String?
   email    String?
   project  Project[]
   role     Role      @default(USER)
-  session  Session[]
 }
 
 enum Role {
   USER
   ADMIN
-}
-
-model Session {
-  id        String   @id @default(uuid())
-  ip        String?
-  count     Int      @default(0)
-  status    Boolean  @default(true)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Project {

@@ -42,24 +42,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await prisma.session.updateMany({
-    data: {
-      status: false,
-    },
-    where: {
-      userId: user.id,
-      status: true,
-    },
-  })
-
-  const session = await prisma.session.create({
-    data: {
-      userId: user.id,
-      ip: event.node.req.socket.remoteAddress,
-    },
-  })
-
-  setCookie(event, 'token', session.id)
+  setCookie(event, 'token', user.id)
 
   return `<script>location.href='${getRequestProtocol(event) + '://' + getRequestHost(event)}'</script>`
 })
