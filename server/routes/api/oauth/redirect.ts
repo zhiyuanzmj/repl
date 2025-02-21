@@ -13,8 +13,8 @@ export default defineEventHandler(async (event) => {
       },
       params: {
         code: params.code,
-        client_id: import.meta.env.NITRO_CLIENT_ID,
-        client_secret: import.meta.env.NITRO_CLIENT_SECRET,
+        client_id: process.env.NITRO_CLIENT_ID,
+        client_secret: process.env.NITRO_CLIENT_SECRET,
       },
     },
   )
