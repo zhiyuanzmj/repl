@@ -82,7 +82,10 @@ const otherProject = computed(() => {
             :key="project.id"
             class="flex items-center p1 op80"
           >
-            <span>{{ index + 1 }}. {{ project.name }} </span>
+            <span class="flex">
+              <span class="text-center w-4 mr1">{{ index + 1 }}.</span>
+              {{ project.name }}
+            </span>
             <i
               class="ml-auto i-carbon:trash-can cursor-pointer text-base"
               @click="deleteProject(project.id)"
