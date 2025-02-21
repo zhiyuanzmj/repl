@@ -7,6 +7,7 @@ import ToggleButton from './ToggleButton.vue'
 import { type EditorComponentType, injectKeyProps } from '../types'
 import { type File, configFileNames } from '../store'
 import SplitPane from '../SplitPane.vue'
+import { ofetch } from 'ofetch'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -15,12 +16,24 @@ const props = defineProps<{
 const { store, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = useRouteQuery('show-message', true)
 
+function updateProject() {
+  if (!store.value.user.id || !store.value.project) return
+  ofetch('/api/project/' + store.value.project.id, {
+    method: 'PUT',
+    body: {
+      hash: store.value.serialize(),
+    },
+  })
+}
+
 const onChange = debounce((code: string) => {
   store.value.activeFile.code = code
+  updateProject()
 }, 250)
 
 const onConfigChange = debounce((code: string) => {
   store.value.activeConfigFile.code = code
+  updateProject()
 }, 250)
 
 const resolvedFiles = computed(() => {

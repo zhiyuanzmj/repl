@@ -95,7 +95,7 @@ export async function useStore(
         template.value = presets.value['vue-jsx']
         return
       }
-      serializedState = project.value.hash
+      serializedState ??= project.value.hash
       template.value = resolveHash(project.value?.hash ?? '')
     }
   }

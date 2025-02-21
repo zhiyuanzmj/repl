@@ -24,6 +24,7 @@ async function submit() {
   name.value = ''
   await store.value.getProjects()
   loading.value = false
+  dropdownRef.value?.hide()
 }
 
 async function deleteProject(id: string) {
@@ -79,7 +80,7 @@ const otherProject = computed(() => {
           <div
             v-for="(project, index) in store.projects"
             :key="project.id"
-            class="flex items-center p1 op70"
+            class="flex items-center p1 op80"
           >
             <span>{{ index + 1 }}. {{ project.name }} </span>
             <i
@@ -95,7 +96,7 @@ const otherProject = computed(() => {
           <div class="i-carbon:rotate-180 text h-6 w-6 m-auto animate-spin" />
         </div>
       </form>
-      <div v-else class="px4 py2 text-sm">Please log in first</div>
+      <div v-else class="px4 py2 text-sm">Please login first</div>
     </template>
   </Dropdown>
 
@@ -109,7 +110,7 @@ const otherProject = computed(() => {
       </option>
     </optgroup>
     <hr />
-    <optgroup label="Project">
+    <optgroup label="My Projects">
       <option
         v-if="otherProject"
         :value="otherProject.user.username + '/' + otherProject.name"

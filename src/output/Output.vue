@@ -9,7 +9,7 @@ import {
 } from '../types'
 import SplitPane from '../SplitPane.vue'
 import Devtools from './Devtools.vue'
-import Preset from './user/Preset.vue'
+import Preset from './user/Project.vue'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
