@@ -5,3 +5,7 @@ TODOs.md
 
 # jetbrains files
 .idea
+.env
+.nitro
+.output
+.vercel

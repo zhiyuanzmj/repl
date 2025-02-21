@@ -67,6 +67,26 @@ export function useRouteQuery<T extends string | boolean>(
   }) as unknown as Ref<T>
 }
 
+export function useRoutePath<T extends string | boolean>(
+  defaultValue?: T,
+  reload = false,
+) {
+  const data = location.pathname.slice(1)
+  const value = ref(data || defaultValue)
+  return computed({
+    get() {
+      return value.value
+    },
+    set(v) {
+      let pathname = v === defaultValue ? '' : v
+      const url = `/${pathname}${location.search}`
+      if (reload) location.replace(url)
+      else history.pushState({}, '', url + location.hash)
+      value.value = v
+    },
+  }) as unknown as Ref<T>
+}
+
 const esmRE = /(?<=(?:from|import)\s+['"])(?!http|\.|\/)[^'"]+(?=['"])/g
 export function addEsmPrefix(code: string, importMap?: ImportMap) {
   const s = new MagicString(code)

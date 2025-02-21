@@ -12,7 +12,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store, autoSave, virtualFiles, editorOptions } = inject(injectKeyProps)!
+const { store, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = useRouteQuery('show-message', true)
 
 const onChange = debounce((code: string) => {
@@ -80,11 +80,11 @@ const resolvedFiles = computed(() => {
       v-model="showMessage"
       :text="editorOptions?.showErrorText || 'Show Error'"
     />
-    <ToggleButton
+    <!-- <ToggleButton
       v-if="editorOptions?.autoSaveText !== false"
       v-model="autoSave"
       :text="editorOptions?.autoSaveText || 'Auto Save'"
-    />
+    /> -->
   </div>
 </template>
 

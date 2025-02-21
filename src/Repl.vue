@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
-import { type Store, useStore } from './store'
-import { computed, provide, ref, toRefs, useTemplateRef } from 'vue'
+import type { Store } from './store'
+import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
@@ -12,10 +12,13 @@ import EditorContainer from './editor/EditorContainer.vue'
 import type * as monaco from 'monaco-editor-core'
 import { useRouteQuery } from './utils'
 
+import 'floating-vue/dist/style.css'
+import './dropdown.css'
+
 export interface Props {
   previewTheme?: boolean
   editor: EditorComponentType
-  store?: Store
+  store: Store
   autoResize?: boolean
   showCompileOutput?: boolean
   clearConsole?: boolean
@@ -49,7 +52,6 @@ const autoSave = useRouteQuery<boolean>('auto-save', false)
 const virtualFiles = useRouteQuery<boolean>('virtual-files', false)
 const props = withDefaults(defineProps<Props>(), {
   previewTheme: false,
-  store: () => useStore(),
   autoResize: true,
   showCompileOutput: true,
   clearConsole: true,
@@ -111,16 +113,19 @@ defineExpose({ reload })
 </template>
 
 <style>
-.vue-repl {
+.vue-repl,
+.v-popper__popper {
   --bg: #fff;
   --bg-soft: #f8f8f8;
   --border: #ddd;
+  --text: #000;
   --text-light: #888;
   --font-code: Menlo, Monaco, Consolas, 'Courier New', monospace;
   --color-branding: #42b883;
   --color-branding-dark: #416f9c;
   --header-height: 38px;
-
+}
+.vue-repl {
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -130,13 +135,19 @@ defineExpose({ reload })
   background-color: var(--bg-soft);
 }
 
-.dark .vue-repl {
+.dark .vue-repl,
+.v-popper__popper {
   --bg: #1a1a1a;
   --bg-soft: #242424;
   --border: #383838;
+  --text: #fff;
   --text-light: #aaa;
   --color-branding: #42d392;
   --color-branding-dark: #89ddff;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 .vue-repl button {

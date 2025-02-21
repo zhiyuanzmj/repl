@@ -21,3 +21,17 @@ export const injectKeyProps: InjectionKey<
 export const injectKeyPreviewRef: InjectionKey<
   ComputedRef<HTMLDivElement | null>
 > = Symbol('preview-ref')
+
+export type User = {
+  id: string
+  username: string
+  avatar?: string
+}
+
+export type Project = {
+  id: string
+  name: string
+  hash: string
+  userId: string
+  user: User
+}

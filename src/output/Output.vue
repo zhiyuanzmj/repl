@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
+import Login from './user/Login.vue'
 import { computed, inject, ref, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
@@ -8,6 +9,7 @@ import {
 } from '../types'
 import SplitPane from '../SplitPane.vue'
 import Devtools from './Devtools.vue'
+import Preset from './user/Preset.vue'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -67,32 +69,23 @@ const devtoolsLoaded = ref(mode.value === 'devtools')
             <span>preview</span>
           </button>
 
-          <div class="ml-auto flex items-center gap-2 pr-2">
-            <select
-              v-model="store.preset"
-              class="ml-auto h-6 my-auto bg-transparent rounded outline-none px-1"
-              :class="store.theme === 'dark' ? 'text-white' : ''"
-            >
-              <option v-for="(_, name) in store.presets" :key="name">
-                {{ name }}
-              </option>
-            </select>
+          <div class="actions ml-auto flex items-center gap-2 pr-2">
+            <Preset />
 
             <button
               class="text-xl"
               :class="
-                store.theme === 'dark'
-                  ? 'i-carbon:moon bg-white!'
-                  : 'i-carbon:light bg-black!'
+                store.theme === 'dark' ? 'i-carbon:moon' : 'i-carbon:light'
               "
               @click="toggleDark"
             />
 
             <button
               class="i-carbon:logo-github text-2xl"
-              :class="store.theme === 'dark' ? 'bg-white!' : 'bg-black!'"
               @click="jumpToGithub"
             />
+
+            <Login />
           </div>
         </div>
         <Preview v-if="!store.loading" ref="preview" :ssr="ssr" />
@@ -155,6 +148,10 @@ const devtoolsLoaded = ref(mode.value === 'devtools')
 .tab-buttons button {
   padding: 0;
   box-sizing: border-box;
+}
+
+.tab-buttons .actions button {
+  background-color: currentColor;
 }
 
 .tab-buttons span {

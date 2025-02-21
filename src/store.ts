@@ -8,18 +8,32 @@ import {
   watchEffect,
 } from 'vue'
 import { compileFile, cssRE, transformTS } from './transform'
-import { addEsmPrefix, atou, useRouteQuery, utoa } from './utils'
-import type { OutputModes } from './types'
+import { addEsmPrefix, atou, useRoutePath, useRouteQuery, utoa } from './utils'
+import type { OutputModes, Project, User } from './types'
 import type { editor } from 'monaco-editor-core'
 
 import { defaultPresets } from './presets'
+import { ofetch } from 'ofetch'
+import {
+  importMapFile,
+  tsconfigFile,
+  viteConfigFile,
+  tsMacroConfigFile,
+  indexHtmlFile,
+  appFile,
+  newFile,
+} from './presets/index'
 
-export const importMapFile = 'import-map.json'
-export const tsconfigFile = 'tsconfig.json'
-export const viteConfigFile = 'vite.config.ts'
-export const tsMacroConfigFile = 'tsm.config.ts'
-export const indexHtmlFile = 'src/index.html'
-export const appFile = 'src/App.tsx'
+export {
+  importMapFile,
+  tsconfigFile,
+  viteConfigFile,
+  tsMacroConfigFile,
+  indexHtmlFile,
+  appFile,
+  newFile,
+}
+
 export const configFileNames = [
   importMapFile,
   tsconfigFile,
@@ -27,7 +41,7 @@ export const configFileNames = [
   viteConfigFile,
 ]
 
-export function useStore(
+export async function useStore(
   {
     files = ref(Object.create(null)),
     activeFilename = useRouteQuery('main', appFile),
@@ -45,23 +59,59 @@ export function useStore(
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
 
-    preset = useRouteQuery<string>('preset', 'vue-jsx'),
+    preset = useRoutePath<string>('vue-jsx'),
     presets = ref(defaultPresets),
   }: Partial<StoreState> = {},
   serializedState?: string,
-): ReplStore {
-  const template = computed(() => presets.value[preset.value])
+): Promise<ReplStore> {
+  const user = ref({} as User)
+  if (document.cookie.split('; ').some((i) => /^token=\S+/.test(i)))
+    user.value = await ofetch('/api/user-info').catch(() => ({}))
+
+  const projects = ref<Project[]>([])
+  async function getProjects() {
+    if (!user.value.id) return
+    const { data } = await ofetch('/api/project', {
+      params: {
+        userId: user.value.id,
+      },
+    })
+    projects.value = data
+  }
+  await getProjects()
+
+  const project = ref<Project>()
+  const template = ref({} as Template)
+  async function getTemplate() {
+    if (presets.value[preset.value]) {
+      template.value = presets.value[preset.value]
+    } else {
+      project.value =
+        projects.value.find(
+          (i) => `${i.user.username}/${i.name}` === preset.value,
+        ) || (await ofetch('/api/project/' + preset.value))
+      if (!project.value) {
+        preset.value = 'vue-jsx'
+        template.value = presets.value['vue-jsx']
+        return
+      }
+      serializedState = project.value.hash
+      template.value = resolveHash(project.value?.hash ?? '')
+    }
+  }
+  await getTemplate()
 
   async function init() {
-    watch(preset, () => {
+    watch(preset, async () => {
+      await getTemplate()
       setFiles(
         {
-          [indexHtmlFile]: template.value.indexHtml,
-          [appFile]: template.value.app,
-          [viteConfigFile]: template.value.viteConfig,
-          [tsMacroConfigFile]: template.value.tsmConfig,
-          [tsconfigFile]: template.value.tsconfig,
-          [importMapFile]: template.value.importMap,
+          [indexHtmlFile]: template.value[indexHtmlFile].code,
+          [appFile]: template.value[appFile].code,
+          [viteConfigFile]: template.value[viteConfigFile].code,
+          [tsMacroConfigFile]: template.value[tsMacroConfigFile].code,
+          [tsconfigFile]: template.value[tsconfigFile].code,
+          [importMapFile]: template.value[importMapFile].code,
         },
         appFile,
       )
@@ -130,7 +180,7 @@ export function useStore(
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.tsx') ? template.value.new : '',
+        fileOrFilename.endsWith('.tsx') ? template.value[newFile].code : '',
       )
     } else {
       file = fileOrFilename
@@ -260,7 +310,7 @@ export function useStore(
     const files = getFiles()
     return '#' + utoa(JSON.stringify(files))
   }
-  const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
+  function resolveHash(serializedState: string) {
     if (serializedState.startsWith('#'))
       serializedState = serializedState.slice(1)
     let saved: any
@@ -271,6 +321,11 @@ export function useStore(
       alert('Failed to load code from URL.')
       return setDefaultFile()
     }
+    return saved
+  }
+  function deserialize(serializedState: string) {
+    const saved = resolveHash(serializedState)
+    if (!saved) return
     for (const filename in saved) {
       setFile(
         files.value,
@@ -283,8 +338,7 @@ export function useStore(
   const getFiles: ReplStore['getFiles'] = () => {
     const exported: Record<string, { code: string; hidden?: boolean }> = {}
     for (const [filename, file] of Object.entries(files.value)) {
-      const normalized = stripSrcPrefix(filename)
-      exported[normalized] = { code: file.code, hidden: file.hidden }
+      exported[filename] = { code: file.code, hidden: file.hidden }
     }
     return exported
   }
@@ -297,7 +351,7 @@ export function useStore(
 
     mainFile = addSrcPrefix(mainFile)
     if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value.app!)
+      setFile(files, mainFile, template.value[appFile].code)
     }
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
@@ -317,12 +371,16 @@ export function useStore(
     }, 1000)
   }
   const setDefaultFile = (): void => {
-    setFile(files.value, indexHtmlFile, template.value.indexHtml)
-    setFile(files.value, appFile, template.value.app)
-    setFile(files.value, viteConfigFile, template.value.viteConfig)
-    setFile(files.value, tsMacroConfigFile, template.value.tsmConfig)
-    setFile(files.value, tsconfigFile, template.value.tsconfig)
-    setFile(files.value, importMapFile, template.value.importMap)
+    setFile(files.value, indexHtmlFile, template.value[indexHtmlFile].code)
+    setFile(files.value, appFile, template.value[appFile].code)
+    setFile(files.value, viteConfigFile, template.value[viteConfigFile].code)
+    setFile(
+      files.value,
+      tsMacroConfigFile,
+      template.value[tsMacroConfigFile].code,
+    )
+    setFile(files.value, tsconfigFile, template.value[tsconfigFile].code)
+    setFile(files.value, importMapFile, template.value[importMapFile].code)
   }
 
   if (serializedState) {
@@ -330,6 +388,15 @@ export function useStore(
   } else {
     setDefaultFile()
   }
+
+  watchEffect(() => {
+    if (user.value.id && !presets.value[preset.value]) {
+      history.pushState(null, '', location.pathname + location.search)
+    } else {
+      history.replaceState({}, '', serialize())
+    }
+  })
+
   if (!files.value[mainFile.value]) {
     mainFile.value = Object.keys(files.value).find((i) => i.endsWith('.tsx'))!
   }
@@ -350,6 +417,10 @@ export function useStore(
     mainFile,
     template,
     importMap,
+    user,
+    project,
+    projects,
+    getProjects,
 
     errors,
     showOutput,
@@ -385,14 +456,15 @@ export interface ImportMap {
   scopes?: Record<string, Record<string, string>>
 }
 
-type Template = {
-  indexHtml: string
-  app: string
-  new: string
-  viteConfig: string
-  tsmConfig: string
-  tsconfig: string
-  importMap: string
+type TemplateItem = { code: string; hidden?: boolean }
+export type Template = {
+  [indexHtmlFile]: TemplateItem
+  [appFile]: TemplateItem
+  [newFile]: TemplateItem
+  [viteConfigFile]: TemplateItem
+  [tsMacroConfigFile]: TemplateItem
+  [tsconfigFile]: TemplateItem
+  [importMapFile]: TemplateItem
 }
 
 export type StoreState = ToRefs<{
@@ -436,6 +508,9 @@ export type ViteConfig = {
 }
 
 export interface ReplStore extends UnwrapRef<StoreState> {
+  user: User
+  project?: Project
+  projects: Project[]
   activeFile: File
   activeConfigFile: File
   viteConfig: ViteConfig
@@ -450,11 +525,17 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  getProjects(): Promise<void>
 }
 
 export type Store = Pick<
   ReplStore,
+  | 'user'
+  | 'project'
+  | 'projects'
+  | 'getProjects'
   | 'files'
+  | 'serialize'
   | 'fileCaches'
   | 'activeFile'
   | 'activeConfigFile'

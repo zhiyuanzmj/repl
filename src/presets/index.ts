@@ -38,50 +38,58 @@ import solidViteConfCode from './solid/vite.config.ts?raw'
 import solidTsconfigCode from './solid/tsconfig.json?raw'
 import solidImportMap from './solid/import-map.json?raw'
 
+export const importMapFile = 'import-map.json'
+export const tsconfigFile = 'tsconfig.json'
+export const viteConfigFile = 'vite.config.ts'
+export const tsMacroConfigFile = 'tsm.config.ts'
+export const indexHtmlFile = 'src/index.html'
+export const appFile = 'src/App.tsx'
+export const newFile = 'src/new.tsx'
+
 export const defaultPresets = {
   'vue-jsx': {
-    indexHtml: vueJsxHtml,
-    app: vueJsxAppCode,
-    new: vueJsxNewCode,
-    viteConfig: vueJsxViteConfCode,
-    tsmConfig: vueJsxTsmConfigCode,
-    tsconfig: vueJsxTsconfigCode,
-    importMap: vueJsxImportMap,
+    [indexHtmlFile]: { code: vueJsxHtml },
+    [appFile]: { code: vueJsxAppCode },
+    [newFile]: { code: vueJsxNewCode },
+    [viteConfigFile]: { code: vueJsxViteConfCode },
+    [tsMacroConfigFile]: { code: vueJsxTsmConfigCode },
+    [tsconfigFile]: { code: vueJsxTsconfigCode },
+    [importMapFile]: { code: vueJsxImportMap },
   },
   'vue-jsx-vapor': {
-    indexHtml: vueJsxVaporHtml,
-    app: vueJsxVaporAppCode,
-    new: vueJsxVaporNewCode,
-    viteConfig: vueJsxVaporViteConfCode,
-    tsmConfig: vueJsxVaporTsmConfigCode,
-    tsconfig: vueJsxVaporTsconfigCode,
-    importMap: vueJsxVaporImportMap,
+    [indexHtmlFile]: { code: vueJsxVaporHtml },
+    [appFile]: { code: vueJsxVaporAppCode },
+    [newFile]: { code: vueJsxVaporNewCode },
+    [viteConfigFile]: { code: vueJsxVaporViteConfCode },
+    [tsMacroConfigFile]: { code: vueJsxVaporTsmConfigCode },
+    [tsconfigFile]: { code: vueJsxVaporTsconfigCode },
+    [importMapFile]: { code: vueJsxVaporImportMap },
   },
   react: {
-    indexHtml: reactHtml,
-    app: reactAppCode,
-    new: reactNewCode,
-    viteConfig: reactViteConfCode,
-    tsmConfig: reactTsmConfigCode,
-    tsconfig: reactTsconfigCode,
-    importMap: reactImportMap,
+    [indexHtmlFile]: { code: reactHtml },
+    [appFile]: { code: reactAppCode },
+    [newFile]: { code: reactNewCode },
+    [viteConfigFile]: { code: reactViteConfCode },
+    [tsMacroConfigFile]: { code: reactTsmConfigCode },
+    [tsconfigFile]: { code: reactTsconfigCode },
+    [importMapFile]: { code: reactImportMap },
   },
   preact: {
-    indexHtml: preactHtml,
-    app: preactAppCode,
-    new: preactNewCode,
-    viteConfig: preactViteConfCode,
-    tsmConfig: preactTsmConfigCode,
-    tsconfig: preactTsconfigCode,
-    importMap: preactImportMap,
+    [indexHtmlFile]: { code: preactHtml },
+    [appFile]: { code: preactAppCode },
+    [newFile]: { code: preactNewCode },
+    [viteConfigFile]: { code: preactViteConfCode },
+    [tsMacroConfigFile]: { code: preactTsmConfigCode },
+    [tsconfigFile]: { code: preactTsconfigCode },
+    [importMapFile]: { code: preactImportMap },
   },
   solid: {
-    indexHtml: solidHtml,
-    app: solidAppCode,
-    new: solidNewCode,
-    viteConfig: solidViteConfCode,
-    tsmConfig: solidTsmConfigCode,
-    tsconfig: solidTsconfigCode,
-    importMap: solidImportMap,
+    [indexHtmlFile]: { code: solidHtml },
+    [appFile]: { code: solidAppCode },
+    [newFile]: { code: solidNewCode },
+    [viteConfigFile]: { code: solidViteConfCode },
+    [tsMacroConfigFile]: { code: solidTsmConfigCode },
+    [tsconfigFile]: { code: solidTsconfigCode },
+    [importMapFile]: { code: solidImportMap },
   },
 }

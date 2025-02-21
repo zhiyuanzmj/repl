@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
-import { createApp, h, ref, watchEffect } from 'vue'
+import { createApp, h, ref } from 'vue'
 import { Repl, useStore } from '../src'
 // @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
@@ -14,32 +14,40 @@ window.process = { env: {} }
 const App = {
   setup() {
     const query = new URLSearchParams(location.search)
-    const store = (window.store = useStore(
+    const loading = ref(true)
+    let store!: any
+    useStore(
       {
         showOutput: ref(query.has('so')),
       },
       location.hash,
-    ))
-
-    watchEffect(() => history.replaceState({}, '', store.serialize()))
+    ).then((result) => {
+      store = window.store = result
+      loading.value = false
+    })
 
     const previewTheme = ref(false)
 
     return () =>
-      h(Repl, {
-        store,
-        previewTheme: previewTheme.value,
-        editor: MonacoEditor,
-        ssr: false,
-        // showCompileOutput: false,
-        editorOptions: {
-          autoSaveText: 'Auto Save',
-          virtualFilesText: 'Virtual Files',
-          monacoOptions: {
-            // wordWrap: 'on',
-          },
-        },
-      })
+      loading.value
+        ? h('div', {
+            class:
+              'i-carbon:rotate-180 text h-10 w-10 relative top-45% m-auto animate-spin',
+          })
+        : h(Repl, {
+            store,
+            previewTheme: previewTheme.value,
+            editor: MonacoEditor,
+            ssr: false,
+            // showCompileOutput: false,
+            editorOptions: {
+              autoSaveText: 'Auto Save',
+              virtualFilesText: 'Virtual Files',
+              monacoOptions: {
+                // wordWrap: 'on',
+              },
+            },
+          })
   },
 }
 

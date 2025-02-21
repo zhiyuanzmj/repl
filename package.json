@@ -43,6 +43,9 @@
   },
   "scripts": {
     "dev": "vite",
+    "server:dev": "nitro dev",
+    "server:build": "prisma generate && prisma migrate deploy && nitro build",
+    "postinstall": "prisma generate",
     "build": "vite build",
     "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
@@ -76,6 +79,7 @@
     "@babel/types": "^7.26.3",
     "@eslint/js": "^9.17.0",
     "@iconify-json/carbon": "^1.2.5",
+    "@prisma/client": "^6.4.1",
     "@rollup/plugin-replace": "^6.0.2",
     "@shikijs/monaco": "^1.25.1",
     "@ts-macro/language-plugin": "^0.1.17",
@@ -93,15 +97,20 @@
     "eslint": "^9.17.0",
     "eslint-plugin-vue": "^9.32.0",
     "fflate": "^0.8.2",
+    "floating-vue": "^5.2.2",
     "globby": "^14.0.2",
     "lint-staged": "^15.3.0",
     "monaco-editor-core": "^0.52.2",
+    "nitropack": "^2.10.4",
+    "ofetch": "^1.4.1",
     "postcss": "^8.5.1",
     "postcss-modules": "^6.0.1",
     "prettier": "^3.4.2",
+    "prisma": "^6.4.1",
     "shiki": "^1.25.1",
     "simple-git-hooks": "^2.11.1",
     "sucrase": "^3.35.0",
+    "ts-macro": "^0.1.17",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.0",
     "unocss": "^65.4.3",
@@ -110,7 +119,9 @@
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
     "vue": "https://pkg.pr.new/vuejs/vue-vapor/vue@6d5bc43",
-    "vue-tsc": "~2.2.0",
-    "ts-macro": "^0.1.17"
+    "vue-tsc": "~2.2.0"
+  },
+  "prisma": {
+    "schema": "./server/prisma/schema.prisma"
   }
 }
