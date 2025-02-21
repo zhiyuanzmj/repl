@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     user = await prisma.user.create({
       data: {
         githubId: data.id,
-        username: data.name,
+        username: data.name || data.login,
         email: data.email,
         avatar: data.avatar_url,
       },
