@@ -34,4 +34,5 @@ export type Project = {
   hash: string
   userId: string
   user: User
+  editing?: boolean
 }

@@ -138,7 +138,7 @@ defineExpose({ reload })
 .dark .vue-repl,
 .v-popper__popper {
   --bg: #1a1a1a;
-  --bg-soft: #242424;
+  --bg-soft: #282828;
   --border: #383838;
   --text: #fff;
   --text-light: #aaa;
