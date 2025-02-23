@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { Dropdown } from 'floating-vue'
-import { computed, inject, ref, useTemplateRef } from 'vue'
+import { Menu } from 'floating-vue'
+import { computed, inject, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
-import { injectKeyProps } from '../../types'
+import { type Project, injectKeyProps } from '../../types'
 
 const { store } = inject(injectKeyProps)!
 
 const loading = ref(false)
 
 const name = ref()
-const dropdownRef = useTemplateRef('dropdownRef')
 async function submit() {
   loading.value = true
   try {
@@ -17,45 +16,113 @@ async function submit() {
       method: 'POST',
       body: {
         name: name.value,
+        userName: store.value.userName,
         userId: store.value.user.id,
         hash: store.value.serialize(),
       },
     })
-    store.value.preset = store.value.user.username + '/' + name.value
+    store.value.preset = store.value.userName + '/' + name.value
     name.value = ''
-    await store.value.getProjects()
-    dropdownRef.value?.hide()
+    getProjects()
   } finally {
     loading.value = false
   }
 }
 
-async function deleteProject(id: string) {
+const projects = ref<Project[]>([])
+async function getProjects() {
+  if (!store.value.user.id) return
+  const { data } = await ofetch('/api/project', {
+    params: {
+      userName: store.value.userName,
+    },
+  }).catch(() => ({ data: [] }))
+  projects.value = data.map((i: Project) => ({
+    ...i,
+    originName: i.name,
+  }))
+}
+getProjects()
+
+const publicProjects = ref<Project[]>([])
+async function getPublicProjects() {
+  const { data } = await ofetch('/api/project').catch(() => ({ data: [] }))
+  publicProjects.value = data
+}
+getPublicProjects()
+
+watch(
+  () => store.value.userName,
+  async () => {
+    await getProjects()
+    store.value.project = projects.value[0]
+    store.value.preset = projects.value[0]
+      ? `${store.value.project.userName}/${store.value.project.name}`
+      : 'vue-jsx'
+  },
+)
+
+const projectsGroup = computed(() =>
+  [...publicProjects.value, ...projects.value].reduce(
+    (acc, project) => {
+      if (!acc[project.userName]) {
+        acc[project.userName] = []
+      }
+      acc[project.userName].push(project)
+      return acc
+    },
+    {} as Record<string, Project[]>,
+  ),
+)
+
+async function deleteProject(project: Project) {
   if (confirm('Confirm delete the project?')) {
     loading.value = true
     try {
-      await ofetch('/api/project/' + id, { method: 'DELETE' })
-      await store.value.getProjects()
+      await ofetch(
+        '/api/project/' + project.userName + '/' + project.originName,
+        { method: 'DELETE' },
+      )
+      getProjects()
     } finally {
       loading.value = false
     }
   }
 }
 
-async function updateProject(project: any) {
+async function updateProject(project: Project) {
   loading.value = true
   try {
-    await ofetch('/api/project/' + project.id, {
+    await ofetch(
+      '/api/project/' + project.userName + '/' + project.originName,
+      {
+        method: 'PUT',
+        body: {
+          name: project.name,
+          userName: project.userName,
+        },
+      },
+    )
+    if (store.value.project?.id === project.id) {
+      store.value.preset = store.value.userName + '/' + project.name
+    }
+    await getProjects()
+    project.editing = false
+  } finally {
+    loading.value = false
+  }
+}
+
+async function toggleProjectPublic(project: Project) {
+  loading.value = true
+  try {
+    await ofetch('/api/project/' + project.userName + '/' + project.name, {
       method: 'PUT',
       body: {
-        name: project.name,
+        public: !project.public,
       },
     })
-    if (store.value.project?.id === project.id) {
-      store.value.preset = store.value.user.username + '/' + project.name
-    }
-    await store.value.getProjects()
-    project.editing = false
+    getProjects()
   } finally {
     loading.value = false
   }
@@ -64,7 +131,8 @@ async function updateProject(project: any) {
 const otherProject = computed(() => {
   return (
     store.value.project &&
-    store.value.projects.every(
+    projects.value.every((project) => project.id !== store.value.project?.id) &&
+    publicProjects.value.every(
       (project) => project.id !== store.value.project?.id,
     ) &&
     store.value.project
@@ -73,49 +141,85 @@ const otherProject = computed(() => {
 </script>
 
 <template>
-  <Dropdown ref="dropdownRef" :distance="8">
+  <Menu :distance="8">
     <button class="i-carbon:add-large bg-$text! text-xl" />
     <template #popper>
-      <form v-if="store.user.id" class="px4 py2 text-sm relative" @submit.prevent>
-        <div class="text mb1 flex">
-          <span class="op70">Project Name</span>
-          <i class="ml-auto i-carbon:close-large cursor-pointer text-base mr-1" @click="dropdownRef?.hide()" />
-        </div>
+      <form
+        v-if="store.user.id"
+        class="px4 py2 text-sm relative"
+        @submit.prevent
+      >
+        <div class="text mb1 flex op70">Project Name</div>
         <div class="flex items-center">
-          <input v-model="name" class="outline-none bg-$bg-soft p2 rounded b-0 w-full" @keydown.enter="submit" />
-          <button class="bg-$bg-soft b-0 ml3 cursor-pointer px2.5 py1.3 mr--2 rounded" type="button" @click="submit">
+          <input
+            v-model="name"
+            class="outline-none bg-$bg-soft p2 rounded b-0 w-full"
+            @keydown.enter="submit"
+          />
+          <button
+            class="bg-$bg-soft b-0 ml3 cursor-pointer px2.5 py1.3 mr--2 rounded"
+            type="button"
+            @click="submit"
+          >
             <div class="i-carbon:add-large bg-$text text-xl" />
           </button>
         </div>
 
-        <div v-if="store.user.id" class="mt3">
-          <div v-for="(project, index) in store.projects" :key="project.id" class="flex items-center p1 op80">
+        <div v-if="store.user.id" class="mt2">
+          <div
+            v-for="(project, index) in projects"
+            :key="project.id"
+            class="flex items-center p1 op80"
+          >
             <span class="flex items-center h6 w-46">
               <span class="text-center w-4 mr1">{{ index + 1 }}.</span>
               <input
-                v-if="project.editing" v-model="project.name" class="outline-none bg-$bg-soft p2 rounded b-0"
+                v-if="project.editing"
+                v-model="project.name"
+                class="outline-none bg-$bg-soft p2 rounded b-0"
                 @keydown.enter="updateProject(project)"
               />
               <span v-else>{{ project.name }}</span>
             </span>
 
             <template v-if="project.editing">
-              <i class="ml-auto i-carbon:save cursor-pointer text-lg" @click="updateProject(project)" />
-              <i class="i-carbon:close-outline cursor-pointer text-lg ml-1 mr--2" @click="project.editing = false" />
+              <i
+                class="ml-auto i-carbon:save cursor-pointer text-lg"
+                @click="updateProject(project)"
+              />
+              <i
+                class="i-carbon:close-outline cursor-pointer text-lg ml-1 mr--2"
+                @click="project.editing = false"
+              />
             </template>
             <template v-else>
-              <i class="ml-auto i-carbon:edit cursor-pointer text-lg" @click="project.editing = true" />
-              <i class="i-carbon:trash-can cursor-pointer text-lg ml-1 mr--2" @click="deleteProject(project.id)" />
+              <i
+                v-if="store.user.role === 'ADMIN'"
+                class="ml-auto cursor-pointer text-lg mr-1"
+                :class="project.public ? 'i-carbon:view' : 'i-carbon:view-off'"
+                @click="toggleProjectPublic(project)"
+              />
+              <i
+                class="ml-auto i-carbon:edit cursor-pointer text-lg"
+                @click="project.editing = true"
+              />
+              <i
+                class="i-carbon:trash-can cursor-pointer text-lg ml-1 mr--2"
+                @click="deleteProject(project)"
+              />
             </template>
           </div>
         </div>
-        <div v-if="loading" class="h-full absolute bottom-0 top-0 left-0 right-0 bg op50 flex">
+        <div
+          v-if="loading"
+          class="h-full absolute bottom-0 top-0 left-0 right-0 bg op50 flex"
+        >
           <div class="i-carbon:rotate-180 text h-6 w-6 m-auto animate-spin" />
         </div>
       </form>
       <div v-else class="px4 py2 text-sm">Please login first</div>
     </template>
-  </Dropdown>
+  </Menu>
 
   <select
     v-model="store.preset"
@@ -125,13 +229,24 @@ const otherProject = computed(() => {
       <option v-for="(_, presetName) in store.presets" :key="presetName">
         {{ presetName }}
       </option>
-    </optgroup>
-    <hr />
-    <optgroup label="My Projects">
-      <option v-if="otherProject" :value="otherProject.user.username + '/' + otherProject.name">
+      <option
+        v-if="otherProject"
+        :value="otherProject.userName + '/' + otherProject.name"
+      >
         {{ otherProject.name }}
       </option>
-      <option v-for="project in store.projects" :key="project.id" :value="project.user.username + '/' + project.name">
+    </optgroup>
+    <hr />
+    <optgroup
+      v-for="(list, label) in projectsGroup"
+      :key="label"
+      :label="label"
+    >
+      <option
+        v-for="project in list"
+        :key="project.id"
+        :value="project.userName + '/' + project.name"
+      >
         {{ project.name }}
       </option>
     </optgroup>

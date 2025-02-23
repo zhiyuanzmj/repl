@@ -1,17 +1,16 @@
-import { User } from '@prisma/client'
-
 export default defineEventHandler(async (event) => {
+  const { userName } = getQuery<{ userName: string }>(event)
   return {
     data: await prisma.project.findMany({
-      include: {
-        user: {
-          select: {
-            username: true,
-          },
-        },
-      },
       where: {
-        userId: getSession<User>(event).id,
+        OR: [
+          {
+            userName,
+          },
+          {
+            public: true,
+          },
+        ],
       },
     }),
   }

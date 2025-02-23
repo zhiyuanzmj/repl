@@ -1,5 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -10,7 +10,7 @@ datasource db {
 
 model User {
   id       String    @id @default(uuid())
-  username String    @unique
+  name     String    @unique
   githubId Int       @unique
   avatar   String?
   email    String?
@@ -24,11 +24,13 @@ enum Role {
 }
 
 model Project {
-  id     String @id @default(cuid())
-  name   String
-  hash   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id       String  @id @default(cuid())
+  name     String
+  hash     String
+  userId   String
+  public   Boolean @default(false)
+  user     User    @relation(fields: [userId], references: [id])
+  userName String
 
-  @@unique([name, userId])
+  @@unique([name, userName])
 }

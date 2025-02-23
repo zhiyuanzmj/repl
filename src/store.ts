@@ -9,7 +9,7 @@ import {
 } from 'vue'
 import { compileFile, cssRE, transformTS } from './transform'
 import { addEsmPrefix, atou, useRoutePath, useRouteQuery, utoa } from './utils'
-import type { OutputModes, Project, User } from './types'
+import type { Organization, OutputModes, Project, User } from './types'
 import type { editor } from 'monaco-editor-core'
 
 import { defaultPresets } from './presets'
@@ -64,21 +64,22 @@ export async function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): Promise<ReplStore> {
-  const user = ref({} as User)
-  if (document.cookie.split('; ').some((i) => /^token=\S+/.test(i)))
-    user.value = await ofetch('/api/user-info').catch(() => ({}))
-
-  const projects = ref<Project[]>([])
-  async function getProjects() {
-    if (!user.value.id) return
-    const { data } = await ofetch('/api/project', {
-      params: {
-        userId: user.value.id,
-      },
-    })
-    projects.value = data
+  const organization = ref<Organization>()
+  const organizations = ref<Organization[]>([])
+  async function getOrganizations(name: string) {
+    organizations.value = await ofetch(
+      `https://api.github.com/users/${name}/orgs`,
+    )
+    const userName = preset.value.split('/')[0]
+    organization.value = organizations.value.find((i) => i.login === userName)
   }
-  await getProjects()
+
+  const user = ref({} as User)
+  if (document.cookie.split('; ').some((i) => /^token=\S+/.test(i))) {
+    user.value = await ofetch('/api/user-info').catch(() => ({}))
+    getOrganizations(user.value.name)
+  }
+  const userName = computed(() => organization.value?.login || user.value.name)
 
   const project = ref<Project>()
   const template = ref({} as Template)
@@ -86,10 +87,7 @@ export async function useStore(
     if (presets.value[preset.value]) {
       template.value = presets.value[preset.value]
     } else {
-      project.value =
-        projects.value.find(
-          (i) => `${i.user.username}/${i.name}` === preset.value,
-        ) || (await ofetch('/api/project/' + preset.value))
+      project.value = await ofetch('/api/project/' + preset.value)
       if (!project.value) {
         preset.value = 'vue-jsx'
         template.value = presets.value['vue-jsx']
@@ -408,6 +406,9 @@ export async function useStore(
   const fileCaches = ref(Object.create(null))
 
   const store: ReplStore = reactive({
+    organization,
+    organizations,
+    userName,
     files,
     fileCaches,
     activeFile,
@@ -419,8 +420,6 @@ export async function useStore(
     importMap,
     user,
     project,
-    projects,
-    getProjects,
 
     errors,
     showOutput,
@@ -508,9 +507,11 @@ export type ViteConfig = {
 }
 
 export interface ReplStore extends UnwrapRef<StoreState> {
+  organization?: Organization
+  organizations: Organization[]
+  userName: string
   user: User
   project?: Project
-  projects: Project[]
   activeFile: File
   activeConfigFile: File
   viteConfig: ViteConfig
@@ -525,15 +526,15 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
-  getProjects(): Promise<void>
 }
 
 export type Store = Pick<
   ReplStore,
+  | 'organization'
+  | 'organizations'
+  | 'userName'
   | 'user'
   | 'project'
-  | 'projects'
-  | 'getProjects'
   | 'files'
   | 'serialize'
   | 'fileCaches'

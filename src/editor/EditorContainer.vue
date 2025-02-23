@@ -18,12 +18,18 @@ const showMessage = useRouteQuery('show-message', true)
 
 function updateProject() {
   if (!store.value.user.id || !store.value.project) return
-  ofetch('/api/project/' + store.value.project.id, {
-    method: 'PUT',
-    body: {
-      hash: store.value.serialize(),
+  ofetch(
+    '/api/project/' +
+      store.value.project.userName +
+      '/' +
+      store.value.project.name,
+    {
+      method: 'PUT',
+      body: {
+        hash: store.value.serialize(),
+      },
     },
-  })
+  )
 }
 
 const onChange = debounce((code: string) => {

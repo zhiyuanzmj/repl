@@ -1,10 +1,11 @@
 export default defineEventHandler(async (event) => {
   const [userName, name] = getRouterParam(event, 'name').split('/')
-  const data = await prisma.project.findFirst({
+  return await prisma.project.delete({
     where: {
-      name,
-      userName,
+      name_userName: {
+        name,
+        userName,
+      },
     },
   })
-  return data
 })

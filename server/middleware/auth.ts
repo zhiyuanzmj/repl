@@ -7,7 +7,7 @@ export default eventHandler(async (event) => {
   const url = req.url.replace(/^\/api([^?#]*).*$/, '$1')
 
   if (
-    (req.method === 'GET' && url.startsWith('/project/')) ||
+    (req.method === 'GET' && url.startsWith('/project')) ||
     ['/oauth/redirect'].includes(url)
   )
     return
