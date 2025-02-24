@@ -55,9 +55,10 @@ watch(
   () => store.value.userName,
   async () => {
     await getProjects()
-    store.value.project = projects.value[0]
-    store.value.preset = projects.value[0]
-      ? `${store.value.project.userName}/${store.value.project.name}`
+    const project = projects.value[0]
+    store.value.project = project
+    store.value.preset = project
+      ? `${project.userName}/${project.name}`
       : 'vue-jsx'
   },
 )
@@ -68,7 +69,9 @@ const projectsGroup = computed(() =>
       if (!acc[project.userName]) {
         acc[project.userName] = []
       }
-      acc[project.userName].push(project)
+      if (!acc[project.userName].some((i) => i.id === project.id)) {
+        acc[project.userName].push(project)
+      }
       return acc
     },
     {} as Record<string, Project[]>,
@@ -195,7 +198,7 @@ const otherProject = computed(() => {
             <template v-else>
               <i
                 v-if="store.user.role === 'ADMIN'"
-                class="ml-auto cursor-pointer text-lg mr-1"
+                class="ml-auto cursor-pointer text-lg mr-1.5"
                 :class="project.public ? 'i-carbon:view' : 'i-carbon:view-off'"
                 @click="toggleProjectPublic(project)"
               />
