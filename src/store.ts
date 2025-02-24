@@ -97,11 +97,15 @@ export async function useStore(
 
   const isUpdated = ref(false)
   async function setDefaultFile() {
+    loading.value = true
     isUpdated.value = false
     activeFilename.value = appFile
     history.pushState(null, '', location.pathname + location.search)
     await getTemplate()
-    setFiles(template.value)
+    await setFiles(template.value)
+    setTimeout(() => {
+      loading.value = false
+    }, 1000)
   }
   await setDefaultFile()
 
@@ -335,16 +339,11 @@ export async function useStore(
     return exported
   }
   async function setFiles(newFiles: Record<string, File>) {
-    loading.value = true
-
     const result: Record<string, File> = Object.create(null)
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(result, filename, file.code, file.hidden)
     }
     files.value = result
-    setTimeout(() => {
-      loading.value = false
-    }, 1000)
   }
 
   if (serializedState) {
