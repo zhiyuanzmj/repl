@@ -31,7 +31,7 @@ async function submit() {
 
 const projects = ref<Project[]>([])
 async function getProjects() {
-  if (!store.value.user.id) return
+  if (!store.value.userName) return
   const { data } = await ofetch('/api/project', {
     params: {
       userName: store.value.userName,
@@ -63,19 +63,17 @@ watch(
   },
 )
 
+const groupFn = (acc: Record<string, Project[]>, project: Project) => {
+  if (!acc[project.userName]) {
+    acc[project.userName] = []
+  }
+  if (!acc[project.userName].some((i) => i.id === project.id)) {
+    acc[project.userName].push(project)
+  }
+  return acc
+}
 const projectsGroup = computed(() =>
-  [...publicProjects.value, ...projects.value].reduce(
-    (acc, project) => {
-      if (!acc[project.userName]) {
-        acc[project.userName] = []
-      }
-      if (!acc[project.userName].some((i) => i.id === project.id)) {
-        acc[project.userName].push(project)
-      }
-      return acc
-    },
-    {} as Record<string, Project[]>,
-  ),
+  publicProjects.value.reduce(groupFn, projects.value.reduce(groupFn, {})),
 )
 
 async function deleteProject(project: Project) {

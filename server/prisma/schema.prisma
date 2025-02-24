@@ -24,13 +24,14 @@ enum Role {
 }
 
 model Project {
-  id       String  @id @default(cuid())
-  name     String
-  hash     String
-  userId   String
-  public   Boolean @default(false)
-  user     User    @relation(fields: [userId], references: [id])
-  userName String
+  id        String   @id @default(cuid())
+  name      String
+  hash      String
+  userId    String
+  public    Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  userName  String
+  createdAt DateTime @default(now())
 
   @@unique([name, userName])
 }
