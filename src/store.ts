@@ -98,9 +98,6 @@ export async function useStore(
   const isUpdated = ref(false)
   async function setDefaultFile() {
     loading.value = true
-    isUpdated.value = false
-    activeFilename.value = appFile
-    history.pushState(null, '', location.pathname + location.search)
     await getTemplate()
     await setFiles(template.value)
     setTimeout(() => {
@@ -110,7 +107,12 @@ export async function useStore(
   await setDefaultFile()
 
   async function init() {
-    watch(preset, setDefaultFile)
+    watch(preset, () => {
+      isUpdated.value = false
+      activeFilename.value = appFile
+      history.pushState(null, '', location.pathname + location.search)
+      setDefaultFile()
+    })
 
     await getViteConfig()
 
@@ -353,7 +355,7 @@ export async function useStore(
   watchEffect(() => {
     if (user.value.id && !presets.value[preset.value]) {
       history.pushState(null, '', location.pathname + location.search)
-    } else if(isUpdated.value) {
+    } else if (isUpdated.value) {
       history.replaceState({}, '', serialize())
     }
   })
