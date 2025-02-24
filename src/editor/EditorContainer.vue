@@ -17,6 +17,7 @@ const { store, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = useRouteQuery('show-message', true)
 
 function updateProject() {
+  store.value.isUpdated = true
   if (!store.value.user.id || !store.value.project) return
   ofetch(
     '/api/project/' +
