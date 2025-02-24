@@ -1,7 +1,4 @@
 {
-  "imports": {
-    "@vue-macros/jsx-macros/raw.js": "/proxy/vite-plugin-jsx-macros.js",
-    "@vue-macros/volar/jsx-macros.js": "/proxy/volar-plugin-jsx-macros.js"
-  },
+  "imports": {},
   "scopes": {}
 }
