@@ -123,6 +123,7 @@ function processModule(store: Store, src: string, filename: string) {
     let resolved = raw
     const file =
       files[resolved] ||
+      files[(resolved = raw + '.tsx')] ||
       files[(resolved = raw + '.ts')] ||
       files[(resolved = raw + '.js')]
     return file ? resolved : undefined

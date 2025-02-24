@@ -21,7 +21,6 @@ import {
   tsMacroConfigFile,
   indexHtmlFile,
   appFile,
-  newFile,
 } from './presets/index'
 
 export {
@@ -31,7 +30,6 @@ export {
   tsMacroConfigFile,
   indexHtmlFile,
   appFile,
-  newFile,
 }
 
 export const configFileNames = [
@@ -60,7 +58,7 @@ export async function useStore(
     reloadLanguageTools = ref(),
 
     preset = useRoutePath<string>('vue-jsx'),
-    presets = ref(defaultPresets),
+    presets = ref(defaultPresets as any),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): Promise<ReplStore> {
@@ -97,39 +95,27 @@ export async function useStore(
       template.value = resolveHash(project.value?.hash ?? '')
     }
   }
-  await getTemplate()
+
+  async function setDefaultFile() {
+    await getTemplate()
+    setFiles(template.value)
+  }
+  await setDefaultFile()
 
   async function init() {
-    watch(preset, async () => {
-      await getTemplate()
-      setFiles(
-        {
-          [indexHtmlFile]: template.value[indexHtmlFile].code,
-          [appFile]: template.value[appFile].code,
-          [viteConfigFile]: template.value[viteConfigFile].code,
-          [tsMacroConfigFile]: template.value[tsMacroConfigFile].code,
-          [tsconfigFile]: template.value[tsconfigFile].code,
-          [importMapFile]: template.value[importMapFile].code,
-        },
-        appFile,
-      )
-    })
+    watch(preset, setDefaultFile)
 
     await getViteConfig()
 
-    watchEffect(async () => {
-      await compileFile(store, activeFile.value).then(
+    watchEffect(() => {
+      compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+    })
+
+    watchEffect(() => {
+      compileFile(store, activeConfigFile.value).then(
         (errs) => (errors.value = errs),
       )
     })
-    watchEffect(async () => {
-      await compileFile(store, activeConfigFile.value).then(
-        (errs) => (errors.value = errs),
-      )
-    })
-    await compileFile(store, files.value[mainFile.value]).then(
-      (errs) => (errors.value = errs),
-    )
 
     watch(
       () => [
@@ -147,6 +133,7 @@ export async function useStore(
       () => files.value[viteConfigFile]?.code,
       async () => {
         await getViteConfig()
+        errors.value = []
         for (const [_, file] of Object.entries(files.value)) {
           await compileFile(store, file).then((errs) =>
             errors.value.push(...errs),
@@ -158,17 +145,20 @@ export async function useStore(
     // compile rest of the files
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
-      if (filename !== mainFile.value) {
+      if (
+        ![activeConfigFile.value.filename, activeFile.value.filename].includes(
+          filename,
+        )
+      )
         await compileFile(store, file).then((errs) =>
           errors.value.push(...errs),
         )
-      }
     }
 
     loading.value = false
   }
 
-  const setActive: Store['setActive'] = (filename) => {
+  function setActive(filename: string) {
     if (configFileNames.includes(filename))
       activeConfigFilename.value = filename
     else activeFilename.value = filename
@@ -178,7 +168,11 @@ export async function useStore(
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.tsx') ? template.value[newFile].code : '',
+        fileOrFilename.endsWith('.tsx')
+          ? `export default () => {
+  return <div></div>
+}`
+          : '',
       )
     } else {
       file = fileOrFilename
@@ -333,58 +327,29 @@ export async function useStore(
       )
     }
   }
-  const getFiles: ReplStore['getFiles'] = () => {
+  function getFiles() {
     const exported: Record<string, { code: string; hidden?: boolean }> = {}
     for (const [filename, file] of Object.entries(files.value)) {
       exported[filename] = { code: file.code, hidden: file.hidden }
     }
     return exported
   }
-  const setFiles: ReplStore['setFiles'] = async (
-    newFiles,
-    mainFile = store.mainFile,
-  ) => {
+  async function setFiles(newFiles: Record<string, File>) {
     loading.value = true
-    const files: Record<string, File> = Object.create(null)
 
-    mainFile = addSrcPrefix(mainFile)
-    if (!newFiles[mainFile]) {
-      setFile(files, mainFile, template.value[appFile].code)
-    }
+    const result: Record<string, File> = Object.create(null)
     for (const [filename, file] of Object.entries(newFiles)) {
-      setFile(files, filename, file)
+      setFile(result, filename, file.code, file.hidden)
     }
-
-    const errors = []
-    for (const file of Object.values(files)) {
-      errors.push(...(await compileFile(store, file)))
-    }
-
-    store.mainFile = mainFile
-    store.files = files
-    store.errors = errors
-    setActive(store.mainFile)
+    files.value = result
+    setActive(mainFile.value)
     setTimeout(() => {
       loading.value = false
     }, 1000)
   }
-  const setDefaultFile = (): void => {
-    setFile(files.value, indexHtmlFile, template.value[indexHtmlFile].code)
-    setFile(files.value, appFile, template.value[appFile].code)
-    setFile(files.value, viteConfigFile, template.value[viteConfigFile].code)
-    setFile(
-      files.value,
-      tsMacroConfigFile,
-      template.value[tsMacroConfigFile].code,
-    )
-    setFile(files.value, tsconfigFile, template.value[tsconfigFile].code)
-    setFile(files.value, importMapFile, template.value[importMapFile].code)
-  }
 
   if (serializedState) {
     deserialize(serializedState)
-  } else {
-    setDefaultFile()
   }
 
   watchEffect(() => {
@@ -455,15 +420,13 @@ export interface ImportMap {
   scopes?: Record<string, Record<string, string>>
 }
 
-type TemplateItem = { code: string; hidden?: boolean }
 export type Template = {
-  [indexHtmlFile]: TemplateItem
-  [appFile]: TemplateItem
-  [newFile]: TemplateItem
-  [viteConfigFile]: TemplateItem
-  [tsMacroConfigFile]: TemplateItem
-  [tsconfigFile]: TemplateItem
-  [importMapFile]: TemplateItem
+  [indexHtmlFile]: File
+  [appFile]: File
+  [viteConfigFile]: File
+  [tsMacroConfigFile]: File
+  [tsconfigFile]: File
+  [importMapFile]: File
 }
 
 export type StoreState = ToRefs<{
@@ -525,7 +488,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   serialize(): string
   deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
-  setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  setFiles(newFiles: Record<string, File>, mainFile?: string): Promise<void>
 }
 
 export type Store = Pick<
