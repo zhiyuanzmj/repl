@@ -2,6 +2,7 @@
 import { injectKeyProps } from '../../src/types'
 import {
   type File,
+  appFile,
   indexHtmlFile,
   stripSrcPrefix,
   tsconfigFile,
@@ -139,7 +140,7 @@ const isUpdated = computed(
         }"
         @click="store.setActive(file)"
         @dblclick="
-          ![store.mainFile, indexHtmlFile].includes(file) && editFileName(file)
+          ![appFile + '', indexHtmlFile].includes(file) && editFileName(file)
         "
       >
         <span class="label">{{ stripSrcPrefix(file) }} </span>
@@ -147,9 +148,7 @@ const isUpdated = computed(
           {{ isUpdated(file) }}
         </span>
         <span
-          v-else-if="
-            ![store.mainFile, indexHtmlFile].includes(file) && !disabled
-          "
+          v-else-if="![appFile + '', indexHtmlFile].includes(file) && !disabled"
           class="remove"
           @click.stop="store.deleteFile(file)"
         >

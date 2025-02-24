@@ -44,7 +44,6 @@ export async function useStore(
     files = ref(Object.create(null)),
     activeFilename = useRouteQuery('main', appFile),
     activeConfigFilename = useRouteQuery('config', viteConfigFile),
-    mainFile = ref(appFile),
 
     errors = ref([]),
     showOutput = ref(false),
@@ -188,7 +187,7 @@ export async function useStore(
     }
 
     if (activeFilename.value === filename) {
-      activeFilename.value = mainFile.value
+      activeFilename.value = appFile
     }
     delete files.value[filename]
   }
@@ -220,9 +219,6 @@ export async function useStore(
 
     files.value = newFiles
 
-    if (mainFile.value === oldFilename) {
-      mainFile.value = newFilename
-    }
     if (activeFilename.value === oldFilename) {
       activeFilename.value = newFilename
     } else {
@@ -342,7 +338,6 @@ export async function useStore(
       setFile(result, filename, file.code, file.hidden)
     }
     files.value = result
-    setActive(mainFile.value)
     setTimeout(() => {
       loading.value = false
     }, 1000)
@@ -360,9 +355,6 @@ export async function useStore(
     }
   })
 
-  if (!files.value[mainFile.value]) {
-    mainFile.value = Object.keys(files.value).find((i) => i.endsWith('.tsx'))!
-  }
   const activeFile = computed(() => files.value[activeFilename.value])
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
@@ -380,7 +372,6 @@ export async function useStore(
     activeFilename,
     activeConfigFile,
     activeConfigFilename,
-    mainFile,
     template,
     importMap,
     user,
@@ -434,7 +425,6 @@ export type StoreState = ToRefs<{
   fileCaches: Record<string, string>
   activeFilename: string
   activeConfigFilename: string
-  mainFile: string
   importMap: ImportMap
 
   // output
@@ -488,7 +478,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   serialize(): string
   deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
-  setFiles(newFiles: Record<string, File>, mainFile?: string): Promise<void>
+  setFiles(newFiles: Record<string, File>): Promise<void>
 }
 
 export type Store = Pick<
@@ -503,7 +493,6 @@ export type Store = Pick<
   | 'fileCaches'
   | 'activeFile'
   | 'activeConfigFile'
-  | 'mainFile'
   | 'errors'
   | 'showOutput'
   | 'outputMode'
