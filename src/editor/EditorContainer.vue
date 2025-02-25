@@ -17,20 +17,27 @@ const { store, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = useRouteQuery('show-message', true)
 
 function updateProject() {
-  store.value.isUpdated = true
-  if (!store.value.user.id || !store.value.project) return
-  ofetch(
-    '/api/project/' +
-      store.value.project.userName +
-      '/' +
-      store.value.project.name,
-    {
-      method: 'PUT',
-      body: {
-        hash: store.value.serialize(),
-      },
-    },
-  )
+  const paths = location.pathname.slice(0).split('/')
+  const hasPermission = paths[0] === store.value.userName && paths[1]
+  if (hasPermission) {
+    history.pushState(null, '', location.pathname + location.search)
+    if (store.value.project) {
+      ofetch(
+        '/api/project/' +
+          store.value.project.userName +
+          '/' +
+          store.value.project.name,
+        {
+          method: 'PUT',
+          body: {
+            hash: store.value.serialize(),
+          },
+        },
+      )
+    }
+  } else {
+    history.replaceState({}, '', store.value.serialize())
+  }
 }
 
 const onChange = debounce((code: string) => {

@@ -96,7 +96,6 @@ export async function useStore(
     }
   }
 
-  const isUpdated = ref(false)
   async function setDefaultFile() {
     loading.value = true
     await getTemplate()
@@ -109,7 +108,6 @@ export async function useStore(
 
   async function init() {
     watch(preset, () => {
-      isUpdated.value = false
       activeFilename.value = appFile
       history.pushState(null, '', location.pathname + location.search)
       setDefaultFile()
@@ -353,14 +351,6 @@ export async function useStore(
     deserialize(serializedState)
   }
 
-  watchEffect(() => {
-    if (user.value.id && !presets.value[preset.value]) {
-      history.pushState(null, '', location.pathname + location.search)
-    } else if (isUpdated.value) {
-      history.replaceState({}, '', serialize())
-    }
-  })
-
   const activeFile = computed(() => files.value[activeFilename.value])
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
@@ -369,7 +359,6 @@ export async function useStore(
   const fileCaches = ref(Object.create(null))
 
   const store: ReplStore = reactive({
-    isUpdated,
     organization,
     organizations,
     userName,
@@ -467,7 +456,6 @@ export type ViteConfig = {
 }
 
 export interface ReplStore extends UnwrapRef<StoreState> {
-  isUpdated: boolean
   organization?: Organization
   organizations: Organization[]
   userName: string
@@ -491,7 +479,6 @@ export interface ReplStore extends UnwrapRef<StoreState> {
 
 export type Store = Pick<
   ReplStore,
-  | 'isUpdated'
   | 'organization'
   | 'organizations'
   | 'userName'
