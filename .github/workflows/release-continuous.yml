@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+      - test1
 
 jobs:
   build:
