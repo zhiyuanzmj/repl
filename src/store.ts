@@ -82,6 +82,7 @@ export async function useStore(
   const template = ref({} as Template)
   async function getTemplate() {
     if (presets.value[preset.value]) {
+      project.value = undefined
       template.value = presets.value[preset.value]
     } else {
       project.value = await ofetch('/api/project/' + preset.value)

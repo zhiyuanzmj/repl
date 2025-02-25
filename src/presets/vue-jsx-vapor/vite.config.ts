@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { transformSync } from '@babel/core'
-import { helperId, helperCode } from 'unplugin-vue-jsx-vapor/api'
+import { helperId, helperCode } from 'unplugin-vue-jsx-vapor/api.js'
 import jsx from '@vue-jsx-vapor/babel'
 
 export default {
