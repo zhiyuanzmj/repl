@@ -4,7 +4,7 @@ import { computed, inject, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import { type Project, injectKeyProps } from '../../types'
 
-const test = 2
+const test = 3
 
 const { store } = inject(injectKeyProps)!
 
