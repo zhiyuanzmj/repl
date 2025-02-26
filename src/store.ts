@@ -74,7 +74,7 @@ export async function useStore(
   const user = ref({} as User)
   if (document.cookie.split('; ').some((i) => /^token=\S+/.test(i))) {
     user.value = await ofetch('/api/user-info').catch(() => ({}))
-    getOrganizations(user.value.name)
+    await getOrganizations(user.value.name)
   }
   const userName = computed(() => organization.value?.login || user.value.name)
 

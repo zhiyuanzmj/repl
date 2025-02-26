@@ -89,8 +89,8 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
-    "@vue-macros/jsx-macros": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@dda3750",
-    "@vue-macros/volar": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/volar@dda3750",
+    "@vue-macros/jsx-macros": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/jsx-macros@70d2897",
+    "@vue-macros/volar": "https://pkg.pr.new/vue-macros/vue-macros/@vue-macros/volar@70d2897",
     "assert": "^2.1.0",
     "bumpp": "^9.9.2",
     "codemirror": "^5.65.18",
@@ -119,7 +119,7 @@
     "vite-plugin-dts": "^4.4.0",
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
-    "vue": "https://pkg.pr.new/vuejs/vue-vapor/vue@6d5bc43",
+    "vue": "https://pkg.pr.new/vue@dc910ac",
     "vue-tsc": "~2.2.0"
   },
   "prisma": {
