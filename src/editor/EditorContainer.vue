@@ -17,7 +17,7 @@ const { store, virtualFiles, editorOptions } = inject(injectKeyProps)!
 const showMessage = useRouteQuery('show-message', true)
 
 function updateProject() {
-  const paths = location.pathname.slice(0).split('/')
+  const paths = location.pathname.slice(1).split('/')
   const hasPermission = paths[0] === store.value.userName && paths[1]
   if (hasPermission) {
     history.pushState(null, '', location.pathname + location.search)

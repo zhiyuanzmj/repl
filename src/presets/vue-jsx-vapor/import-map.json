@@ -1,7 +1,6 @@
 {
   "imports": {
-    "vue": "/proxy/vue-vapor.js",
-    "vue/vapor": "/proxy/vue-vapor.js"
+    "vue": "/proxy/vue-vapor.js"
   },
   "scopes": {}
 }

@@ -351,7 +351,7 @@ export async function useStore(
     deserialize(serializedState)
   }
 
-  const activeFile = computed(() => files.value[activeFilename.value])
+  const activeFile = computed(() => files.value[activeFilename.value] || files.value[appFile])
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
   )
