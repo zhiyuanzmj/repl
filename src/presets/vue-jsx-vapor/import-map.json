@@ -1,6 +1,6 @@
 {
   "imports": {
-    "vue": "/proxy/vue-vapor.js"
+    "vue": "https://esm.sh/pr/vue@dc910ac/es2022/dist/vue.runtime-with-vapor.esm-browser.mjs"
   },
   "scopes": {}
 }
