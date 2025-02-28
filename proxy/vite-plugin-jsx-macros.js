@@ -1,2 +1,1 @@
-import jsxMacros from '@vue-macros/jsx-macros/raw'
-export default jsxMacros
+export { default } from '@vue-macros/jsx/raw'

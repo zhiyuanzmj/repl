@@ -1,2 +1,1 @@
-import transformJsxMacros from '@vue-macros/volar/jsx-macros'
-export default transformJsxMacros
+export { default } from '@vue-macros/jsx/volar'
