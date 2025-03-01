@@ -118,7 +118,7 @@
     "vite-plugin-dts": "^4.4.0",
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
-    "vue": "https://pkg.pr.new/vue@dc910ac",
+    "vue": "https://pkg.pr.new/vue@ce35a8c",
     "vue-tsc": "~2.2.0"
   },
   "prisma": {
