@@ -1,4 +1,4 @@
-import { transformSync } from '@babel/core'
+import { transform } from '@babel/standalone'
 import jsx from '@babel/plugin-transform-react-jsx'
 
 export default {
@@ -9,7 +9,7 @@ export default {
         if (id.match(/\.[jt]sx$/))
           return (
             'import { h, Fragment } from "preact"\n' +
-            transformSync(code, {
+            transform(code, {
               plugins: [
                 [
                   jsx,

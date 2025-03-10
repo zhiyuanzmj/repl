@@ -15,7 +15,7 @@ export default () => {
       </button>
       <button onClick={() => count.value--}>-</button>
 
-      <div>{count.value}</div>
+      <div v-for={index in count.value}>{index}</div>
     </>
   )
 }

@@ -18,12 +18,13 @@ export default defineConfig({
   build: {
     outDir: './.vercel/output/static',
     rollupOptions: {
-      external: ['node:worker_threads', 'unconfig'],
+      external: ['node:worker_threads', 'unconfig', '@babel/core'],
       plugins: [
         {
-          name: 'remove unconfig',
+          name: 'remove external',
           renderChunk(code) {
             return code.replaceAll(/import\s+["']unconfig["'];?\n?/g, '')
+              .replaceAll(`'@babel/core'`, `'https://esm.sh/@babel/core'`)
           },
         },
       ],

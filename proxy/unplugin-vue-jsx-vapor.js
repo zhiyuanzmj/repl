@@ -1,0 +1,1 @@
+export { default } from 'unplugin-vue-jsx-vapor/raw'

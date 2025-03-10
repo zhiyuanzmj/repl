@@ -118,7 +118,8 @@
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
     "vue": "https://pkg.pr.new/vue@ce35a8c",
-    "vue-tsc": "~2.2.0"
+    "vue-tsc": "~2.2.0",
+    "unplugin-vue-jsx-vapor": "^1.5.0"
   },
   "prisma": {
     "schema": "./server/prisma/schema.prisma"

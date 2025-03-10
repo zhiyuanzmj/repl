@@ -1,4 +1,4 @@
-import { transformSync } from '@babel/core'
+import { transform } from '@babel/standalone'
 import jsx from 'babel-preset-solid'
 
 export default {
@@ -7,7 +7,7 @@ export default {
       name: 'vite-plugin-solid',
       transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return transformSync(code, {
+          return transform(code, {
             presets: [jsx],
           }).code
       },
