@@ -1,4 +1,5 @@
-import vueJsxVapor from 'unplugin-vue-jsx-vapor/raw'
+// @ts-nocheck
+import vueJsxVapor from 'unplugin-vue-jsx-vapor/raw.js'
 
 export default {
   plugins: [
