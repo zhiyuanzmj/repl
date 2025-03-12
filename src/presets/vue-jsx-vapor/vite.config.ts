@@ -3,6 +3,8 @@ import vueJsxVapor from 'vue-jsx-vapor/raw.js'
 
 export default {
   plugins: [
-    vueJsxVapor()
+    vueJsxVapor({
+      macros: true
+    })
   ],
 }
