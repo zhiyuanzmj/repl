@@ -135,8 +135,8 @@ importers:
         specifier: https://pkg.pr.new/vue@ce35a8c
         version: https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2)
       vue-jsx-vapor:
-        specifier: ^2.0.0
-        version: 2.0.0(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue-tsc@2.2.0(typescript@5.7.2))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
+        specifier: ^2.0.1
+        version: 2.0.1(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue-tsc@2.2.0(typescript@5.7.2))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
       vue-tsc:
         specifier: ~2.2.0
         version: 2.2.0(typescript@5.7.2)
@@ -1302,15 +1302,15 @@ packages:
   '@volar/typescript@2.4.11':
     resolution: {integrity: sha512-2DT+Tdh88Spp5PyPbqhyoYavYCPDsqbHLFwcUI9K1NlY1YgUJvujGdrqUp0zWxnW7KWNTr3xSpMuv2WnaTKDAw==}
 
-  '@vue-jsx-vapor/babel@2.0.0':
-    resolution: {integrity: sha512-7wc08iKt8VIbyuqKeFC78D7WgoB4Zs/pXi91+vaC03RgCliaDLxOuzSK4tuYMsjufgmJLxtHUzk2aXLQ/1fV3g==}
+  '@vue-jsx-vapor/babel@2.0.1':
+    resolution: {integrity: sha512-ST0x217vjneMIE5e9hibu8xD28K4ykUJD+zcmw2SicX7Lwygt6MqgLt4Ma63uKatLKQ67mhYL8X6M1j8adHDGA==}
 
-  '@vue-jsx-vapor/compiler@2.0.0':
-    resolution: {integrity: sha512-REabaIOYY9gnEWZ5uBLwjzefMpKTuvpkDJm2uIdVwF6q+BgycCYVUESa6yIOTNihcCw1jnuG6djQVsXiwOiT8w==}
+  '@vue-jsx-vapor/compiler@2.0.1':
+    resolution: {integrity: sha512-573BJbRY+0GvK4IQczP9Zlnpl+1G5ECRvq253BOXYQSIB81xnSOZ9MBPMlAQLayjyjn+rMxeim436PLlgUhCtg==}
 
-  '@vue-jsx-vapor/macros@2.0.0':
-    resolution: {integrity: sha512-DtFsmwyf7PJaiC/jksnOowZiSQIx0CwNH6iAuxhaikwhnNphb4E8kvElz7hLdvOITe9TWI62T0vBFt8COAQOQw==}
-    version: 2.0.0
+  '@vue-jsx-vapor/macros@2.0.1':
+    resolution: {integrity: sha512-h4vXi/6cGQXyOmV5+PokGoWIHKjSJwZC2Xaenz8IHWS9t3TNes92nxGT2Xy4Emh4PL/9LX+BIYn8nx8duGzGOg==}
+    version: 2.0.1
     peerDependencies:
       '@nuxt/kit': ^3
       '@nuxt/schema': ^3
@@ -4062,9 +4062,9 @@ packages:
     peerDependencies:
       vue: ^3.4.37
 
-  vue-jsx-vapor@2.0.0:
-    resolution: {integrity: sha512-Gt3ar6dBtaJW9yI8lW3UKvAJfP8EMf6x21/sJFkwIfOyXwu12yGCY5mymbmkyI+fe8+j7bRYHVbD3qz4d1WsZQ==}
-    version: 2.0.0
+  vue-jsx-vapor@2.0.1:
+    resolution: {integrity: sha512-NGkA3AoATJixxxCAXhCTpqqmcoQPAa0dbRUQBIuRf6LFXxLRoROP/rL+eXQ5sZmlwQ0feGNPUdgQyBoc9C/TvA==}
+    version: 2.0.1
     peerDependencies:
       '@nuxt/kit': ^3
       '@nuxt/schema': ^3
@@ -5390,19 +5390,19 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
-  '@vue-jsx-vapor/babel@2.0.0':
+  '@vue-jsx-vapor/babel@2.0.1':
     dependencies:
       '@babel/core': 7.26.9
       '@babel/parser': 7.26.9
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.9)
       '@babel/traverse': 7.26.9
       '@babel/types': 7.26.9
-      '@vue-jsx-vapor/compiler': 2.0.0
+      '@vue-jsx-vapor/compiler': 2.0.1
       source-map-js: 1.2.1
     transitivePeerDependencies:
       - supports-color
 
-  '@vue-jsx-vapor/compiler@2.0.0':
+  '@vue-jsx-vapor/compiler@2.0.1':
     dependencies:
       '@babel/parser': 7.26.9
       '@babel/types': 7.26.9
@@ -5410,7 +5410,7 @@ snapshots:
       '@vue/compiler-vapor': https://pkg.pr.new/@vue/compiler-vapor@ce35a8c
       '@vue/shared': https://pkg.pr.new/@vue/shared@ce35a8c
 
-  '@vue-jsx-vapor/macros@2.0.0(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))':
+  '@vue-jsx-vapor/macros@2.0.1(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))':
     dependencies:
       '@vue-macros/common': 3.0.0-beta.4(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
       '@vue/compiler-dom': https://pkg.pr.new/@vue/compiler-dom@ce35a8c
@@ -8148,7 +8148,7 @@ snapshots:
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
       '@volar/language-core': 2.4.11
-      '@vue/language-core': 2.2.4(typescript@5.7.2)
+      '@vue/language-core': 2.2.8(typescript@5.7.2)
       muggle-string: 0.4.1
     transitivePeerDependencies:
       - rollup
@@ -8308,7 +8308,7 @@ snapshots:
 
   unplugin-utils@0.2.4:
     dependencies:
-      pathe: 2.0.2
+      pathe: 2.0.3
       picomatch: 4.0.2
 
   unplugin@1.16.1:
@@ -8480,13 +8480,13 @@ snapshots:
     dependencies:
       vue: https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2)
 
-  vue-jsx-vapor@2.0.0(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue-tsc@2.2.0(typescript@5.7.2))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2)):
+  vue-jsx-vapor@2.0.1(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue-tsc@2.2.0(typescript@5.7.2))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2)):
     dependencies:
       '@babel/core': 7.26.9
       '@babel/plugin-transform-typescript': 7.26.8(@babel/core@7.26.9)
-      '@vue-jsx-vapor/babel': 2.0.0
-      '@vue-jsx-vapor/compiler': 2.0.0
-      '@vue-jsx-vapor/macros': 2.0.0(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
+      '@vue-jsx-vapor/babel': 2.0.1
+      '@vue-jsx-vapor/compiler': 2.0.1
+      '@vue-jsx-vapor/macros': 2.0.1(esbuild@0.24.2)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.6.1))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
       '@vue-macros/volar': 3.0.0-beta.4(rollup@4.29.1)(typescript@5.7.2)(vue-tsc@2.2.0(typescript@5.7.2))(vue@https://pkg.pr.new/vue@ce35a8c(typescript@5.7.2))
       magic-string-stack: 0.1.2
       ts-macro: 0.1.21(rollup@4.29.1)(typescript@5.7.2)

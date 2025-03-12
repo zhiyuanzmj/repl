@@ -113,7 +113,7 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.0",
     "unocss": "^65.4.3",
-    "vue-jsx-vapor": "^2.0.0",
+    "vue-jsx-vapor": "^2.0.1",
     "vite": "^6.0.6",
     "vite-plugin-dts": "^4.4.0",
     "volar-service-typescript": "^0.0.62",
