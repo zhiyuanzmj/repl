@@ -443,6 +443,7 @@ export type StoreState = ToRefs<{
 
 export type VitePlugin = {
   name?: string
+  enforce?: 'pre' | 'post'
   resolveId?: (id: string) => string | null | undefined
   load?: (id: string) => string | null | undefined
   transformInclude?: (id: string) => boolean

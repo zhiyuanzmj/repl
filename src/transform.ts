@@ -1,4 +1,4 @@
-import { addSrcPrefix, File, type Store } from './store'
+import { addSrcPrefix, File, VitePlugin, type Store } from './store'
 import { type Transform, transform } from 'sucrase'
 import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
@@ -76,6 +76,30 @@ export async function compileFile(
   return []
 }
 
+function resolvePlugins(
+  plugins: (VitePlugin| undefined)[],
+): VitePlugin[] {
+  const prePlugins: VitePlugin[] = []
+  const postPlugins: VitePlugin[] = []
+  const normalPlugins: VitePlugin[] = []
+
+  if (plugins) {
+    plugins.flat().forEach((p) => {
+      if (!p) return
+      if (p.enforce === 'pre') prePlugins.push(p)
+      else if (p.enforce === 'post') postPlugins.push(p)
+      else normalPlugins.push(p)
+    })
+  }
+  const result = [...prePlugins, ...normalPlugins, ...postPlugins]
+
+  const map = new Map()
+  for (const [index, plugin] of result.entries()) {
+    map.set(plugin.name || `plugin-${index}`, plugin)
+  }
+  return [...map.values()]
+}
+
 async function transformVitePlugin(
   code: string,
   id: string,
@@ -87,7 +111,7 @@ async function transformVitePlugin(
   }
 
   const { plugins } = store.viteConfig
-  for (const plugin of plugins.flat()) {
+  for (const plugin of resolvePlugins(plugins)) {
     if (plugin.transformInclude) {
       if (!plugin.transformInclude(id)) continue
     }
