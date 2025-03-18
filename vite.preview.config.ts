@@ -24,7 +24,7 @@ export default defineConfig({
           name: 'remove external',
           renderChunk(code) {
             return code.replaceAll(/import\s+["']unconfig["'];?\n?/g, '')
-              .replaceAll(`'@babel/core'`, `'https://esm.sh/@babel/core'`)
+              // .replaceAll(`'@babel/core'`, `'https://esm.sh/@babel/core'`)
           },
         },
       ],
