@@ -1,5 +1,4 @@
-import { ref } from 'vue'
-import { useRef } from 'vue-jsx-vapor'
+import { ref, shallowRef as useRef } from 'vue'
 
 export default () => {
   const count = ref(0)
