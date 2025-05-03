@@ -16,6 +16,7 @@ export function transformTS(src: string, isJSX?: boolean) {
   return transform(src, {
     transforms: ['typescript', ...(isJSX ? (['jsx'] as Transform[]) : [])],
     jsxRuntime: 'preserve',
+    keepUnusedImports: true
   }).code
 }
 

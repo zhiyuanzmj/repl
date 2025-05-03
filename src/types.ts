@@ -1,7 +1,7 @@
 import type { Component, ComputedRef, InjectionKey, ToRefs } from 'vue'
 import { Props } from './Repl.vue'
 
-export type EditorMode = 'js' | 'css' | 'ssr' | 'volar' | 'devtools'
+export type EditorMode = 'js' | 'css' | 'ssr' | 'ts' | 'devtools'
 export interface EditorProps {
   value: string
   filename: string

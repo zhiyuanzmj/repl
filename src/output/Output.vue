@@ -21,7 +21,7 @@ const { store } = inject(injectKeyProps)!
 const previewRef = useTemplateRef<InstanceType<typeof Preview>>('preview')
 const modes = computed(() =>
   props.showCompileOutput
-    ? (['js', 'css', 'volar', 'devtools'] as const)
+    ? (['js', 'css', 'ts', 'devtools'] as const)
     : ([] as const),
 )
 
