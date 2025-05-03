@@ -516,7 +516,7 @@ export class File {
   compiled = {
     js: '',
     css: '',
-    volar: '',
+    ts: '',
     ssr: '',
   }
   editorViewState: editor.ICodeEditorViewState | null = null

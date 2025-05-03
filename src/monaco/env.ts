@@ -123,7 +123,7 @@ export function loadMonacoEnv(store: Store) {
             } else if (data.data?.filePath) {
               const file = store.files[data.data.filePath.slice(1)]
               if (file) {
-                file.compiled.volar = data.data.code
+                file.compiled.ts = data.data.code
               }
             }
           })
