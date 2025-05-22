@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
-import { globby } from 'globby'
+// import { globby } from 'globby'
 import Unocss from 'unocss/vite'
 
 export default defineConfig({
@@ -28,18 +28,18 @@ export default defineConfig({
           },
         },
       ],
-      treeshake: true,
+      treeshake: true
     },
-    lib: {
-      entry: ['index.html', ...(await globby(['./proxy/*']))],
-      fileName(_, name) {
-        if (name === 'index.html') {
-          return 'index.html'
-        }
-        return `proxy/${name}.js`
-      },
-      formats: ['es'],
-    },
+    // lib: {
+    //   entry: ['index.html', ...(await globby(['./proxy/*']))],
+    //   fileName(_, name) {
+    //     if (name === 'index.html') {
+    //       return 'index.html'
+    //     }
+    //     return `proxy/${name}.js`
+    //   },
+    //   formats: ['es'],
+    // },
     commonjsOptions: {
       ignore: ['typescript'],
     },

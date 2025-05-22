@@ -273,7 +273,7 @@ export async function useStore(
     }
     return (
       'data:text/javascript;charset=utf-8,' +
-      encodeURIComponent(await transformTS(addEsmPrefix(code, importMap.value)))
+      encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
     )
   }
 
@@ -290,7 +290,7 @@ export async function useStore(
       store.viteConfig = await import(
         'data:text/javascript;charset=utf-8,' +
           encodeURIComponent(
-            await transformTS(addEsmPrefix(code, importMap.value)),
+            transformTS(addEsmPrefix(code, importMap.value)),
           )
       ).then((i) => i.default)
     } catch (e) {
