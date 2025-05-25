@@ -50,7 +50,7 @@
     "release": "bumpp --all",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "prepublishOnly": "npm run build",
-    "deploy": "pnpm run build-preview && rsync -v -a --delete ./dist/ root@zmjs.dev:/usr/share/nginx/html/repl"
+    "deploy": "pnpm run build && rsync -v -a --delete ./.vercel/output/static/ root@zmjs.dev:/usr/share/nginx/html/repl"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"

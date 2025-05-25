@@ -93,7 +93,7 @@ export default defineComponent(
             [isVertical ? 'height' : 'width']: 100 - boundSplit + '%',
           }}
         >
-          <div class="view-size" v-show="state.dragging">
+          <div class="view-size" v-show={state.dragging}>
             {`${state.viewWidth}px x ${state.viewHeight}px`}
           </div>
           <slots.right />

@@ -1,7 +1,7 @@
 import { ref, shallowRef as useRef } from 'vue'
 
 export default () => {
-  const count = ref(0)
+  const count = ref(1)
 
   return (
     <>

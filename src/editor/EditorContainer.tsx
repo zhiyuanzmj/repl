@@ -88,7 +88,7 @@ export default defineComponent(
           </template>
         </SplitPane>
 
-        <Message err={store.errors[0]} v-show="showMessage" />
+        <Message err={store.errors[0]} v-show={showMessage} />
 
         <div class="editor-floating">
           <ToggleButton

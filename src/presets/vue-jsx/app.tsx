@@ -1,7 +1,7 @@
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent(() => {
-  const count = ref(0)
+  const count = ref(1)
 
   return () => (
     <>
