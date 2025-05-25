@@ -1,6 +1,8 @@
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'
+import vueJsxVapor from '@vue-jsx-vapor/eslint'
+import reactivityFunction from 'unplugin-vue-reactivity-function/eslint'
 
 export default tseslint.config(
   { ignores: ['**/node_modules', '**/dist'] },
@@ -8,7 +10,7 @@ export default tseslint.config(
   tseslint.configs.base,
   ...pluginVue.configs['flat/recommended'],
   {
-    files: ['**/*.vue'],
+    files: ['**/*.vue', '**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
         parser: '@typescript-eslint/parser',
@@ -18,10 +20,11 @@ export default tseslint.config(
   {
     rules: {
       'no-debugger': 'error',
+      'no-unreachable': 'off',
+      'prefer-const': 'off',
       'no-console': ['error', { allow: ['warn', 'error', 'info', 'clear'] }],
       'no-unused-vars': 'off',
       'no-undef': 'off',
-      'prefer-const': 'error',
       'sort-imports': ['error', { ignoreDeclarationSort: true }],
       'no-duplicate-imports': 'error',
       // This rule enforces the preference for using '@ts-expect-error' comments in TypeScript
@@ -50,4 +53,6 @@ export default tseslint.config(
       ],
     },
   },
+  vueJsxVapor(),
+  // reactivityFunction(),
 )

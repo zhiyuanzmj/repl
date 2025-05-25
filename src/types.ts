@@ -1,5 +1,5 @@
-import type { Component, ComputedRef, InjectionKey, ToRefs } from 'vue'
-import { Props } from './Repl.vue'
+import type { ComputedRef, FunctionalComponent, InjectionKey, ToRefs } from 'vue'
+import type { Props } from './Repl'
 
 export type EditorMode = 'js' | 'css' | 'ssr' | 'ts' | 'devtools'
 export interface EditorProps {
@@ -7,11 +7,9 @@ export interface EditorProps {
   filename: string
   readonly?: boolean
   mode?: EditorMode
+  onChange?: (code: string) => void
 }
-export interface EditorEmits {
-  (e: 'change', code: string): void
-}
-export type EditorComponentType = Component<EditorProps>
+export type EditorComponentType = FunctionalComponent<EditorProps>
 
 export type OutputModes = EditorMode
 

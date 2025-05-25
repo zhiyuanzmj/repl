@@ -17,21 +17,6 @@ export default defineConfig({
 })
 ```
 
-### With CodeMirror Editor
-
-Basic editing experience with no intellisense. Lighter weight, fewer network requests, better for embedding use cases.
-
-```vue
-<script setup>
-import { Repl } from 'jsx-repl'
-import CodeMirror from 'jsx-repl/codemirror-editor'
-</script>
-
-<template>
-  <Repl :editor="CodeMirror" />
-</template>
-```
-
 ### With Monaco Editor
 
 With Volar support, autocomplete, type inference, and semantic highlighting. Heavier bundle, loads dts files from CDN, better for standalone use cases.

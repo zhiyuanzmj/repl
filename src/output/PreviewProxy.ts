@@ -37,15 +37,15 @@ export class PreviewProxy {
   }
 
   handle_command_message(cmd_data: any) {
-    let action = cmd_data.action
-    let id = cmd_data.cmd_id
-    let handler = this.pending_cmds.get(id)
+    const action = cmd_data.action
+    const id = cmd_data.cmd_id
+    const handler = this.pending_cmds.get(id)
 
     if (handler) {
       this.pending_cmds.delete(id)
       if (action === 'cmd_error') {
-        let { message, stack } = cmd_data
-        let e = new Error(message)
+        const { message, stack } = cmd_data
+        const e = new Error(message)
         e.stack = stack
         handler.reject(e)
       }

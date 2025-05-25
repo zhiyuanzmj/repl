@@ -15,12 +15,12 @@ import type { editor } from 'monaco-editor-core'
 import { defaultPresets } from './presets'
 import { ofetch } from 'ofetch'
 import {
+  appFile,
   importMapFile,
+  indexHtmlFile,
+  tsMacroConfigFile,
   tsconfigFile,
   viteConfigFile,
-  tsMacroConfigFile,
-  indexHtmlFile,
-  appFile,
 } from './presets/index'
 
 export {
@@ -265,7 +265,7 @@ export async function useStore(
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = async () => {
     let code = files.value[tsMacroConfigFile]?.code
-    for (let name in store.importMap.imports) {
+    for (const name in store.importMap.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
         store.importMap.imports[name] as string,
@@ -280,7 +280,7 @@ export async function useStore(
   const viteConfig = ref({} as ViteConfig)
   const getViteConfig = async () => {
     let code = files.value[viteConfigFile]?.code
-    for (let name in store.importMap.imports) {
+    for (const name in store.importMap.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
         store.importMap.imports[name] as string,

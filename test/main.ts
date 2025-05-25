@@ -2,9 +2,7 @@
 import { createApp, h, ref } from 'vue'
 import { Repl, useStore } from '../src'
 // @ts-ignore
-import MonacoEditor from '../src/editor/MonacoEditor.vue'
-// @ts-ignore
-import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
+import MonacoEditor from '../src/editor/MonacoEditor'
 
 import 'uno.css'
 
@@ -39,7 +37,7 @@ const App = {
             previewTheme: previewTheme.value,
             editor: MonacoEditor,
             ssr: false,
-            // showCompileOutput: false,
+            showCompileOutput: true,
             editorOptions: {
               autoSaveText: 'Auto Save',
               virtualFilesText: 'Virtual Files',

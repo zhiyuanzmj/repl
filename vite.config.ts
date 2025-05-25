@@ -1,74 +1,92 @@
-import { type Plugin, mergeConfig } from 'vite'
-import dts from 'vite-plugin-dts'
-import base from './vite.preview.config'
-import fs from 'node:fs'
-import path from 'node:path'
+import { defineConfig } from 'vite'
+import replace from '@rollup/plugin-replace'
+// import { globby } from 'globby'
+import Unocss from 'unocss/vite'
+import vueJsxVapor from 'vue-jsx-vapor/vite'
+import reactivityFunction from 'unplugin-vue-reactivity-function/vite'
+import inspect from 'vite-plugin-inspect'
+import AutoImport from 'unplugin-auto-import/vite'
+import { visualizer } from 'rollup-plugin-visualizer'
 
-const genStub: Plugin = {
-  name: 'gen-stub',
-  apply: 'build',
-  generateBundle() {
-    this.emitFile({
-      type: 'asset',
-      fileName: 'ssr-stub.js',
-      source: `module.exports = {}`,
-    })
-  },
-}
-
-/**
- * Patch generated entries and import their corresponding CSS files.
- * Also normalize MonacoEditor.css
- */
-const patchCssFiles: Plugin = {
-  name: 'patch-css',
-  apply: 'build',
-  writeBundle() {
-    //  inject css imports to the files
-    const outDir = path.resolve('dist')
-    ;['vue-repl', 'monaco-editor', 'codemirror-editor'].forEach((file) => {
-      const filePath = path.resolve(outDir, file + '.js')
-      const content = fs.readFileSync(filePath, 'utf-8')
-      fs.writeFileSync(filePath, `import './${file}.css'\n${content}`)
-    })
-  },
-}
-delete base.build!.lib
-export default mergeConfig(base, {
+export default defineConfig({
   plugins: [
-    dts({
-      rollupTypes: true,
+    reactivityFunction(),
+    vueJsxVapor({
+      macros: {
+        defineExpose: {
+          alias: ['defineExpose', 'defineExpose$'],
+        },
+        defineModel: {
+          alias: ['defineModel', '$defineModel'],
+        },
+      },
+      ref: {
+        alias: ['useRef', '$useRef'],
+      },
+      interop: true,
     }),
-    genStub,
-    patchCssFiles,
+    Unocss(),
+    inspect(),
+    AutoImport({
+      imports: ['vue', { from: 'vue-jsx-vapor', imports: ['useRef'] }],
+    }),
+    visualizer(),
   ],
-  optimizeDeps: {
-    // avoid late discovered deps
-    include: [
-      'typescript',
-      'monaco-editor-core/esm/vs/editor/editor.worker',
-      'vue/server-renderer',
+  resolve: {
+    alias: {
+      '@vue/compiler-dom': '@vue/compiler-dom/dist/compiler-dom.cjs.js',
+      '@vue/compiler-core': '@vue/compiler-core/dist/compiler-core.cjs.js',
+    },
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  },
+  build: {
+    outDir: './.vercel/output/static',
+    rollupOptions: {
+      external: ['node:worker_threads', 'unconfig', '@babel/core'],
+      plugins: [
+        {
+          name: 'remove external',
+          renderChunk(code) {
+            return code.replaceAll(/import\s+["']unconfig["'];?\n?/g, '')
+            // .replaceAll(`'@babel/core'`, `'https://esm.sh/@babel/core'`)
+          },
+        },
+      ],
+      treeshake: true,
+    },
+    // lib: {
+    //   entry: ['index.html', ...(await globby(['./proxy/*']))],
+    //   fileName(_, name) {
+    //     if (name === 'index.html') {
+    //       return 'index.html'
+    //     }
+    //     return `proxy/${name}.js`
+    //   },
+    //   formats: ['es'],
+    // },
+    commonjsOptions: {
+      ignore: ['typescript'],
+    },
+  },
+  worker: {
+    format: 'es',
+    plugins: () => [
+      replace({
+        preventAssignment: true,
+        values: {
+          'process.env.NODE_ENV': JSON.stringify('production'),
+        },
+      }),
     ],
   },
-  base: './',
-  build: {
-    target: 'esnext',
-    minify: false,
-    lib: {
-      entry: {
-        'vue-repl': './src/index.ts',
-        'monaco-editor': './src/editor/MonacoEditor.vue',
-        'codemirror-editor': './src/editor/CodeMirrorEditor.vue',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
       },
-      formats: ['es'],
-      fileName: () => '[name].js',
-    },
-    cssCodeSplit: true,
-    rollupOptions: {
-      output: {
-        chunkFileNames: 'chunks/[name]-[hash].js',
-      },
-      external: ['vue', 'vue/compiler-sfc'],
     },
   },
+  envPrefix: 'NITRO_',
 })

@@ -9,3 +9,5 @@ TODOs.md
 .nitro
 .output
 .vercel
+auto-imports.d.ts
+stats.html

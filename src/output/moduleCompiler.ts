@@ -1,13 +1,13 @@
-import { indexHtmlFile, type File, type Store } from '../store'
+import { type File, type Store, indexHtmlFile } from '../store'
+import MagicString from 'magic-string'
+import { parse as babelParse } from '@babel/parser'
 import {
-  MagicString,
-  babelParse,
   extractIdentifiers,
   isInDestructureAssignment,
   isStaticProperty,
   walk,
   walkIdentifiers,
-} from 'vue/compiler-sfc'
+} from './babelUtils'
 import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 import { addEsmPrefix } from '../utils'
 import { cssRE } from '../transform'
@@ -290,6 +290,7 @@ function processModule(store: Store, src: string, filename: string) {
 
   // 4. convert dynamic imports
   let hasDynamicImport = false
+  // @ts-expect-error ignore
   walk(ast, {
     enter(node: Node, parent: Node) {
       if (node.type === 'Import' && parent.type === 'CallExpression') {

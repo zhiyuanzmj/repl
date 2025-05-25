@@ -10,6 +10,7 @@ export default {
           return (
             'import { h, Fragment } from "preact"\n' +
             transform(code, {
+              presets: [['typescript', { allExtensions: true, isTSX: true }]],
               plugins: [
                 [
                   jsx,

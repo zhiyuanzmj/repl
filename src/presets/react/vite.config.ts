@@ -10,6 +10,7 @@ export default {
           return (
             'import React from "react"\n' +
             transform(code, {
+              presets: [['typescript', { allExtensions: true, isTSX: true }]],
               plugins: [jsx],
             }).code
           )

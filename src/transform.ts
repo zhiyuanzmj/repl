@@ -1,4 +1,4 @@
-import { addSrcPrefix, File, VitePlugin, type Store } from './store'
+import { File, type Store, type VitePlugin, addSrcPrefix } from './store'
 import { type Transform, transform } from 'sucrase'
 import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
@@ -157,7 +157,7 @@ export const cssRE = /\.(css|scss)$/
 async function transformCssModules(code: string, id: string) {
   if (code.startsWith('export default')) return
   if (sassRE.test(id)) {
-    // @ts-ignore
+    // @ts-expect-error
     code = await import('https://jspm.dev/sass').then(
       (i) => i.compileString(code).css,
     )

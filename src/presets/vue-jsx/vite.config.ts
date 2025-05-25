@@ -8,6 +8,7 @@ export default {
       transform(code, id) {
         if (id.match(/\.[jt]sx$/))
           return transform(code, {
+            presets: [['typescript', { allExtensions: true,  isTSX: true }]],
             plugins: [jsx],
           }).code
       },
