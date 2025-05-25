@@ -1,4 +1,4 @@
-import { ref, shallowRef as useRef } from 'vue'
+import { ref } from 'vue'
 
 export default () => {
   const count = ref(1)
