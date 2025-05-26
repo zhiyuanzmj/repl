@@ -1,6 +1,5 @@
 import Preview from './Preview'
 import Login from './user/Login'
-import { computed, defineComponent, inject, ref } from 'vue'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -11,7 +10,7 @@ import Devtools from './Devtools'
 import Preset from './user/Project'
 import { useRef } from 'vue-jsx-vapor'
 
-export default defineComponent(
+export default defineVaporComponent(
   (props: {
     editorComponent: EditorComponentType
     showCompileOutput?: boolean
@@ -58,7 +57,7 @@ export default defineComponent(
 
     let devtoolsLoaded = $ref(mode === 'devtools')
 
-    return () => (
+    return (
       <SplitPane layout="vertical">
         <template v-slot:left>
           <div class="flex-1 h-full">

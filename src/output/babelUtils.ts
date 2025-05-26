@@ -36,6 +36,7 @@ export function walkIdentifiers(
       ? root.body[0].type === 'ExpressionStatement' && root.body[0].expression
       : root
 
+  // @ts-expect-error ignore
   walk(root, {
     enter(node: Node & { scopeIds?: Set<string> }, parent: Node | null) {
       parent && parentStack.push(parent)

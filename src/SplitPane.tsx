@@ -1,8 +1,6 @@
-import { computed, defineComponent, inject, reactive } from 'vue'
 import { injectKeyPreviewRef, injectKeyProps } from './types'
-import { useRef } from 'vue-jsx-vapor'
 
-export default defineComponent(
+export default defineVaporComponent(
   (props: { layout?: 'horizontal' | 'vertical' }) => {
     const isVertical = $computed(() => props.layout === 'vertical')
 
@@ -64,7 +62,7 @@ export default defineComponent(
       right: () => <div />,
     })
 
-    return () => (
+    return (
       <div
         class={[
           'split-pane',
@@ -75,7 +73,7 @@ export default defineComponent(
         ]}
         ref$={containerRef}
         onMouseleave={dragEnd}
-        onMousemove={dragMove as any}
+        onMousemove={dragMove}
         onMouseup={dragEnd}
       >
         <div
@@ -85,7 +83,7 @@ export default defineComponent(
           }}
         >
           <slots.left />
-          <div class="dragger" onMousedown_prevent={dragStart as any} />
+          <div class="dragger" onMousedown_prevent={dragStart} />
         </div>
         <div
           class="right"

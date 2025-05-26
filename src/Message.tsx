@@ -1,7 +1,6 @@
-import { Transition, defineComponent, ref, watch } from 'vue'
 import type { CompilerError } from 'vue/compiler-sfc'
 
-export default defineComponent(
+export default defineVaporComponent(
   ({ err, warn }: { err?: string | Error | false; warn?: string | Error }) => {
     let dismissed = $ref(false)
 
@@ -25,8 +24,8 @@ export default defineComponent(
       }
     }
 
-    return () => (
-      <Transition name="fade">
+    return (
+      // <Transition name="fade"> 
         <div
           v-if={!dismissed && (err || warn)}
           class={['msg', err ? 'err' : 'warn']}
@@ -36,7 +35,7 @@ export default defineComponent(
             ✕
           </button>
         </div>
-      </Transition>
+      // </Transition>
     )
 
     defineStyle(`

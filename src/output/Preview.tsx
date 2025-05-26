@@ -1,13 +1,6 @@
 import Message from '../Message'
-import {
-  type WatchStopHandle,
-  defineComponent,
-  inject,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  watchEffect,
+import type {
+  WatchStopHandle,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
@@ -15,7 +8,7 @@ import { compileModulesForPreview } from './moduleCompiler'
 import { injectKeyProps } from '../../src/types'
 import { useRef } from 'vue-jsx-vapor'
 
-export default defineComponent(({ ssr = false }) => {
+export default defineVaporComponent(({ ssr = false }) => {
   const { store, clearConsole, previewTheme, previewOptions } =
     $inject(injectKeyProps)!
 
@@ -203,7 +196,7 @@ export default defineComponent(({ ssr = false }) => {
 
   defineExpose({ reload, container: $$(containerRef) })
 
-  return () => (
+  return (
     <>
       <div
         ref={(e) => (containerRef = e)}

@@ -1,9 +1,8 @@
 import { Menu } from 'floating-vue'
-import { computed, defineComponent, inject, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import { type Project, injectKeyProps } from '../../types'
 
-export default defineComponent(() => {
+export default defineVaporComponent(() => {
   const { store } = $inject(injectKeyProps)!
 
   let loading = $ref(false)
@@ -135,8 +134,8 @@ export default defineComponent(() => {
     )
   })
 
-  return () => (
-    <>
+  return (
+    <div class="flex items-center gap-2">
       <Menu distance={8}>
         <button class="i-carbon:add-large bg-$text! text-xl" />
         <template v-slot:popper>
@@ -251,6 +250,6 @@ export default defineComponent(() => {
           </option>
         </optgroup>
       </select>
-    </>
+    </div>
   )
 })

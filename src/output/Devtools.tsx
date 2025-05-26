@@ -1,7 +1,4 @@
-import { defineComponent, watchEffect } from 'vue'
-import { useRef } from 'vue-jsx-vapor'
-
-export default defineComponent(
+export default defineVaporComponent(
   ({
     iframe = undefined as unknown as HTMLIFrameElement,
     theme = 'dark' as 'dark' | 'light',
@@ -41,7 +38,7 @@ export default defineComponent(
       devtoolsIframe?.contentWindow?.location.reload()
     })
 
-    return () => (
+    return (
       <div class="relative h-full">
         <iframe
           ref={(e) => (devtoolsIframe = e)}

@@ -1,7 +1,6 @@
 import * as volar from '@volar/monaco'
 import { Uri, editor, languages } from 'monaco-editor-core'
 import editorWorker from 'monaco-editor-core/esm/vs/editor/editor.worker?worker'
-import { watchEffect } from 'vue'
 import type { Store } from '../store'
 import { getOrCreateModel } from './utils'
 import type { CreateData } from './worker'

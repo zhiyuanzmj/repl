@@ -34,7 +34,6 @@ export function atou(base64: string): string {
   return decodeURIComponent(escape(binary))
 }
 
-import { type Ref, computed, ref } from 'vue'
 import type { ImportMap } from './store'
 
 export function useRouteQuery<T extends string | boolean>(

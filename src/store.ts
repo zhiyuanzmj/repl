@@ -1,11 +1,6 @@
-import {
-  type ToRefs,
-  type UnwrapRef,
-  computed,
-  reactive,
-  ref,
-  watch,
-  watchEffect,
+import type {
+  ToRefs,
+  UnwrapRef,
 } from 'vue'
 import { compileFile, cssRE, transformTS } from './transform'
 import { addEsmPrefix, atou, useRoutePath, useRouteQuery, utoa } from './utils'

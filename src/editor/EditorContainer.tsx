@@ -1,14 +1,13 @@
 import FileSelector from './FileSelector'
 import Message from '../Message'
 import { debounce, useRouteQuery } from '../utils'
-import { computed, defineComponent, inject } from 'vue'
 import ToggleButton from './ToggleButton'
 import { type EditorComponentType, injectKeyProps } from '../types'
 import { type File, configFileNames } from '../store'
 import SplitPane from '../SplitPane'
 import { ofetch } from 'ofetch'
 
-export default defineComponent(
+export default defineVaporComponent(
   (props: { editorComponent: EditorComponentType }) => {
     const { store, virtualFiles, editorOptions } = $inject(injectKeyProps)!
     const showMessage = useRouteQuery('show-message', true)
@@ -56,7 +55,7 @@ export default defineComponent(
       return result
     })
 
-    return () => (
+    return (
       <>
         <SplitPane layout="vertical">
           <template v-slot:left>

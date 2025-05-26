@@ -1,14 +1,13 @@
-import { defineComponent } from 'vue'
 import Monaco from '../monaco/Monaco'
 import type { EditorProps } from '../types'
 
-export default defineComponent(
+export default defineVaporComponent(
   ({ filename, value, readonly, onChange }: EditorProps) => {
     const change = (code: string) => {
-      onChange(code)
+      onChange?.(code)
     }
 
-    return () => (
+    return (
       <Monaco
         filename={filename}
         readonly={readonly}

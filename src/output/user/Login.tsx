@@ -1,9 +1,8 @@
 import { ofetch } from 'ofetch'
 import { Menu } from 'floating-vue'
-import { defineComponent, inject } from 'vue'
 import { type User, injectKeyProps } from '../../types'
 
-export default defineComponent(() => {
+export default defineVaporComponent(() => {
   const { store } = $inject(injectKeyProps)!
 
   function login() {
@@ -15,7 +14,7 @@ export default defineComponent(() => {
     store.user = {} as User
   }
 
-  return () => (
+  return (
     <>
       <Menu
         v-if={store.user.name}
@@ -75,7 +74,7 @@ export default defineComponent(() => {
           </div>
         </template>
       </Menu>
-      <button v-else class="text! bg!" onClick={login}>
+      <button class="text! bg!" onClick={login}>
         Log in
       </button>
     </>

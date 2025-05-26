@@ -28,7 +28,11 @@ export default defineConfig({
     Unocss(),
     inspect(),
     AutoImport({
-      imports: ['vue', { from: 'vue-jsx-vapor', imports: ['useRef'] }],
+      imports: [
+        'vue',
+        { from: 'vue', imports: ['defineVaporComponent','defineComponent'] },
+        { from: 'vue-jsx-vapor', imports: ['useRef'] },
+      ],
     }),
     visualizer(),
   ],

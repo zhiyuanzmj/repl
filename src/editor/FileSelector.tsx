@@ -1,4 +1,3 @@
-import { useRef } from 'vue-jsx-vapor'
 import { injectKeyProps } from '../../src/types'
 import {
   type File,
@@ -7,9 +6,8 @@ import {
   stripSrcPrefix,
   tsconfigFile,
 } from '../store'
-import { type VNode, computed, defineComponent, inject, ref } from 'vue'
 
-export default defineComponent(
+export default defineVaporComponent(
   (props: {
     files: Record<string, File>
     activeFile: File
@@ -126,11 +124,11 @@ export default defineComponent(
           : '',
     )
 
-    return () => (
+    return (
       <div
         class="file-selector"
         ref$={fileSelector}
-        onWheel={horizontalScroll as any}
+        onWheel={horizontalScroll}
       >
         {/* TODO <template v-for={(file, i) in files} key={file}> */}
         <template v-for={(file, i) in files}>

@@ -1,9 +1,7 @@
-import { defineComponent } from 'vue'
-
-export default defineComponent(({ text = '' }) => {
+export default defineVaporComponent(({ text = '' }) => {
   let active = $defineModel<boolean>()
   
-  return () => (
+  return (
     <div class="wrapper" onClick={() => (active = !active)}>
       <span>{text}</span>
       <div class={['toggle', { active }]}>

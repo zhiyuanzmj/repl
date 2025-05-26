@@ -1,13 +1,3 @@
-import {
-  computed,
-  defineComponent,
-  inject,
-  onBeforeUnmount,
-  onMounted,
-  onWatcherCleanup,
-  shallowRef,
-  watch,
-} from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
@@ -15,7 +5,7 @@ import { type EditorMode, injectKeyProps } from '../types'
 import { registerHighlighter } from './highlight'
 import { useRef } from 'vue-jsx-vapor'
 
-export default defineComponent(
+export default defineVaporComponent(
   ({
     filename = ''!,
     readonly = false,
@@ -23,7 +13,7 @@ export default defineComponent(
     mode = undefined as unknown as EditorMode,
     onChange = (value: string) => {},
   }) => {
-    const containerRef = $useRef()
+    let containerRef = $useRef()
     let editor = $shallowRef<monaco.editor.IStandaloneCodeEditor>()
     const { store, autoSave, editorOptions } = $inject(injectKeyProps)!
 
@@ -143,7 +133,7 @@ export default defineComponent(
       )
 
       watch(
-        ()=>autoSave,
+        () => autoSave,
         (autoSave) => {
           const disposable = editorInstance.onDidChangeModelContent((e) => {
             if (e.isFlush) return
@@ -173,12 +163,19 @@ export default defineComponent(
       editor?.dispose()
     })
 
-    return () => (
+    return (
       <div
+        ref={(e) => {
+          containerRef = e
+          containerRef.addEventListener('keydown', (e) => {
+            if (e.key === 's' && (e.metaKey)) {
+              e.preventDefault()
+              emitChangeEvent()
+            }
+          })
+        }}
         class="editor"
-        ref$={containerRef}
         onKeydown_ctrl_s_prevent={emitChangeEvent}
-        onKeydown_meta_s_prevent={emitChangeEvent}
       />
     )
   },

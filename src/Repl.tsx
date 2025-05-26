@@ -2,14 +2,6 @@ import SplitPane from './SplitPane'
 import Output from './output/Output'
 import type { Store } from './store'
 import {
-  computed,
-  defineComponent,
-  getCurrentInstance,
-  provide,
-  proxyRefs,
-  toRefs,
-} from 'vue'
-import {
   type EditorComponentType,
   injectKeyPreviewRef,
   injectKeyProps,
@@ -17,18 +9,10 @@ import {
 import EditorContainer from './editor/EditorContainer'
 import type * as monaco from 'monaco-editor-core'
 import { useRouteQuery } from './utils'
-import { useRef } from 'vue-jsx-vapor'
 
 import 'floating-vue/dist/style.css'
 import './dropdown.css'
-
-function useProps() {
-  const i = getCurrentInstance()
-  return proxyRefs({
-    ...toRefs(i!.props),
-    ...toRefs(i!.attrs),
-  })
-}
+import { useFullProps } from 'vue-jsx-vapor'
 
 export interface Props {
   previewTheme?: boolean
@@ -63,7 +47,7 @@ export interface Props {
   }
 }
 
-export default defineComponent(
+export default defineVaporComponent(
   ({
     previewTheme = false,
     autoResize = true,
@@ -92,7 +76,7 @@ export default defineComponent(
     const outputSlotName = computed(() => (layoutReverse ? 'left' : 'right'))
 
     provide(injectKeyProps, {
-      ...toRefs(useProps()),
+      ...toRefs(useFullProps()),
       autoSave,
       virtualFiles,
     } as any)
@@ -110,7 +94,7 @@ export default defineComponent(
 
     defineExpose({ reload })
 
-    return () => (
+    return (
       <div class="vue-repl">
         <SplitPane layout={layout}>
           <template v-slot:$editorSlotName_value$={{}}>
