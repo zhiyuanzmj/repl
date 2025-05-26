@@ -74,7 +74,7 @@ export default defineVaporComponent(() => {
           </div>
         </template>
       </Menu>
-      <button class="text! bg!" onClick={login}>
+      <button v-else class="text! bg!" onClick={login}>
         Log in
       </button>
     </>

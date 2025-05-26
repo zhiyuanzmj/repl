@@ -2,7 +2,7 @@ import { Menu } from 'floating-vue'
 import { ofetch } from 'ofetch'
 import { type Project, injectKeyProps } from '../../types'
 
-export default defineVaporComponent(() => {
+export default defineComponent(() => {
   const { store } = $inject(injectKeyProps)!
 
   let loading = $ref(false)
@@ -134,7 +134,7 @@ export default defineVaporComponent(() => {
     )
   })
 
-  return (
+  return () => (
     <div class="flex items-center gap-2">
       <Menu distance={8}>
         <button class="i-carbon:add-large bg-$text! text-xl" />
