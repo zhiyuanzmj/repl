@@ -194,7 +194,7 @@ export default defineVaporComponent(({ ssr = false }) => {
     sandbox.contentWindow?.location.reload()
   }
 
-  defineExpose({ reload, container: $$(containerRef) })
+  defineExpose$({ reload, container: containerRef })
 
   return (
     <>

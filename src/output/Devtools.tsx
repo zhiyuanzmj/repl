@@ -1,6 +1,6 @@
 export default defineVaporComponent(
   ({
-    iframe = undefined as unknown as HTMLIFrameElement,
+    previewContainer = undefined as unknown as HTMLDivElement | null,
     theme = 'dark' as 'dark' | 'light',
   }) => {
     const useDevtoolsSrc = () => {
@@ -22,11 +22,12 @@ export default defineVaporComponent(
     const devtoolsSrc = useDevtoolsSrc()
 
     window.addEventListener('message', (event) => {
-      if (event.source === iframe?.contentWindow) {
+      const Iframe = previewContainer?.firstChild as HTMLIFrameElement | undefined
+      if (event.source === Iframe?.contentWindow) {
         devtoolsIframe?.contentWindow!.postMessage(event.data, '*')
       }
       if (event.source === devtoolsIframe?.contentWindow) {
-        iframe?.contentWindow!.postMessage(
+        Iframe?.contentWindow!.postMessage(
           { event: 'DEV', data: event.data },
           '*',
         )

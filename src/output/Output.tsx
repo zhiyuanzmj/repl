@@ -44,11 +44,7 @@ export default defineVaporComponent(
       previewRef?.reload()
     }
 
-    defineExpose({ reload, previewRef: $$(previewRef) })
-
-    const iframe = $computed(
-      () => previewRef?.container?.firstChild as HTMLIFrameElement | undefined,
-    )
+    defineExpose$({ reload, previewRef })
 
     const toggleDark = () => {
       document.documentElement.classList.toggle('dark')
@@ -116,8 +112,8 @@ export default defineVaporComponent(
             </div>
 
             <Devtools
-              v-if={devtoolsLoaded}
-              iframe={iframe}
+              v-if={devtoolsLoaded && previewRef?.container}
+              previewContainer={previewRef.container}
               theme={store.theme}
               v-show={mode === 'devtools'}
             />
