@@ -16,7 +16,7 @@ export function transformTS(src: string, isJSX?: boolean) {
   return transform(src, {
     transforms: ['typescript', ...(isJSX ? (['jsx'] as Transform[]) : [])],
     jsxRuntime: 'preserve',
-    keepUnusedImports: true
+    keepUnusedImports: true,
   }).code
 }
 
@@ -77,9 +77,7 @@ export async function compileFile(
   return []
 }
 
-function resolvePlugins(
-  plugins: (VitePlugin| undefined)[],
-): VitePlugin[] {
+function resolvePlugins(plugins: (VitePlugin | undefined)[]): VitePlugin[] {
   const prePlugins: VitePlugin[] = []
   const postPlugins: VitePlugin[] = []
   const normalPlugins: VitePlugin[] = []
@@ -121,9 +119,16 @@ async function transformVitePlugin(
       const resolvedId = plugin.resolveId(id)
       if (!resolvedId) continue
 
-      code = code.replace(
-        id,
-        (resolvedId.startsWith('/') ? '.' : './') + resolvedId,
+      function escapeRegExp(str: string) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      }
+      code = code.replaceAll(
+        new RegExp(`(?<=['"])` + escapeRegExp(id), 'g'),
+        (resolvedId.startsWith('/')
+          ? '.'
+          : resolvedId.startsWith('./')
+            ? ''
+            : './') + resolvedId,
       )
       let loaded = plugin.load?.(resolvedId)
       if (!loaded) continue
