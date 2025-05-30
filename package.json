@@ -113,7 +113,7 @@
     "unocss": "^65.4.3",
     "unplugin-auto-import": "^19.2.0",
     "unplugin-vue-reactivity-function": "^1.1.7",
-    "vite": "^6.0.6",
+    "vite": "npm:rolldown-vite@latest",
     "vite-plugin-dts": "^4.4.0",
     "vite-plugin-inspect": "^11.1.0",
     "volar-service-typescript": "^0.0.62",

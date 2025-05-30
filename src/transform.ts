@@ -163,7 +163,7 @@ async function transformCssModules(code: string, id: string) {
   if (code.startsWith('export default')) return
   if (sassRE.test(id)) {
     // @ts-expect-error
-    code = await import('https://jspm.dev/sass').then(
+    code = await import(/* @vite-ignore */ 'https://jspm.dev/sass').then(
       (i) => i.compileString(code).css,
     )
   }

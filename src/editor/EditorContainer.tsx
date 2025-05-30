@@ -10,7 +10,7 @@ import { ofetch } from 'ofetch'
 export default defineVaporComponent(
   (props: { editorComponent: EditorComponentType }) => {
     const { store, virtualFiles, editorOptions } = $inject(injectKeyProps)!
-    const showMessage = useRouteQuery('show-message', true)
+    let showMessage = $useRouteQuery('show-message', true)
 
     function updateProject() {
       const paths = location.pathname.slice(1).split('/')

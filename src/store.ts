@@ -1,7 +1,4 @@
-import type {
-  ToRefs,
-  UnwrapRef,
-} from 'vue'
+import type { ToRefs, UnwrapRef } from 'vue'
 import { compileFile, cssRE, transformTS } from './transform'
 import { addEsmPrefix, atou, useRoutePath, useRouteQuery, utoa } from './utils'
 import type { Organization, OutputModes, Project, User } from './types'
@@ -283,10 +280,8 @@ export async function useStore(
     }
     try {
       store.viteConfig = await import(
-        'data:text/javascript;charset=utf-8,' +
-          encodeURIComponent(
-            transformTS(addEsmPrefix(code, importMap.value)),
-          )
+        /* @vite-ignore */ 'data:text/javascript;charset=utf-8,' +
+          encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
       ).then((i) => i.default)
     } catch (e) {
       errors.value = [
@@ -346,7 +341,9 @@ export async function useStore(
     deserialize(serializedState)
   }
 
-  const activeFile = computed(() => files.value[activeFilename.value] || files.value[appFile])
+  const activeFile = computed(
+    () => files.value[activeFilename.value] || files.value[appFile],
+  )
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],
   )
