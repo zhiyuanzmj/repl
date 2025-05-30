@@ -126,6 +126,4 @@ export default defineVaporComponent(
       }
     `)
   },
-  // TODO should be removed
-  { props: ['editorComponent'] },
 )
