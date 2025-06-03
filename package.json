@@ -120,7 +120,8 @@
     "vscode-uri": "^3.0.8",
     "vue": "https://pkg.pr.new/vue@280bc48",
     "vue-jsx-vapor": "^2.4.4",
-    "vue-tsc": "~2.2.0"
+    "vue-tsc": "~2.2.0",
+    "vue-router": "https://pkg.pr.new/vue-router@2509"
   },
   "prisma": {
     "schema": "./server/prisma/schema.prisma"

@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import replace from '@rollup/plugin-replace'
-// import { globby } from 'globby'
+import { globby } from 'globby'
 import Unocss from 'unocss/vite'
 import vueJsxVapor from 'vue-jsx-vapor/vite'
 import reactivityFunction from 'unplugin-vue-reactivity-function/vite'
@@ -30,7 +30,7 @@ export default defineConfig({
     AutoImport({
       imports: [
         'vue',
-        { from: 'vue', imports: ['defineVaporComponent','defineComponent'] },
+        { from: 'vue', imports: ['defineVaporComponent', 'defineComponent'] },
         { from: 'vue-jsx-vapor', imports: ['useRef'] },
       ],
     }),
@@ -60,16 +60,16 @@ export default defineConfig({
       ],
       treeshake: true,
     },
-    // lib: {
-    //   entry: ['index.html', ...(await globby(['./proxy/*']))],
-    //   fileName(_, name) {
-    //     if (name === 'index.html') {
-    //       return 'index.html'
-    //     }
-    //     return `proxy/${name}.js`
-    //   },
-    //   formats: ['es'],
-    // },
+    lib: {
+      entry: ['index.html', ...(await globby(['./proxy/*']))],
+      fileName(_, name) {
+        if (name === 'index.html') {
+          return 'index.html'
+        }
+        return `proxy/${name}.js`
+      },
+      formats: ['es'],
+    },
     commonjsOptions: {
       ignore: ['typescript'],
     },

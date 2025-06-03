@@ -1,7 +1,5 @@
 import Message from '../Message'
-import type {
-  WatchStopHandle,
-} from 'vue'
+import type { WatchStopHandle } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
@@ -90,7 +88,9 @@ export default defineVaporComponent(({ ssr = false }) => {
         /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
         previewOptions?.placeholderHTML || '',
       )
-    sandbox.srcdoc = sandboxSrc
+    sandbox.src = URL.createObjectURL(
+      new Blob([sandboxSrc], { type: 'text/html' }),
+    )
     containerRef?.appendChild(sandbox)
 
     proxy = new PreviewProxy(sandbox, {
