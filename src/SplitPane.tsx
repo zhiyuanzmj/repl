@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'vue-jsx-vapor'
 import { injectKeyPreviewRef, injectKeyProps } from './types'
 
 export default defineVaporComponent(

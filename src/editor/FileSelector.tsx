@@ -1,3 +1,4 @@
+import type { WheelEvent } from 'vue-jsx-vapor'
 import { injectKeyProps } from '../../src/types'
 import {
   type File,
@@ -59,8 +60,10 @@ export default defineVaporComponent(
       pending = false
     }
 
-    function focus({ el }: VNode) {
-      ;(el as HTMLInputElement).focus()
+    function focus(el: HTMLInputElement) {
+      setTimeout(() => {
+        el?.focus()
+      })
     }
 
     function doneNameFile() {
@@ -125,11 +128,7 @@ export default defineVaporComponent(
     )
 
     return (
-      <div
-        class="file-selector"
-        ref$={fileSelector}
-        onWheel={horizontalScroll}
-      >
+      <div class="file-selector" ref$={fileSelector} onWheel={horizontalScroll}>
         {/* TODO <template v-for={(file, i) in files} key={file}> */}
         <template v-for={(file, i) in files}>
           <div
@@ -170,12 +169,12 @@ export default defineVaporComponent(
           >
             <span class="file pending">{pendingFilename}</span>
             <input
+              ref={(el) => focus(el)}
               v-model={pendingFilename}
               spellcheck="false"
               onBlur={doneNameFile}
               onKeyup_enter={doneNameFile}
               onKeyup_esc={cancelNameFile}
-              onVnodeMounted={focus}
             />
           </div>
         </template>

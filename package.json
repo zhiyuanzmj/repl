@@ -118,8 +118,8 @@
     "vite-plugin-inspect": "^11.1.0",
     "volar-service-typescript": "^0.0.62",
     "vscode-uri": "^3.0.8",
-    "vue": "https://pkg.pr.new/vue@46e707d",
-    "vue-jsx-vapor": "^2.4.0",
+    "vue": "https://pkg.pr.new/vue@280bc48",
+    "vue-jsx-vapor": "^2.4.4",
     "vue-tsc": "~2.2.0"
   },
   "prisma": {

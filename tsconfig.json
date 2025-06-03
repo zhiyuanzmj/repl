@@ -3,7 +3,7 @@
     "outDir": "dist",
     "sourceMap": false,
     "target": "esnext",
-    "jsxImportSource": "vue",
+    "jsxImportSource": "vue-jsx-vapor",
     "useDefineForClassFields": false,
     "module": "esnext",
     "moduleResolution": "node",
