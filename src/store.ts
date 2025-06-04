@@ -82,33 +82,66 @@ export async function useStore(
     }
   }
 
+  const viteConfig = ref({} as ViteConfig)
+  const importMap = computed<ImportMap>(() => {
+    try {
+      const result = JSON.parse(files.value[importMapFile]?.code || '{}')
+      if (result.imports)
+        for (const [key, value] of Object.entries(result.imports)) {
+          if (value) {
+            result.imports[key] = (value + '').startsWith('http')
+              ? value
+              : location.origin + value
+          }
+        }
+      return result
+    } catch (e) {
+      errors.value = [
+        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
+      ]
+      return { imports: {}, scopes: {} }
+    }
+  })
+  async function getViteConfig(code = files.value[viteConfigFile]?.code) {
+    for (const name in importMap.value.imports) {
+      code = code.replaceAll(
+        new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
+        importMap.value.imports[name] as string,
+      )
+    }
+    try {
+      viteConfig.value = await import(
+        /* @vite-ignore */ 'data:text/javascript;charset=utf-8,' +
+          encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
+      ).then((i) => i.default || { plugins: [] })
+    } catch (e) {
+      errors.value = [
+        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
+      ]
+      console.error(e)
+      viteConfig.value = { plugins: [] }
+    }
+    return viteConfig.value
+  }
+
   async function setDefaultFile() {
     loading.value = true
     await getTemplate()
     await setFiles(template.value)
-    setTimeout(() => {
-      loading.value = false
-    }, 1000)
+    loading.value = false
+    errors.value = []
   }
   await setDefaultFile()
 
   async function init() {
-    watch(preset, () => {
+    watch(preset, async () => {
+      await setDefaultFile()
       activeFilename.value = appFile
       history.pushState(null, '', location.pathname + location.search)
-      setDefaultFile()
     })
-
-    await getViteConfig()
 
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
-    })
-
-    watchEffect(() => {
-      compileFile(store, activeConfigFile.value).then(
-        (errs) => (errors.value = errs),
-      )
     })
 
     watch(
@@ -140,9 +173,13 @@ export async function useStore(
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
       if (
-        ![activeConfigFile.value.filename, activeFile.value.filename].includes(
-          filename,
-        )
+        ![
+          tsMacroConfigFile,
+          viteConfigFile,
+          tsconfigFile,
+          importMapFile,
+          activeFile.value.filename,
+        ].includes(filename)
       )
         await compileFile(store, file).then((errs) =>
           errors.value.push(...errs),
@@ -221,26 +258,6 @@ export async function useStore(
     }
   }
 
-  const importMap = computed<ImportMap>(() => {
-    try {
-      const result = JSON.parse(files.value[importMapFile]?.code || '{}')
-      if (result.imports)
-        for (const [key, value] of Object.entries(result.imports)) {
-          if (value) {
-            result.imports[key] = (value + '').startsWith('http')
-              ? value
-              : location.origin + value
-          }
-        }
-      return result
-    } catch (e) {
-      errors.value = [
-        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
-      ]
-      return { imports: {}, scopes: {} }
-    }
-  })
-
   const getTsConfig: Store['getTsConfig'] = () => {
     try {
       return JSON.parse(files.value[tsconfigFile].code)
@@ -251,40 +268,16 @@ export async function useStore(
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = async () => {
     let code = files.value[tsMacroConfigFile]?.code
-    for (const name in store.importMap.imports) {
+    for (const name in importMap.value.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        store.importMap.imports[name] as string,
+        importMap.value.imports[name] as string,
       )
     }
     return (
       'data:text/javascript;charset=utf-8,' +
       encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
     )
-  }
-
-  const viteConfig = ref({} as ViteConfig)
-  const getViteConfig = async () => {
-    let code = files.value[viteConfigFile]?.code
-    for (const name in store.importMap.imports) {
-      code = code.replaceAll(
-        new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        store.importMap.imports[name] as string,
-      )
-    }
-    try {
-      store.viteConfig = await import(
-        /* @vite-ignore */ 'data:text/javascript;charset=utf-8,' +
-          encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
-      ).then((i) => i.default)
-    } catch (e) {
-      errors.value = [
-        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
-      ]
-      console.error(e)
-      store.viteConfig = { plugins: [] }
-    }
-    return store.viteConfig
   }
 
   const serialize: ReplStore['serialize'] = () => {
@@ -329,6 +322,7 @@ export async function useStore(
       setFile(result, filename, file.code, file.hidden)
     }
     files.value = result
+    await getViteConfig()
   }
 
   if (serializedState) {
@@ -336,7 +330,7 @@ export async function useStore(
   }
 
   const activeFile = computed(
-    () => files.value[activeFilename.value] || files.value[appFile],
+    () => files.value[activeFilename.value] || files.value[appFile] || {},
   )
   const activeConfigFile = computed(
     () => files.value[activeConfigFilename.value] || defaultPresets['vue-jsx'],

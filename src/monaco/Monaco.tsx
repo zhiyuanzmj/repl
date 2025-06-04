@@ -167,7 +167,7 @@ export default defineVaporComponent(
       <div
         ref={(e) => {
           containerRef = e
-          containerRef.addEventListener('keydown', (e) => {
+          containerRef?.addEventListener('keydown', (e) => {
             if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
               e.preventDefault()
               emitChangeEvent()

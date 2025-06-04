@@ -1,0 +1,38 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - run: pnpm install
+
+      - run: pnpm build
+      - uses: AEnterprise/rsync-deploy@v1.0.2
+        env:
+          DEPLOY_KEY: ${{ secrets.SSH_KEY }}
+          ARGS: -az --delete
+          FOLDER: ./.vercel/output
+          SERVER_PORT: '22'
+          SERVER_IP: zmjs.dev
+          USERNAME: root
+          SERVER_DESTINATION: /usr/share/nginx/html/repl

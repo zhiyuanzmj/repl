@@ -14,7 +14,7 @@ export default defineVaporComponent(
     function formatMessage(err: string | Error): string {
       if (typeof err === 'string') {
         return err
-      } else {
+      } else if (err) {
         let msg = err.message
         const loc = (err as CompilerError).loc
         if (loc && loc.start) {
@@ -22,19 +22,20 @@ export default defineVaporComponent(
         }
         return msg
       }
+      return ''
     }
 
     return (
-      // <Transition name="fade"> 
-        <div
-          v-if={!dismissed && (err || warn)}
-          class={['msg', err ? 'err' : 'warn']}
-        >
-          <pre>{formatMessage(err || warn!)}</pre>
-          <button class="dismiss" onClick={() => (dismissed = true)}>
-            ✕
-          </button>
-        </div>
+      // <Transition name="fade">
+      <div
+        v-if={!dismissed && (err || warn)}
+        class={['msg', err ? 'err' : 'warn']}
+      >
+        <pre>{formatMessage(err || warn!)}</pre>
+        <button class="dismiss" onClick={() => (dismissed = true)}>
+          ✕
+        </button>
+      </div>
       // </Transition>
     )
 
