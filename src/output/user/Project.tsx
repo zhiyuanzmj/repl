@@ -49,16 +49,6 @@ export default defineComponent(() => {
   }
   getPublicProjects()
 
-  watch(
-    () => store.userName,
-    async () => {
-      await getProjects()
-      const project = projects[0]
-      store.project = project
-      store.preset = project ? `${project.userName}/${project.name}` : 'vue-jsx'
-    },
-  )
-
   const groupFn = (acc: Record<string, Project[]>, project: Project) => {
     if (!acc[project.userName]) {
       acc[project.userName] = []

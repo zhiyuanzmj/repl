@@ -53,20 +53,14 @@ export async function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): Promise<ReplStore> {
+  const user = ref({} as User)
   const organization = ref<Organization>()
   const organizations = ref<Organization[]>([])
-  async function getOrganizations(name: string) {
-    organizations.value = await ofetch(
-      `https://api.github.com/users/${name}/orgs`,
-    )
-    const userName = preset.value.split('/')[0]
-    organization.value = organizations.value.find((i) => i.login === userName)
-  }
-
-  const user = ref({} as User)
   if (document.cookie.split('; ').some((i) => /^token=\S+/.test(i))) {
     user.value = await ofetch('/api/user-info').catch(() => ({}))
-    await getOrganizations(user.value.name)
+    organizations.value = await ofetch(
+      `https://api.github.com/users/${user.value.name}/orgs`,
+    )
   }
   const userName = computed(() => organization.value?.login || user.value.name)
 
