@@ -49,6 +49,11 @@ export default defineComponent(() => {
   }
   getPublicProjects()
 
+  watch(
+    () => store.userName,
+    () => getProjects(),
+  )
+
   const groupFn = (acc: Record<string, Project[]>, project: Project) => {
     if (!acc[project.userName]) {
       acc[project.userName] = []
