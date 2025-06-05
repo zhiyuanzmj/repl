@@ -1,6 +1,5 @@
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
-import pluginVue from 'eslint-plugin-vue'
 import vueJsxVapor from '@vue-jsx-vapor/eslint'
 import reactivityFunction from 'unplugin-vue-reactivity-function/eslint'
 
@@ -8,7 +7,6 @@ export default tseslint.config(
   { ignores: ['**/node_modules', '**/dist'] },
   eslint.configs.recommended,
   tseslint.configs.base,
-  ...pluginVue.configs['flat/recommended'],
   {
     files: ['**/*.vue', '**/*.ts', '**/*.tsx'],
     languageOptions: {
