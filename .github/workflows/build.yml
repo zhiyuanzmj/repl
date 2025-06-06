@@ -27,11 +27,11 @@ jobs:
       - run: pnpm install
 
       - run: pnpm build
-      - uses: AEnterprise/rsync-deploy@v1.0.2
+      - uses: AEnterprise/rsync-deploy@v1.1.1
         env:
           DEPLOY_KEY: ${{ secrets.SSH_KEY }}
           ARGS: -az --delete
-          FOLDER: ./.vercel/output
+          FOLDER: './.vercel/output/'
           SERVER_PORT: '22'
           SERVER_IP: zmjs.dev
           USERNAME: root
