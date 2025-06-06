@@ -155,7 +155,8 @@ export default defineVaporComponent(
         position: absolute;
         left: 50%;
         bottom: 20px;
-        background-color: var(--bg);
+        margin-bottom: 5px;
+        background-color: var(--border);
         padding: 8px 12px;
         border-radius: 8px;
         transform: translateX(-50%);
@@ -163,7 +164,7 @@ export default defineVaporComponent(
       }
       
       .dark .toggler {
-        background-color: var(--bg);
+        background-color: var(--border);
       }
       
       /* vertical */
