@@ -7,7 +7,7 @@ import {
 } from '../types'
 import SplitPane from '../SplitPane'
 import Devtools from './Devtools'
-import Preset from './user/Project'
+import Project from './user/Project'
 import { useRef } from 'vue-jsx-vapor'
 
 export default defineVaporComponent(
@@ -63,7 +63,7 @@ export default defineVaporComponent(
               </button>
 
               <div class="actions ml-auto flex items-center gap-2 pr-2">
-                <Preset />
+                <Project />
 
                 <button
                   class={[
