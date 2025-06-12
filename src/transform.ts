@@ -47,7 +47,6 @@ export async function compileFile(
     compiled.js = compiled.ssr = await transformVitePlugin(
       code,
       filename,
-      compiled,
       store,
     )
 
@@ -99,12 +98,7 @@ function resolvePlugins(plugins: (VitePlugin | undefined)[]): VitePlugin[] {
   return [...map.values()]
 }
 
-async function transformVitePlugin(
-  code: string,
-  id: string,
-  compiled: File['compiled'],
-  store: Store,
-) {
+async function transformVitePlugin(code: string, id: string, store: Store) {
   const { plugins } = store.viteConfig
   for (const plugin of resolvePlugins(plugins)) {
     if (plugin.transformInclude) {
@@ -132,7 +126,7 @@ async function transformVitePlugin(
       )
       let loaded = plugin.load?.(resolvedId)
       if (!loaded) continue
-      loaded = await transformVitePlugin(loaded, resolvedId, compiled, store)
+      loaded = await transformVitePlugin(loaded, resolvedId, store)
 
       const fileName = addSrcPrefix(resolvedId)
       if (!store.files[fileName] || store.files[fileName].code !== loaded) {
