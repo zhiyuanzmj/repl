@@ -1,4 +1,4 @@
-import { createVaporApp, ref,vaporInteropPlugin } from 'vue'
+import { createVaporApp, ref, vaporInteropPlugin } from 'vue'
 import { Repl, useStore } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor'
 
@@ -8,15 +8,9 @@ const window = globalThis.window as any
 window.process = { env: {} }
 
 const App = defineVaporComponent(() => {
-  const query = new URLSearchParams(location.search)
   let loading = $ref(true)
   let store!: any
-  useStore(
-    {
-      showOutput: ref(query.has('so')),
-    },
-    location.hash,
-  ).then((result) => {
+  useStore({}, location.hash).then((result) => {
     store = window.store = result
     loading = false
   })
@@ -46,6 +40,6 @@ const App = defineVaporComponent(() => {
   )
 })
 
-const app =createVaporApp(App) 
+const app = createVaporApp(App)
 window.app = app
 app.use(vaporInteropPlugin).mount('#app')

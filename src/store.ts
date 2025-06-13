@@ -38,7 +38,7 @@ export async function useStore(
     activeConfigFilename = useRouteQuery('config', viteConfigFile),
 
     errors = ref([]),
-    showOutput = ref(false),
+    showOutput = useRouteQuery('show-output', false),
     outputMode = useRouteQuery('output', 'js'),
     theme = ref('dark'),
     loading = ref(true),
