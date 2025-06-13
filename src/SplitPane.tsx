@@ -1,4 +1,3 @@
-import type { MouseEvent } from 'vue-jsx-vapor'
 import { injectKeyPreviewRef, injectKeyProps } from './types'
 
 export default defineVaporComponent(
@@ -26,7 +25,7 @@ export default defineVaporComponent(
     let startPosition = 0
     let startSplit = 0
 
-    function dragStart(e: MouseEvent) {
+    function dragStart(e: any) {
       state.dragging = true
       startPosition = isVertical ? e.pageY : e.pageX
       startSplit = boundSplit
@@ -34,7 +33,7 @@ export default defineVaporComponent(
       changeViewSize()
     }
 
-    function dragMove(e: MouseEvent) {
+    function dragMove(e: any) {
       if (containerRef && state.dragging) {
         const position = isVertical ? e.pageY : e.pageX
         const totalSize = isVertical
@@ -75,7 +74,9 @@ export default defineVaporComponent(
         ref$={containerRef}
         onMouseleave={dragEnd}
         onMousemove={dragMove}
+        onTouchmove={dragMove}
         onMouseup={dragEnd}
+        onTouchend={dragEnd}
       >
         <div
           class="left"
@@ -84,7 +85,11 @@ export default defineVaporComponent(
           }}
         >
           <slots.left />
-          <div class="dragger" onMousedown_prevent={dragStart} />
+          <div
+            class="dragger"
+            onTouchstart_prevent={dragStart}
+            onMousedown_prevent={dragStart}
+          />
         </div>
         <div
           class="right"
