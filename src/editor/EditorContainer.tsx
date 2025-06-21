@@ -6,10 +6,13 @@ import { type EditorComponentType, injectKeyProps } from '../types'
 import { type File, configFileNames } from '../store'
 import SplitPane from '../SplitPane'
 import { ofetch } from 'ofetch'
+import Monaco from '../monaco/Monaco'
+import { useSourceMap } from './sourceMap'
 
 export default defineVaporComponent(
   (props: { editorComponent: EditorComponentType }) => {
-    const { store, virtualFiles, editorOptions } = $inject(injectKeyProps)!
+    const { store, showVirtualFiles, showSourceMap, editorOptions } =
+      $inject(injectKeyProps)!
     let showMessage = $useRouteQuery('show-message', true)
 
     function updateProject() {
@@ -55,8 +58,11 @@ export default defineVaporComponent(
       return result
     })
 
+    useSourceMap()
+
     return (
-      <>
+      <div class="h-full">
+        {/** TODO: use div instead of fragment to prevent HRM error */}
         <SplitPane layout="vertical">
           <template v-slot:left>
             <div class="editor-container">
@@ -64,7 +70,10 @@ export default defineVaporComponent(
                 activeFile={store.activeFile}
                 files={resolvedFiles.value[0]}
               />
-              <props.editorComponent
+              <Monaco
+                ref={(e) => {
+                  store.editor = e?.editor
+                }}
                 filename={store.activeFile.filename}
                 value={store.activeFile.code}
                 onChange={onChange}
@@ -86,13 +95,16 @@ export default defineVaporComponent(
             </div>
           </template>
         </SplitPane>
-
         <Message err={store.errors[0]} v-show={showMessage} />
-
         <div class="editor-floating">
           <ToggleButton
+            v-if={editorOptions?.sourceMapText !== false}
+            v-model={showSourceMap}
+            text={editorOptions?.sourceMapText || 'Source Map'}
+          />
+          <ToggleButton
             v-if={editorOptions?.virtualFilesText !== false}
-            v-model={virtualFiles}
+            v-model={showVirtualFiles}
             text={editorOptions?.virtualFilesText || 'Virtual Files'}
           />
           <ToggleButton
@@ -101,7 +113,7 @@ export default defineVaporComponent(
             text={editorOptions?.showErrorText || 'Show Error'}
           />
         </div>
-      </>
+      </div>
     )
 
     defineStyle(`
@@ -127,3 +139,33 @@ export default defineVaporComponent(
     `)
   },
 )
+
+defineStyle(`
+  .cursor {
+    position: relative;
+    display: inline-block;
+    outline: none;
+  }
+  
+  .cursor::after {
+    content: "";
+    outline: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 2px;
+    height: 1.5em;
+    background: oklch(87.2% 0.01 258.338);
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+`)

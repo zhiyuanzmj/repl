@@ -290,7 +290,6 @@ function processModule(store: Store, src: string, filename: string) {
 
   // 4. convert dynamic imports
   let hasDynamicImport = false
-  // @ts-expect-error ignore
   walk(ast, {
     enter(node: Node, parent: Node) {
       if (node.type === 'Import' && parent.type === 'CallExpression') {

@@ -115,6 +115,7 @@ export function loadMonacoEnv(store: Store) {
     async getWorker(_: any, label: string) {
       if (label === 'tsx') {
         const worker = new Worker()
+        // eslint-disable-next-line no-async-promise-executor
         const init = new Promise<void>(async (resolve) => {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {
@@ -123,6 +124,7 @@ export function loadMonacoEnv(store: Store) {
               const file = store.files[data.data.filePath.slice(1)]
               if (file) {
                 file.compiled.ts = data.data.code
+                file.compiled.tsMaps = data.data.mappings
               }
             }
           })

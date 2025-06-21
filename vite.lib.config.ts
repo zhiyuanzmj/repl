@@ -57,7 +57,7 @@ export default mergeConfig(base, {
     lib: {
       entry: {
         'vue-repl': './src/index.ts',
-        'monaco-editor': './src/editor/MonacoEditor.vue',
+        'monaco-editor': './src/monaco/Monaco.vue',
       },
       formats: ['es'],
       fileName: () => '[name].js',

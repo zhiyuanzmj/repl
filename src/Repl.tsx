@@ -38,6 +38,7 @@ export interface Props {
   editorOptions?: {
     showErrorText?: string | false
     virtualFilesText?: string | false
+    sourceMapText?: string | false
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
@@ -62,7 +63,8 @@ export default defineVaporComponent(
     ...props
   }: Props) => {
     const autoSave = useRouteQuery<boolean>('auto-save', false)
-    const virtualFiles = useRouteQuery<boolean>('virtual-files', false)
+    const showVirtualFiles = useRouteQuery<boolean>('virtual-files', false)
+    const showSourceMap = useRouteQuery<boolean>('source-map', false)
 
     if (!props.editor) {
       throw new Error('The "editor" prop is now required.')
@@ -78,7 +80,8 @@ export default defineVaporComponent(
     provide(injectKeyProps, {
       ...toRefs(useFullProps()),
       autoSave,
-      virtualFiles,
+      showVirtualFiles,
+      showSourceMap,
     } as any)
     provide(
       injectKeyPreviewRef,

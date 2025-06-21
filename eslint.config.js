@@ -8,7 +8,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   tseslint.configs.base,
   {
-    files: ['**/*.vue', '**/*.ts', '**/*.tsx'],
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
         parser: '@typescript-eslint/parser',
@@ -38,17 +38,6 @@ export default tseslint.config(
       ],
       // Enforce the use of top-level import type qualifier when an import only has specifiers with inline type qualifiers
       '@typescript-eslint/no-import-type-side-effects': 'error',
-      'vue/max-attributes-per-line': 'off',
-      'vue/singleline-html-element-content-newline': 'off',
-      'vue/multi-word-component-names': 'off',
-      'vue/html-self-closing': [
-        'error',
-        {
-          html: { component: 'always', normal: 'always', void: 'any' },
-          math: 'always',
-          svg: 'always',
-        },
-      ],
     },
   },
   vueJsxVapor(),

@@ -119,6 +119,9 @@ export default defineVaporComponent(
             />
             <props.editorComponent
               v-if={mode !== 'devtools'}
+              ref={(e) => {
+                store.outputEditor = e?.editor
+              }}
               readonly
               filename={store.activeFile.filename}
               mode={mode}

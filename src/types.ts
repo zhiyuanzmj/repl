@@ -1,4 +1,9 @@
-import type { ComputedRef, FunctionalComponent, InjectionKey, ToRefs } from 'vue'
+import type {
+  ComputedRef,
+  FunctionalComponent,
+  InjectionKey,
+  ToRefs,
+} from 'vue'
 import type { Props } from './Repl'
 
 export type EditorMode = 'js' | 'css' | 'ssr' | 'ts' | 'devtools'
@@ -14,7 +19,15 @@ export type EditorComponentType = FunctionalComponent<EditorProps>
 export type OutputModes = EditorMode
 
 export const injectKeyProps: InjectionKey<
-  ToRefs<Required<Props & { autoSave: boolean; virtualFiles: boolean }>>
+  ToRefs<
+    Required<
+      Props & {
+        autoSave: boolean
+        showVirtualFiles: boolean
+        showSourceMap: boolean
+      }
+    >
+  >
 > = Symbol('props')
 export const injectKeyPreviewRef: InjectionKey<
   ComputedRef<HTMLDivElement | null>

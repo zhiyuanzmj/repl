@@ -1,6 +1,6 @@
 import { createVaporApp, ref, vaporInteropPlugin } from 'vue'
 import { Repl, useStore } from '../src'
-import MonacoEditor from '../src/editor/MonacoEditor'
+import Monaco from '../src/monaco/Monaco'
 
 import 'uno.css'
 
@@ -25,10 +25,11 @@ const App = defineVaporComponent(() => {
       />
       <Repl
         v-else
-        editor={MonacoEditor}
+        editor={Monaco}
         editorOptions={{
           autoSaveText: 'Auto Save',
           virtualFilesText: 'Virtual Files',
+          sourceMapText: 'Source Map',
           monacoOptions: {
             // wordWrap: 'on',
           },

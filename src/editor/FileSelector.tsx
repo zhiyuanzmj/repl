@@ -14,7 +14,7 @@ export default defineVaporComponent(
     activeFile: File
     disabled?: boolean
   }) => {
-    const { store, virtualFiles } = $inject(injectKeyProps)!
+    const { store, showVirtualFiles } = $inject(injectKeyProps)!
 
     /**
      * When `true`: indicates adding a new file
@@ -30,7 +30,7 @@ export default defineVaporComponent(
 
     const files = $computed(() =>
       Object.entries(props.files)
-        .filter(([_, file]) => (virtualFiles ? true : !file.hidden))
+        .filter(([_, file]) => (showVirtualFiles ? true : !file.hidden))
         .map(([name]) => name),
     )
 

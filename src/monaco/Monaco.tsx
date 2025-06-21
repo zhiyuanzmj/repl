@@ -162,6 +162,9 @@ export default defineVaporComponent(
     onBeforeUnmount(() => {
       editor?.dispose()
     })
+    defineExpose$({
+      editor,
+    })
 
     return (
       <div

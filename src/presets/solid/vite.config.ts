@@ -12,7 +12,9 @@ export default {
               ['typescript', { allExtensions: true, isTSX: true }],
               jsx,
             ],
-          }).code
+            filename: id,
+            sourceMaps: true,
+          })
       },
     },
   ],

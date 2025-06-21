@@ -14,6 +14,7 @@ import {
   tsconfigFile,
   viteConfigFile,
 } from './presets/index'
+import type { SourceMapInput } from '@ampproject/remapping'
 
 export {
   importMapFile,
@@ -65,20 +66,19 @@ export async function useStore(
   const userName = computed(() => organization.value?.login || user.value.name)
 
   const project = ref<Project>()
-  const template = ref({} as Template)
   async function getTemplate() {
-    if (presets.value[preset.value]) {
+    if (serializedState) {
+      return resolveHash(serializedState)
+    } else if (presets.value[preset.value]) {
       project.value = undefined
-      template.value = presets.value[preset.value]
+      return presets.value[preset.value]
     } else {
       project.value = await ofetch('/api/project/' + preset.value)
       if (!project.value) {
         preset.value = 'vue-jsx'
-        template.value = presets.value['vue-jsx']
-        return
+        return presets.value['vue-jsx']
       }
-      serializedState ??= project.value.hash
-      template.value = resolveHash(project.value?.hash ?? '')
+      return resolveHash(project.value?.hash ?? '')
     }
   }
 
@@ -126,8 +126,7 @@ export async function useStore(
 
   async function setDefaultFile() {
     loading.value = true
-    await getTemplate()
-    await setFiles(template.value)
+    await setFiles(await getTemplate())
     loading.value = false
     errors.value = []
   }
@@ -297,18 +296,6 @@ export async function useStore(
     }
     return saved
   }
-  function deserialize(serializedState: string) {
-    const saved = resolveHash(serializedState)
-    if (!saved) return
-    for (const filename in saved) {
-      setFile(
-        files.value,
-        filename,
-        saved[filename].code,
-        saved[filename].hidden,
-      )
-    }
-  }
   function getFiles() {
     const exported: Record<string, { code: string; hidden?: boolean }> = {}
     for (const [filename, file] of Object.entries(files.value)) {
@@ -325,10 +312,6 @@ export async function useStore(
     await getViteConfig()
   }
 
-  if (serializedState) {
-    deserialize(serializedState)
-  }
-
   const activeFile = computed(
     () => files.value[activeFilename.value] || files.value[appFile] || {},
   )
@@ -338,7 +321,12 @@ export async function useStore(
 
   const fileCaches = ref(Object.create(null))
 
+  const editor = shallowRef()
+  const outputEditor = shallowRef()
+
   const store: ReplStore = reactive({
+    editor,
+    outputEditor,
     organization,
     organizations,
     userName,
@@ -348,7 +336,6 @@ export async function useStore(
     activeFilename,
     activeConfigFile,
     activeConfigFilename,
-    template,
     importMap,
     user,
     project,
@@ -375,7 +362,6 @@ export async function useStore(
     getTsConfig,
     getTsMacroConfig,
     serialize,
-    deserialize,
     getFiles,
     setFiles,
   })
@@ -430,13 +416,15 @@ export type VitePlugin = {
   transform?: (
     code: string,
     id: string,
-  ) => string | { code: string; map: any } | null | undefined
+  ) => string | { code: string; map: SourceMapInput } | null | undefined
 }
 export type ViteConfig = {
   plugins: VitePlugin[]
 }
 
 export interface ReplStore extends UnwrapRef<StoreState> {
+  editor?: editor.ICodeEditor
+  outputEditor?: editor.ICodeEditor
   organization?: Organization
   organizations: Organization[]
   userName: string
@@ -453,13 +441,14 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   getTsConfig(): Record<string, any>
   getTsMacroConfig(): Promise<string>
   serialize(): string
-  deserialize(serializedState: string): void
   getFiles(): Record<string, { code: string; hidden?: boolean }>
   setFiles(newFiles: Record<string, File>): Promise<void>
 }
 
 export type Store = Pick<
   ReplStore,
+  | 'editor'
+  | 'outputEditor'
   | 'organization'
   | 'organizations'
   | 'userName'
@@ -498,6 +487,8 @@ export class File {
     css: '',
     ts: '',
     ssr: '',
+    maps: [],
+    tsMaps: [],
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 

@@ -2,6 +2,7 @@ import { File, type Store, type VitePlugin, addSrcPrefix } from './store'
 import { type Transform, transform } from 'sucrase'
 import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
+import type { SourceMapInput } from '@ampproject/remapping'
 
 const REGEX_JS = /\.[jt]sx?$/
 const extRE = /\.[^.]+$/
@@ -48,6 +49,7 @@ export async function compileFile(
       code,
       filename,
       store,
+      compiled.maps,
     )
 
     setTimeout(() => {
@@ -98,14 +100,24 @@ function resolvePlugins(plugins: (VitePlugin | undefined)[]): VitePlugin[] {
   return [...map.values()]
 }
 
-async function transformVitePlugin(code: string, id: string, store: Store) {
+async function transformVitePlugin(
+  code: string,
+  id: string,
+  store: Store,
+  maps: SourceMapInput[] = [],
+) {
   const { plugins } = store.viteConfig
   for (const plugin of resolvePlugins(plugins)) {
     if (plugin.transformInclude) {
       if (!plugin.transformInclude(id)) continue
     }
     const result = await plugin.transform?.(code, id)
-    code = typeof result === 'string' ? result : result?.code || code
+    if (typeof result === 'string') {
+      code = result
+    } else if (result) {
+      code = result.code || code
+      result.map && maps.push(result.map)
+    }
     if (!plugin.resolveId) continue
 
     for (const match of code.matchAll(resolveRE)) {
@@ -126,7 +138,7 @@ async function transformVitePlugin(code: string, id: string, store: Store) {
       )
       let loaded = plugin.load?.(resolvedId)
       if (!loaded) continue
-      loaded = await transformVitePlugin(loaded, resolvedId, store)
+      loaded = await transformVitePlugin(loaded, resolvedId, store, maps)
 
       const fileName = addSrcPrefix(resolvedId)
       if (!store.files[fileName] || store.files[fileName].code !== loaded) {
