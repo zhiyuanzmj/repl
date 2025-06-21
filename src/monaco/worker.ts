@@ -20,7 +20,7 @@ const getVirtualCode = createPlugin(() => ({
       self.postMessage({
         filePath,
         code: toString(codes),
-        mappings: buildMappings(codes),
+        mappings: buildMappings(codes).slice(1),
       })
     }
   },
