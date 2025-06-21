@@ -136,9 +136,9 @@ export const useSourceMap = () => {
   watch(
     () => [showSourceMap, store.outputMode === 'js' ? map : tsMap],
     async ([showSourceMap, map]) => {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      if (!showSourceMap || !map) return
+      await new Promise((resolve) => setTimeout(resolve))
       sourceMapDecorations.forEach((i) => i.clear())
+      if (!showSourceMap || !map) return
       const maps = getMapping()
       if (!maps.length) return
       sourceMapDecorations[0] = store.editor?.createDecorationsCollection(
