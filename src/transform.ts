@@ -45,6 +45,7 @@ export async function compileFile(
   }
 
   if (REGEX_JS.test(filename) || !extRE.test(filename)) {
+    compiled.maps = []
     compiled.js = compiled.ssr = await transformVitePlugin(
       code,
       filename,

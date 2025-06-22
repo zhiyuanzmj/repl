@@ -13,8 +13,8 @@ export const useSourceMap = () => {
           store.activeFile.compiled.maps.length === 1
             ? store.activeFile.compiled.maps[0]
             : (remapping(
-                store.activeFile.compiled.maps,
-                () => undefined,
+                store.activeFile.compiled.maps.slice().reverse(),
+                () => null,
               ) as any),
         )
       : null,
