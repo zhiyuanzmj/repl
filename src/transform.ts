@@ -144,13 +144,6 @@ async function transformVitePlugin(
 
       const fileName = addSrcPrefix(resolvedId)
       if (!store.files[fileName] || store.files[fileName].code !== loaded) {
-        const pathName = fileName.split('?')[0]
-        for (let key in store.files) {
-          if (key.split('?')[0] === pathName) {
-            setTimeout(() => delete store.files[key])
-            break
-          }
-        }
         store.files[fileName] = new File(fileName, loaded, true)
         await compileFile(store, store.files[fileName])
       }
