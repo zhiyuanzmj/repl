@@ -7,21 +7,20 @@ export default {
       name: 'vite-plugin-preact',
       transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return (
-            'import { h, Fragment } from "preact"\n' +
-            transform(code, {
-              presets: [['typescript', { allExtensions: true, isTSX: true }]],
-              plugins: [
-                [
-                  jsx,
-                  {
-                    pragma: 'h',
-                    pragmaFrag: 'Fragment',
-                  },
-                ],
+          return transform(code, {
+            presets: [['typescript', { allExtensions: true, isTSX: true }]],
+            plugins: [
+              [
+                jsx,
+                {
+                  pragma: 'h',
+                  pragmaFrag: 'Fragment',
+                },
               ],
-            }).code
-          )
+            ],
+            filename: id,
+            sourceMaps: true,
+          })
       },
     },
   ],

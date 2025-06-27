@@ -1,9 +1,11 @@
 <html>
   <body>
     <script type="module">
-      import { render, createElement } from 'preact'
+      import { h, render, Fragment } from 'preact'
       import App from './App.tsx'
-      render(createElement(App), document.getElementById('app'))
+      window.h = h
+      window.Fragment = Fragment
+      render(h(App), document.getElementById('app'))
     </script>
 
     <div id="app"></div>

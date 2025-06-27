@@ -2,8 +2,9 @@
   <body>
     <script type="module">
       import { createRoot } from 'react-dom/client'
-      import { createElement } from 'react'
+      import React, { createElement } from 'react'
       import App from './App.tsx'
+      window.React = React
       createRoot(document.getElementById('app')).render(createElement(App))
     </script>
 
