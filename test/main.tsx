@@ -5,7 +5,7 @@ import Monaco from '../src/monaco/Monaco'
 import 'uno.css'
 
 const window = globalThis.window as any
-window.process = { env: {} }
+window.process = { env: {}, cwd: () => '/' }
 
 const App = defineVaporComponent(() => {
   let loading = $ref(true)

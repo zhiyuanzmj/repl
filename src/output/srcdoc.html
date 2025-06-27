@@ -16,7 +16,7 @@
       ;(() => {
         let scriptEls = []
 
-        window.process = { env: {} }
+        window.process = { env: {}, cwd: () => '/' }
         window.__modules__ = {}
 
         window.__export__ = (mod, key, get) => {
