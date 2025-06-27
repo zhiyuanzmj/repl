@@ -299,7 +299,9 @@ export async function useStore(
   function getFiles() {
     const exported: Record<string, { code: string; hidden?: boolean }> = {}
     for (const [filename, file] of Object.entries(files.value)) {
-      exported[filename] = { code: file.code, hidden: file.hidden }
+      if (!file.hidden) {
+        exported[filename] = { code: file.code, hidden: file.hidden }
+      }
     }
     return exported
   }
