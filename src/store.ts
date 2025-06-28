@@ -483,13 +483,19 @@ export type Store = Pick<
   | 'loading'
 >
 
+export type CompiledStack = {
+  name: string
+  code: string
+  map?: SourceMapInput
+  enforce?: 'pre' | 'post'
+}
+
 export class File {
   compiled = {
     js: '',
     css: '',
     ts: '',
     ssr: '',
-    maps: [],
     tsMaps: [],
   }
   editorViewState: editor.ICodeEditorViewState | null = null
@@ -514,6 +520,37 @@ export class File {
       return 'typescript'
     }
     return 'javascript'
+  }
+
+  compiledStack: CompiledStack[] = []
+
+  compiledName: string = ''
+
+  get compiledIndex() {
+    const result = this.compiledStack.findIndex(
+      (i) => i.name === this.compiledName,
+    )
+    return result > -1 ? result : this.compiledStack.length
+  }
+
+  get maps() {
+    return this.compiledStack
+      .filter((i) => !!i.map)
+      .map((item) => item.map) as SourceMapInput[]
+  }
+
+  get editorCode() {
+    if (this.compiledName && this.compiledIndex) {
+      return this.compiledStack[this.compiledIndex - 1].code
+    } else {
+      return this.code
+    }
+  }
+
+  get compiledCode() {
+    return this.compiledName
+      ? this.compiledStack[this.compiledIndex].code
+      : this.compiled.js
   }
 }
 

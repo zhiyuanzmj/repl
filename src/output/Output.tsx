@@ -9,6 +9,60 @@ import SplitPane from '../SplitPane'
 import Devtools from './Devtools'
 import Project from './user/Project'
 import { useRef } from 'vue-jsx-vapor'
+import { useDiff } from './diff'
+import type { CompiledStack } from '../store'
+
+const CompiledSelect = defineVaporComponent(() => {
+  const { store } = $inject(injectKeyProps)!
+
+  const onChange = (value: number) => {
+    store.activeFile.compiledName =
+      store.activeFile.compiledStack[store.activeFile.compiledIndex + value]
+        ?.name || ''
+  }
+
+  const compiledStack = $computed(() => {
+    return store.activeFile.compiledStack.reduce((result, compiled) => {
+      const index =
+        compiled.enforce === 'pre' ? 0 : compiled.enforce === 'post' ? 2 : 1
+      ;(result[index] ??= [])?.push(compiled)
+      return result
+    }, [] as CompiledStack[][])
+  })
+
+  useDiff()
+
+  return (
+    <div class="ml-auto mr-2 flex items-center gap-2">
+      <button
+        class={`i-carbon:previous-outline bg-$text! text-xl ${!store.activeFile.compiledIndex ? 'opacity-50 pointer-events-none' : ''}`}
+        onClick={() => onChange(-1)}
+      />
+      <button
+        class={`i-carbon:next-outline bg-$text! text-xl ${!store.activeFile.compiledName ? 'opacity-50 pointer-events-none' : ''}`}
+        onClick={() => onChange(1)}
+      />
+      <select
+        v-model={store.activeFile.compiledName}
+        class="b-(0 r-4 $border) bg-$border h-6 my-auto rounded outline-none px-1 text"
+      >
+        <optgroup
+          v-for={(list, index) in compiledStack}
+          key={index}
+          label={index === 0 ? 'pre' : index === 1 ? 'default' : 'post'}
+        >
+          <option v-for={compiled in list} key={compiled.name}>
+            {compiled.name}
+          </option>
+        </optgroup>
+        <hr />
+        <option key="" value="">
+          No Inspect
+        </option>
+      </select>
+    </div>
+  )
+})
 
 export default defineVaporComponent(
   (props: {
@@ -34,6 +88,16 @@ export default defineVaporComponent(
           store.outputMode = value
         }
       },
+    })
+
+    const compiledCode = $computed(() => {
+      if (mode === 'js') {
+        return store.activeFile.compiledCode
+      } else if (mode === 'ts' || mode === 'css') {
+        return store.activeFile.compiled[mode]
+      } else {
+        return ''
+      }
     })
 
     function jumpToGithub() {
@@ -109,6 +173,8 @@ export default defineVaporComponent(
               >
                 <span>{m}</span>
               </button>
+
+              <CompiledSelect />
             </div>
 
             <Devtools
@@ -125,7 +191,7 @@ export default defineVaporComponent(
               readonly
               filename={store.activeFile.filename}
               mode={mode}
-              value={store.activeFile.compiled[mode]}
+              value={compiledCode}
             />
           </div>
         </template>

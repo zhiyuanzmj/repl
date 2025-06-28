@@ -75,7 +75,7 @@ export default defineVaporComponent(
                   store.editor = e?.editor
                 }}
                 filename={store.activeFile.filename}
-                value={store.activeFile.code}
+                value={store.activeFile.editorCode}
                 onChange={onChange}
               />
             </div>

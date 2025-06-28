@@ -8,14 +8,16 @@ export const useSourceMap = () => {
   const { store, showSourceMap } = $inject(injectKeyProps)!
 
   const map = $computed(() =>
-    store.activeFile.compiled.maps.length
+    store.activeFile.maps.length
       ? new SourceMapConsumer(
-          store.activeFile.compiled.maps.length === 1
-            ? store.activeFile.compiled.maps[0]
-            : (remapping(
-                store.activeFile.compiled.maps.slice().reverse(),
-                () => null,
-              ) as any),
+          store.activeFile.compiledName
+            ? store.activeFile.maps[store.activeFile.compiledIndex]
+            : store.activeFile.maps.length === 1
+              ? store.activeFile.maps[0]
+              : (remapping(
+                  store.activeFile.maps.slice().reverse(),
+                  () => null,
+                ) as any),
         )
       : null,
   )
@@ -138,7 +140,8 @@ export const useSourceMap = () => {
     async ([showSourceMap, map]) => {
       await new Promise((resolve) => setTimeout(resolve))
       sourceMapDecorations.forEach((i) => i.clear())
-      if (!showSourceMap || !map) return
+      if (!showSourceMap || !map || !['js', 'ts'].includes(store.outputMode))
+        return
       const maps = getMapping()
       if (!maps.length) return
       sourceMapDecorations[0] = store.editor?.createDecorationsCollection(

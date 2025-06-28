@@ -1,8 +1,13 @@
-import { File, type Store, type VitePlugin, addSrcPrefix } from './store'
+import {
+  type CompiledStack,
+  File,
+  type Store,
+  type VitePlugin,
+  addSrcPrefix,
+} from './store'
 import { type Transform, transform } from 'sucrase'
 import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
-import type { SourceMapInput } from '@ampproject/remapping'
 
 const REGEX_JS = /\.[jt]sx?$/
 const extRE = /\.[^.]+$/
@@ -25,8 +30,9 @@ const resolveRE = /(?:from|import)\s+['"]([^'"]+)['"]/g
 
 export async function compileFile(
   store: Store,
-  { filename, code, compiled }: File,
+  file: File,
 ): Promise<(string | Error)[]> {
+  const { filename, code, compiled } = file
   if (!code.trim()) {
     return []
   }
@@ -45,12 +51,12 @@ export async function compileFile(
   }
 
   if (REGEX_JS.test(filename) || !extRE.test(filename)) {
-    compiled.maps = []
+    file.compiledStack = []
     compiled.js = compiled.ssr = await transformVitePlugin(
       code,
       filename,
       store,
-      compiled.maps,
+      file.compiledStack,
     )
 
     setTimeout(() => {
@@ -96,7 +102,7 @@ function resolvePlugins(plugins: (VitePlugin | undefined)[]): VitePlugin[] {
 
   const map = new Map()
   for (const [index, plugin] of result.entries()) {
-    map.set(plugin.name || `plugin-${index}`, plugin)
+    map.set(plugin.name || `plugin ${index}`, plugin)
   }
   return [...map.values()]
 }
@@ -105,9 +111,10 @@ async function transformVitePlugin(
   code: string,
   id: string,
   store: Store,
-  maps: SourceMapInput[] = [],
+  compiledStack: CompiledStack[] = [],
 ) {
   id = id.startsWith('/') ? id : `/${id}`
+  let map
   const { plugins } = store.viteConfig
   for (const plugin of resolvePlugins(plugins)) {
     if (plugin.transformInclude) {
@@ -118,35 +125,45 @@ async function transformVitePlugin(
       code = result
     } else if (result) {
       code = result.code || code
-      result.map && maps.push(result.map)
+      result.map && (map = result.map)
     }
-    if (!plugin.resolveId) continue
 
-    for (const match of code.matchAll(resolveRE)) {
-      const [_, id] = match
-      const resolvedId = plugin.resolveId(id)
-      if (!resolvedId) continue
+    if (plugin.resolveId) {
+      for (const match of code.matchAll(resolveRE)) {
+        const [_, id] = match
+        const resolvedId = plugin.resolveId(id)
+        if (!resolvedId) continue
 
-      function escapeRegExp(str: string) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        function escapeRegExp(str: string) {
+          return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        }
+        code = code.replaceAll(
+          new RegExp(`(?<=['"])` + escapeRegExp(id), 'g'),
+          (resolvedId.startsWith('/')
+            ? '.'
+            : resolvedId.startsWith('./')
+              ? ''
+              : './') + resolvedId,
+        )
+        let loaded = plugin.load?.(resolvedId)
+        if (!loaded) continue
+        loaded = await transformVitePlugin(loaded, resolvedId, store)
+
+        const fileName = addSrcPrefix(resolvedId)
+        if (!store.files[fileName] || store.files[fileName].code !== loaded) {
+          store.files[fileName] = new File(fileName, loaded, true)
+          await compileFile(store, store.files[fileName])
+        }
       }
-      code = code.replaceAll(
-        new RegExp(`(?<=['"])` + escapeRegExp(id), 'g'),
-        (resolvedId.startsWith('/')
-          ? '.'
-          : resolvedId.startsWith('./')
-            ? ''
-            : './') + resolvedId,
-      )
-      let loaded = plugin.load?.(resolvedId)
-      if (!loaded) continue
-      loaded = await transformVitePlugin(loaded, resolvedId, store, maps)
+    }
 
-      const fileName = addSrcPrefix(resolvedId)
-      if (!store.files[fileName] || store.files[fileName].code !== loaded) {
-        store.files[fileName] = new File(fileName, loaded, true)
-        await compileFile(store, store.files[fileName])
-      }
+    if ((compiledStack.at(-1)?.code || store.activeFile.code) !== code) {
+      compiledStack.push({
+        name: plugin.name || `plugin ${compiledStack.length}`,
+        code,
+        map,
+        enforce: plugin.enforce,
+      })
     }
   }
 
