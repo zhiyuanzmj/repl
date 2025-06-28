@@ -56,9 +56,7 @@ const CompiledSelect = defineVaporComponent(() => {
           </option>
         </optgroup>
         <hr />
-        <option key="" value="">
-          No Inspect
-        </option>
+        <option value="">Normal Mode</option>
       </select>
     </div>
   )
