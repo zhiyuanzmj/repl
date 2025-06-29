@@ -15,14 +15,34 @@ import type { CompiledStack } from '../store'
 const CompiledSelect = defineVaporComponent(() => {
   const { store } = $inject(injectKeyProps)!
 
+  const nameKey = $computed(() =>
+    store.outputMode === 'js' ? 'compiledName' : 'tsCompiledName',
+  )
+
+  const indexKey = $computed(() =>
+    store.outputMode === 'js' ? 'compiledIndex' : 'tsCompiledIndex',
+  )
+
+  const stackKey = $computed(() =>
+    store.outputMode === 'js' ? 'compiledStack' : 'tsCompiledStack',
+  )
+
   const onChange = (value: number) => {
-    store.activeFile.compiledName =
-      store.activeFile.compiledStack[store.activeFile.compiledIndex + value]
-        ?.name || ''
+    store.activeFile[nameKey] =
+      store.activeFile[stackKey][store.activeFile[indexKey] + value]?.name || ''
   }
 
+  const compiledName = $computed({
+    get() {
+      return store.activeFile[nameKey]
+    },
+    set(value) {
+      store.activeFile[nameKey] = value
+    },
+  })
+
   const compiledStack = $computed(() =>
-    store.activeFile.compiledStack.reduce(
+    store.activeFile[stackKey].reduce(
       (result, compiled) => {
         result[compiled.enforce || 'default']?.push(compiled)
         return result
@@ -36,15 +56,17 @@ const CompiledSelect = defineVaporComponent(() => {
   return (
     <div class="ml-auto mr-2 flex items-center gap-2">
       <button
-        class={`i-carbon:previous-outline bg-$text! text-xl ${!store.activeFile.compiledIndex ? 'opacity-50 pointer-events-none' : ''}`}
+        class={`i-carbon:previous-outline bg-$text! text-xl ${
+          !store.activeFile[indexKey] ? 'opacity-50 pointer-events-none' : ''
+        }`}
         onClick={() => onChange(-1)}
       />
       <button
-        class={`i-carbon:next-outline bg-$text! text-xl ${!store.activeFile.compiledName ? 'opacity-50 pointer-events-none' : ''}`}
+        class={`i-carbon:next-outline bg-$text! text-xl ${!compiledName ? 'opacity-50 pointer-events-none' : ''}`}
         onClick={() => onChange(1)}
       />
       <select
-        v-model={store.activeFile.compiledName}
+        v-model={compiledName}
         class="b-(0 r-4 $border) bg-$border h-6 my-auto rounded outline-none px-1 text"
       >
         <template v-for={(list, label) in compiledStack}>
@@ -68,6 +90,7 @@ export default defineVaporComponent(
     ssr: boolean
   }) => {
     const { store } = $inject(injectKeyProps)!
+    const { activeFile } = $(store)
     let previewRef = $useRef()
     const modes = $computed(() =>
       props.showCompileOutput
@@ -89,9 +112,13 @@ export default defineVaporComponent(
 
     const compiledCode = $computed(() => {
       if (mode === 'js') {
-        return store.activeFile.compiledCode
-      } else if (mode === 'ts' || mode === 'css') {
-        return store.activeFile.compiled[mode]
+        return activeFile.compiledName
+          ? activeFile.compiledStack[activeFile.compiledIndex].code
+          : activeFile.compiled.js
+      } else if (mode === 'ts') {
+        return activeFile.tsCompiledName
+          ? activeFile.tsCompiledStack[activeFile.tsCompiledIndex].code
+          : activeFile.compiled.ts
       } else {
         return ''
       }

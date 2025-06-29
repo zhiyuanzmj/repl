@@ -124,7 +124,21 @@ export function loadMonacoEnv(store: Store) {
               const file = store.files[data.data.filePath.slice(1)]
               if (file) {
                 file.compiled.ts = data.data.code
-                file.compiled.tsMaps = data.data.mappings
+                const index = file.tsCompiledStack.findIndex(
+                  (i) => i.name === data.data.prevName,
+                )
+                if (file.tsCompiledStack.at(-1)?.code !== data.data.code) {
+                  file.tsCompiledStack.splice(
+                    index > -1 ? index : file.tsCompiledStack.length,
+                    1,
+                    {
+                      code: data.data.code,
+                      map: data.data.map,
+                      name: data.data.prevName,
+                      enforce: data.data.enforce,
+                    },
+                  )
+                }
               }
             }
           })

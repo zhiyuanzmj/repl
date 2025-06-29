@@ -11,20 +11,26 @@ import { getLanguagePlugins } from '@ts-macro/language-plugin'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
-import { type Segment, createPlugin, toString } from 'ts-macro'
+import { type Segment, type TsmVirtualCode, toString } from 'ts-macro'
 
-const getVirtualCode = createPlugin(() => ({
-  name: 'virtual-code',
-  resolveVirtualCode({ codes, filePath }) {
+const getVirtualCodePlugin = (
+  name: string,
+  index: number,
+  enforce?: string,
+) => ({
+  name: 'virtual-code' + index,
+  resolveVirtualCode({ codes, filePath }: TsmVirtualCode) {
     if (filePath.startsWith('/src')) {
       self.postMessage({
         filePath,
         code: toString(codes),
-        mappings: buildMappings(codes).slice(1),
+        map: buildMappings(codes).slice(1),
+        prevName: name || `plugin ${index}`,
+        enforce: enforce,
       })
     }
   },
-}))
+})
 
 function buildMappings<T>(chunks: Segment<T>[]) {
   let length = 0
@@ -67,7 +73,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       tsMacroOptions = { plugins: [] }
       console.error(e)
     }
-    tsMacroOptions.plugins.push(getVirtualCode())
     locale = msg.data.tsLocale
     ts = await importTsFromCdn(msg.data.tsVersion)
     self.postMessage('inited')
@@ -108,6 +113,22 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig?.compilerOptions || {},
         '',
       )
+
+      tsMacroOptions.plugins = tsMacroOptions.plugins
+        .flatMap((plugin: any) => {
+          if (typeof plugin === 'function') {
+            return plugin({
+              ts,
+              compilerOptions,
+            })
+          } else {
+            return plugin
+          }
+        })
+        .flatMap((plugin: any, index: number) => [
+          plugin,
+          getVirtualCodePlugin(plugin.name, index, plugin.enforce),
+        ])
 
       return createTypeScriptWorkerLanguageService({
         typescript: ts,

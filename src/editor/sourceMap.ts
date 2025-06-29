@@ -7,31 +7,38 @@ import remapping from '@ampproject/remapping'
 export const useSourceMap = () => {
   const { store, showSourceMap } = $inject(injectKeyProps)!
 
+  const { activeFile, editor, outputEditor, outputMode } = $(store)
+
   const map = $computed(() =>
-    store.activeFile.maps.length
+    activeFile.maps.length
       ? new SourceMapConsumer(
-          store.activeFile.compiledName
-            ? store.activeFile.maps[store.activeFile.compiledIndex]
-            : store.activeFile.maps.length === 1
-              ? store.activeFile.maps[0]
+          activeFile.compiledName
+            ? activeFile.maps[activeFile.compiledIndex]
+            : activeFile.maps.length === 1
+              ? activeFile.maps[0]
               : (remapping(
-                  store.activeFile.maps.slice().reverse(),
+                  activeFile.maps.slice().reverse(),
                   () => null,
                 ) as any),
         )
       : null,
   )
   const tsMap = $computed(() =>
-    store.activeFile.compiled.tsMaps.length
-      ? new SourceMap(store.activeFile.compiled.tsMaps)
+    activeFile.tsMaps.length &&
+    (activeFile.tsCompiledIndex === 0 || !activeFile.tsCompiledName)
+      ? new SourceMap(
+          activeFile.tsMaps[
+            activeFile.tsCompiledIndex === 0 ? 0 : activeFile.tsMaps.length - 1
+          ],
+        )
       : null,
   )
 
-  const editorModel = $computed(() => store.editor?.getModel())
-  const outputEditorModel = $computed(() => store.outputEditor?.getModel())
+  const editorModel = $computed(() => editor?.getModel())
+  const outputEditorModel = $computed(() => outputEditor?.getModel())
 
   function getMapping() {
-    if (store.outputMode === 'js') {
+    if (outputMode === 'js') {
       if (!map) return []
       const mappings: MappingItem[] = []
       map.eachMapping((mapping) => {
@@ -74,7 +81,7 @@ export const useSourceMap = () => {
     column: number
     line: number
   }) {
-    if (store.outputMode === 'js') {
+    if (outputMode === 'js') {
       const result = map?.generatedPositionFor(params)
       if (result) {
         result.column++
@@ -101,7 +108,7 @@ export const useSourceMap = () => {
   }
 
   function originalPositionFor(params: { column: number; line: number }) {
-    if (store.outputMode === 'js') {
+    if (outputMode === 'js') {
       const result = map?.originalPositionFor(params)
       if (result) {
         result.column++
@@ -136,15 +143,14 @@ export const useSourceMap = () => {
 
   const sourceMapDecorations: editor.IEditorDecorationsCollection[] = []
   watch(
-    () => [showSourceMap, store.outputMode === 'js' ? map : tsMap],
+    () => [showSourceMap, outputMode === 'js' ? map : tsMap],
     async ([showSourceMap, map]) => {
       await new Promise((resolve) => setTimeout(resolve))
       sourceMapDecorations.forEach((i) => i.clear())
-      if (!showSourceMap || !map || !['js', 'ts'].includes(store.outputMode))
-        return
+      if (!showSourceMap || !map || !['js', 'ts'].includes(outputMode)) return
       const maps = getMapping()
       if (!maps.length) return
-      sourceMapDecorations[0] = store.editor?.createDecorationsCollection(
+      sourceMapDecorations[0] = editor?.createDecorationsCollection(
         maps.map((mapping) => ({
           range: {
             startLineNumber: mapping.originalLine!,
@@ -157,7 +163,7 @@ export const useSourceMap = () => {
           },
         })),
       )!
-      sourceMapDecorations[1] = store.outputEditor?.createDecorationsCollection(
+      sourceMapDecorations[1] = outputEditor?.createDecorationsCollection(
         maps.map((mapping) => ({
           range: {
             startLineNumber: mapping.generatedLine,
@@ -177,11 +183,11 @@ export const useSourceMap = () => {
   onMounted(async () => {
     await nextTick()
     let decorations: editor.IEditorDecorationsCollection[] = []
-    store.editor?.onDidBlurEditorText(() => {
+    editor?.onDidBlurEditorText(() => {
       decorations.forEach((i) => i?.clear())
     })
-    store.editor?.onDidChangeCursorPosition((e) => {
-      if (!['js', 'ts'].includes(store.outputMode)) return
+    editor?.onDidChangeCursorPosition((e) => {
+      if (!['js', 'ts'].includes(outputMode)) return
       const generated = generatedPositionFor({
         source: map?.sources[0] || '',
         column: e.position.column - 1,
@@ -191,11 +197,11 @@ export const useSourceMap = () => {
       if (!generated?.line) return
       const origin = originalPositionFor(generated)
       if (!origin?.name) return
-      store.outputEditor?.revealPositionNearTop({
+      outputEditor?.revealPositionNearTop({
         lineNumber: generated.line,
         column: generated.column,
       })
-      decorations[0] = store.editor?.createDecorationsCollection([
+      decorations[0] = editor?.createDecorationsCollection([
         {
           range: {
             startLineNumber: origin.line,
@@ -208,7 +214,7 @@ export const useSourceMap = () => {
           },
         },
       ])!
-      decorations[1] = store.outputEditor?.createDecorationsCollection([
+      decorations[1] = outputEditor?.createDecorationsCollection([
         {
           range: {
             startLineNumber: generated.line,
@@ -236,10 +242,10 @@ export const useSourceMap = () => {
     })
 
     let outputDecorations: editor.IEditorDecorationsCollection[] = []
-    store.outputEditor?.onDidBlurEditorText(() => {
+    outputEditor?.onDidBlurEditorText(() => {
       outputDecorations.forEach((i) => i?.clear())
     })
-    store.outputEditor?.onDidChangeCursorPosition((e) => {
+    outputEditor?.onDidChangeCursorPosition((e) => {
       const origin = originalPositionFor({
         column: e.position.column - 1,
         line: e.position.lineNumber,
@@ -248,11 +254,11 @@ export const useSourceMap = () => {
       const generated = generatedPositionFor(origin)
       if (!generated?.line) return
       outputDecorations.forEach((i) => i?.clear())
-      store.editor?.revealPositionNearTop({
+      editor?.revealPositionNearTop({
         lineNumber: origin.line,
         column: origin.column,
       })
-      outputDecorations[0] = store.outputEditor?.createDecorationsCollection([
+      outputDecorations[0] = outputEditor?.createDecorationsCollection([
         {
           range: {
             startLineNumber: generated.line,
@@ -265,7 +271,7 @@ export const useSourceMap = () => {
           },
         },
       ])!
-      outputDecorations[1] = store.editor?.createDecorationsCollection([
+      outputDecorations[1] = editor?.createDecorationsCollection([
         {
           range: {
             startLineNumber: origin.line,

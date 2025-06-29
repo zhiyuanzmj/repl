@@ -13,6 +13,7 @@ export default defineVaporComponent(
   (props: { editorComponent: EditorComponentType }) => {
     const { store, showVirtualFiles, showSourceMap, editorOptions } =
       $inject(injectKeyProps)!
+    const { activeFile, activeConfigFile, outputMode } = $(store)
     let showMessage = $useRouteQuery('show-message', true)
 
     function updateProject() {
@@ -37,12 +38,12 @@ export default defineVaporComponent(
     }
 
     const onChange = debounce((code: string) => {
-      store.activeFile.code = code
+      activeFile.code = code
       updateProject()
     }, 250)
 
     const onConfigChange = debounce((code: string) => {
-      store.activeConfigFile.code = code
+      activeConfigFile.code = code
       updateProject()
     }, 250)
 
@@ -60,6 +61,16 @@ export default defineVaporComponent(
 
     useSourceMap()
 
+    const code = $computed(() => {
+      const nameKey = outputMode === 'js' ? 'compiledName' : 'tsCompiledName'
+      const indexKey = outputMode === 'js' ? 'compiledIndex' : 'tsCompiledIndex'
+      const stackKey = outputMode === 'js' ? 'compiledStack' : 'tsCompiledStack'
+
+      return activeFile[nameKey] && activeFile[indexKey]
+        ? activeFile[stackKey][activeFile[indexKey] - 1].code
+        : activeFile.code
+    })
+
     return (
       <div class="h-full">
         {/** TODO: use div instead of fragment to prevent HRM error */}
@@ -67,15 +78,15 @@ export default defineVaporComponent(
           <template v-slot:left>
             <div class="editor-container">
               <FileSelector
-                activeFile={store.activeFile}
+                activeFile={activeFile}
                 files={resolvedFiles.value[0]}
               />
               <Monaco
                 ref={(e) => {
                   store.editor = e?.editor
                 }}
-                filename={store.activeFile.filename}
-                value={store.activeFile.editorCode}
+                filename={activeFile.filename}
+                value={code}
                 onChange={onChange}
               />
             </div>
@@ -84,12 +95,12 @@ export default defineVaporComponent(
             <div class="editor-container">
               <FileSelector
                 disabled
-                activeFile={store.activeConfigFile}
+                activeFile={activeConfigFile}
                 files={resolvedFiles.value[1]}
               />
               <props.editorComponent
-                filename={store.activeConfigFile.filename}
-                value={store.activeConfigFile.code}
+                filename={activeConfigFile.filename}
+                value={activeConfigFile.code}
                 onChange={onConfigChange}
               />
             </div>

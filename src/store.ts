@@ -15,6 +15,7 @@ import {
   viteConfigFile,
 } from './presets/index'
 import type { SourceMapInput } from '@ampproject/remapping'
+import type { Mapping } from '@volar/monaco/worker'
 
 export {
   importMapFile,
@@ -496,7 +497,6 @@ export class File {
     css: '',
     ts: '',
     ssr: '',
-    tsMaps: [],
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 
@@ -522,6 +522,23 @@ export class File {
     return 'javascript'
   }
 
+  tsCompiledStack: CompiledStack[] = []
+
+  tsCompiledName: string = ''
+
+  get tsMaps() {
+    return this.tsCompiledStack.map(
+      (item) => item.map,
+    ) as unknown as Mapping[][]
+  }
+
+  get tsCompiledIndex() {
+    const result = this.tsCompiledStack.findIndex(
+      (i) => i.name === this.tsCompiledName,
+    )
+    return result > -1 ? result : this.tsCompiledStack.length
+  }
+
   compiledStack: CompiledStack[] = []
 
   compiledName: string = ''
@@ -537,20 +554,6 @@ export class File {
     return this.compiledStack
       .filter((i) => !!i.map)
       .map((item) => item.map) as SourceMapInput[]
-  }
-
-  get editorCode() {
-    if (this.compiledName && this.compiledIndex) {
-      return this.compiledStack[this.compiledIndex - 1].code
-    } else {
-      return this.code
-    }
-  }
-
-  get compiledCode() {
-    return this.compiledName
-      ? this.compiledStack[this.compiledIndex].code
-      : this.compiled.js
   }
 }
 

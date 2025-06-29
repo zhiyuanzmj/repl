@@ -19,12 +19,14 @@ export const useDiff = () => {
   const decorations: editor.IEditorDecorationsCollection[] = []
 
   watch(
-    () => activeFile.editorCode,
+    () => [activeFile.compiledName, activeFile.tsCompiledName],
     () => {
       decorations.forEach((i) => i.clear())
       if (
         !(editor && outputEditor && editorModel && outputEditorModel) ||
-        !activeFile.compiledName
+        !activeFile[
+          store.outputMode === 'js' ? 'compiledName' : 'tsCompiledName'
+        ]
       )
         return
       const changes = calculateDiff(
