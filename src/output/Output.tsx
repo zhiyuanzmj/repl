@@ -14,35 +14,34 @@ import type { CompiledStack } from '../store'
 
 const CompiledSelect = defineVaporComponent(() => {
   const { store } = $inject(injectKeyProps)!
+  const { activeFile, outputMode } = $(store)
 
   const nameKey = $computed(() =>
-    store.outputMode === 'js' ? 'compiledName' : 'tsCompiledName',
+    outputMode === 'js' ? 'compiledName' : 'tsCompiledName',
   )
-
   const indexKey = $computed(() =>
-    store.outputMode === 'js' ? 'compiledIndex' : 'tsCompiledIndex',
+    outputMode === 'js' ? 'compiledIndex' : 'tsCompiledIndex',
   )
-
   const stackKey = $computed(() =>
-    store.outputMode === 'js' ? 'compiledStack' : 'tsCompiledStack',
+    outputMode === 'js' ? 'compiledStack' : 'tsCompiledStack',
   )
 
   const onChange = (value: number) => {
-    store.activeFile[nameKey] =
-      store.activeFile[stackKey][store.activeFile[indexKey] + value]?.name || ''
+    activeFile[nameKey] =
+      activeFile[stackKey][activeFile[indexKey] + value]?.name || ''
   }
 
   const compiledName = $computed({
     get() {
-      return store.activeFile[nameKey]
+      return activeFile[nameKey]
     },
     set(value) {
-      store.activeFile[nameKey] = value
+      activeFile[nameKey] = value
     },
   })
 
   const compiledStack = $computed(() =>
-    store.activeFile[stackKey].reduce(
+    activeFile[stackKey].reduce(
       (result, compiled) => {
         result[compiled.enforce || 'default']?.push(compiled)
         return result
@@ -57,7 +56,7 @@ const CompiledSelect = defineVaporComponent(() => {
     <div class="ml-auto mr-2 flex items-center gap-2">
       <button
         class={`i-carbon:previous-outline bg-$text! text-xl ${
-          !store.activeFile[indexKey] ? 'opacity-50 pointer-events-none' : ''
+          !activeFile[indexKey] ? 'opacity-50 pointer-events-none' : ''
         }`}
         onClick={() => onChange(-1)}
       />
@@ -198,7 +197,7 @@ export default defineVaporComponent(
                 <span>{m}</span>
               </button>
 
-              <CompiledSelect />
+              <CompiledSelect v-if={['js', 'ts'].includes(store.outputMode)} />
             </div>
 
             <Devtools
