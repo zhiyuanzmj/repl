@@ -21,14 +21,15 @@ const CompiledSelect = defineVaporComponent(() => {
         ?.name || ''
   }
 
-  const compiledStack = $computed(() => {
-    return store.activeFile.compiledStack.reduce((result, compiled) => {
-      const index =
-        compiled.enforce === 'pre' ? 0 : compiled.enforce === 'post' ? 2 : 1
-      ;(result[index] ??= [])?.push(compiled)
-      return result
-    }, [] as CompiledStack[][])
-  })
+  const compiledStack = $computed(() =>
+    store.activeFile.compiledStack.reduce(
+      (result, compiled) => {
+        result[compiled.enforce || 'default']?.push(compiled)
+        return result
+      },
+      { pre: [], default: [], post: [] } as Record<string, CompiledStack[]>,
+    ),
+  )
 
   useDiff()
 
@@ -46,15 +47,13 @@ const CompiledSelect = defineVaporComponent(() => {
         v-model={store.activeFile.compiledName}
         class="b-(0 r-4 $border) bg-$border h-6 my-auto rounded outline-none px-1 text"
       >
-        <optgroup
-          v-for={(list, index) in compiledStack}
-          key={index}
-          label={index === 0 ? 'pre' : index === 1 ? 'default' : 'post'}
-        >
-          <option v-for={compiled in list} key={compiled.name}>
-            {compiled.name}
-          </option>
-        </optgroup>
+        <template v-for={(list, label) in compiledStack}>
+          <optgroup v-if={list.length} key={label} label={label}>
+            <option v-for={compiled in list} key={compiled.name}>
+              {compiled.name}
+            </option>
+          </optgroup>
+        </template>
         <hr />
         <option value="">Normal Mode</option>
       </select>
