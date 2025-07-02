@@ -267,7 +267,7 @@ export async function useStore(
   }
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = async () => {
-    let code = files.value[tsMacroConfigFile]?.code
+    let code = files.value[tsMacroConfigFile]?.code || ''
     for (const name in importMap.value.imports) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
