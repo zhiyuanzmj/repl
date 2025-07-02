@@ -5,9 +5,9 @@ import {
   extractIdentifiers,
   isInDestructureAssignment,
   isStaticProperty,
-  walk,
+  walkAST,
   walkIdentifiers,
-} from './babelUtils'
+} from 'ast-kit'
 import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 import { addEsmPrefix } from '../utils'
 import { cssRE } from '../transform'
@@ -111,7 +111,7 @@ function processModule(store: Store, src: string, filename: string) {
   const ast = babelParse(src, {
     sourceFilename: filename,
     sourceType: 'module',
-  }).program.body
+  }).program
 
   const idToImportMap = new Map<string, string>()
   const declaredConst = new Set<string>()
@@ -159,7 +159,7 @@ function processModule(store: Store, src: string, filename: string) {
   )
 
   // 1. check all import statements and record id -> importName map
-  for (const node of ast) {
+  for (const node of ast.body) {
     // import foo from 'foo' --> foo -> __import_foo__.default
     // import { baz } from 'foo' --> baz -> __import_foo__.baz
     // import * as ok from 'foo' --> ok -> __import_foo__
@@ -186,7 +186,7 @@ function processModule(store: Store, src: string, filename: string) {
   }
 
   // 2. check all export statements and define exports
-  for (const node of ast) {
+  for (const node of ast.body) {
     // named exports
     if (node.type === 'ExportNamedDeclaration') {
       if (node.declaration) {
@@ -254,7 +254,7 @@ function processModule(store: Store, src: string, filename: string) {
   }
 
   // 3. convert references to import bindings
-  for (const node of ast) {
+  for (const node of ast.body) {
     if (node.type === 'ImportDeclaration') continue
     walkIdentifiers(node, (id, parent, parentStack) => {
       const binding = idToImportMap.get(id.name)
@@ -290,9 +290,9 @@ function processModule(store: Store, src: string, filename: string) {
 
   // 4. convert dynamic imports
   let hasDynamicImport = false
-  walk(ast, {
-    enter(node: Node, parent: Node) {
-      if (node.type === 'Import' && parent.type === 'CallExpression') {
+  walkAST(ast, {
+    enter(node, parent) {
+      if (node.type === 'Import' && parent?.type === 'CallExpression') {
         const arg = parent.arguments[0]
         if (arg.type === 'StringLiteral' && arg.value.startsWith('./')) {
           hasDynamicImport = true

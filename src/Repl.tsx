@@ -74,8 +74,8 @@ export default defineVaporComponent(
 
     props.store.init()
 
-    const editorSlotName = computed(() => (layoutReverse ? 'right' : 'left'))
-    const outputSlotName = computed(() => (layoutReverse ? 'left' : 'right'))
+    const editorSlotName = $computed(() => (layoutReverse ? 'right' : 'left'))
+    const outputSlotName = $computed(() => (layoutReverse ? 'left' : 'right'))
 
     provide(injectKeyProps, {
       ...toRefs(useFullProps()),
@@ -100,13 +100,13 @@ export default defineVaporComponent(
     return (
       <div class="vue-repl">
         <SplitPane layout={layout}>
-          <template v-slot:$editorSlotName_value$={{}}>
+          <template v-slot:$editorSlotName$={{}}>
             <EditorContainer editorComponent={props.editor} />
           </template>
-          <template v-slot:$outputSlotName_value$={{}}>
+          <template v-slot:$outputSlotName$={{}}>
             <Output
-              ref={(e) => (outputRef = e)}
               editorComponent={props.editor}
+              ref$={outputRef}
               showCompileOutput={showCompileOutput}
               ssr={!!ssr}
             />

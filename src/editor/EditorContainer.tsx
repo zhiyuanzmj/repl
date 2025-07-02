@@ -11,7 +11,7 @@ import { useSourceMap } from './sourceMap'
 
 export default defineVaporComponent(
   (props: { editorComponent: EditorComponentType }) => {
-    const { store, showVirtualFiles, showSourceMap, editorOptions } =
+    let { store, showVirtualFiles, showSourceMap, editorOptions } =
       $inject(injectKeyProps)!
     const { activeFile, activeConfigFile, outputMode } = $(store)
     let showMessage = $useRouteQuery('show-message', true)

@@ -208,8 +208,8 @@ export default defineVaporComponent(({ ssr = false }) => {
   return (
     <>
       <div
-        ref={(e) => (containerRef = e)}
         class={['iframe-container', { [store.theme]: previewTheme }]}
+        ref$={containerRef}
       />
       <Message
         err={(previewOptions?.showRuntimeError ?? true) && runtimeError}

@@ -74,9 +74,9 @@ export default defineVaporComponent(
         ref$={containerRef}
         onMouseleave={dragEnd}
         onMousemove={dragMove}
-        onTouchmove={dragMove}
         onMouseup={dragEnd}
         onTouchend={dragEnd}
+        onTouchmove={dragMove}
       >
         <div
           class="left"
@@ -87,8 +87,8 @@ export default defineVaporComponent(
           <slots.left />
           <div
             class="dragger"
-            onTouchstart_prevent={dragStart}
             onMousedown_prevent={dragStart}
+            onTouchstart_prevent={dragStart}
           />
         </div>
         <div

@@ -22,7 +22,9 @@ export default defineVaporComponent(
     const devtoolsSrc = useDevtoolsSrc()
 
     window.addEventListener('message', (event) => {
-      const Iframe = previewContainer?.firstChild as HTMLIFrameElement | undefined
+      const Iframe = previewContainer?.firstChild as
+        | HTMLIFrameElement
+        | undefined
       if (event.source === Iframe?.contentWindow) {
         devtoolsIframe?.contentWindow!.postMessage(event.data, '*')
       }
@@ -42,8 +44,8 @@ export default defineVaporComponent(
     return (
       <div class="relative h-full">
         <iframe
-          ref={(e) => (devtoolsIframe = e)}
           class="absolute inset-0 block h-full w-full border-none"
+          ref$={devtoolsIframe}
           src={devtoolsSrc}
           title="Devtools"
         />
