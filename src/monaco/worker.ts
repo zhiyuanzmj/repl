@@ -11,7 +11,12 @@ import { getLanguagePlugins } from '@ts-macro/language-plugin'
 import { create as createTypeScriptServices } from 'volar-service-typescript'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
-import { type Segment, type TsmVirtualCode, toString } from 'ts-macro'
+import {
+  type Segment,
+  type TsmLanguagePlugin,
+  type TsmVirtualCode,
+  toString,
+} from 'ts-macro'
 
 const getVirtualCodePlugin = (
   name: string,
@@ -27,6 +32,7 @@ const getVirtualCodePlugin = (
         map: buildMappings(codes).slice(1),
         prevName: name || `plugin ${index}`,
         enforce: enforce,
+        init: index === 1,
       })
     }
   },
@@ -62,6 +68,43 @@ export interface CreateData {
 let ts: typeof import('typescript')
 let locale: string | undefined
 let tsMacroOptions: any
+
+function resolvePlugins(
+  plugins: (TsmLanguagePlugin | undefined)[],
+): TsmLanguagePlugin[] {
+  const prePlugins: TsmLanguagePlugin[] = []
+  const postPlugins: TsmLanguagePlugin[] = []
+  const normalPlugins: TsmLanguagePlugin[] = []
+
+  if (plugins) {
+    plugins.flat().forEach((p, index) => {
+      if (!p) return
+      if (p.enforce === 'pre')
+        prePlugins.push(
+          { ...p, enforce: undefined },
+          getVirtualCodePlugin(p.name, index, p.enforce),
+        )
+      else if (p.enforce === 'post')
+        postPlugins.push(
+          { ...p, enforce: undefined },
+          getVirtualCodePlugin(p.name, index, p.enforce),
+        )
+      else
+        normalPlugins.push(
+          { ...p, enforce: undefined },
+          getVirtualCodePlugin(p.name, index, p.enforce),
+        )
+    })
+  }
+  const result = [...prePlugins, ...normalPlugins, ...postPlugins]
+
+  // unique
+  const map = new Map()
+  for (const [index, plugin] of result.entries()) {
+    map.set(plugin.name || `plugin-${index}`, plugin)
+  }
+  return [...map.values()]
+}
 
 self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   if (msg.data?.event === 'init') {
@@ -114,8 +157,8 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         '',
       )
 
-      tsMacroOptions.plugins = tsMacroOptions.plugins
-        .flatMap((plugin: any) => {
+      tsMacroOptions.plugins = resolvePlugins(
+        tsMacroOptions.plugins.flatMap((plugin: any) => {
           if (typeof plugin === 'function') {
             return plugin({
               ts,
@@ -124,11 +167,8 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           } else {
             return plugin
           }
-        })
-        .flatMap((plugin: any, index: number) => [
-          plugin,
-          getVirtualCodePlugin(plugin.name, index, plugin.enforce),
-        ])
+        }),
+      )
 
       return createTypeScriptWorkerLanguageService({
         typescript: ts,

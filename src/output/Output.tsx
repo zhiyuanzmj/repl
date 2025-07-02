@@ -112,14 +112,14 @@ export default defineVaporComponent(
     const compiledCode = $computed(() => {
       if (mode === 'js') {
         return activeFile.compiledName
-          ? activeFile.compiledStack[activeFile.compiledIndex].code
+          ? activeFile.compiledStack[activeFile.compiledIndex]?.code || ''
           : activeFile.compiled.js
       } else if (mode === 'ts') {
         return activeFile.tsCompiledName
-          ? activeFile.tsCompiledStack[activeFile.tsCompiledIndex].code
+          ? activeFile.tsCompiledStack[activeFile.tsCompiledIndex]?.code || ''
           : activeFile.compiled.ts
       } else {
-        return ''
+        return activeFile.compiled.css
       }
     })
 
@@ -203,12 +203,32 @@ export default defineVaporComponent(
               v-show={mode === 'devtools'}
             />
             <props.editorComponent
-              v-if={mode !== 'devtools'}
+              v-if={mode === 'js'}
               ref={(e) => {
                 store.outputEditor = e?.editor
               }}
               readonly
-              filename={store.activeFile.filename}
+              filename={store.activeFile.filename + '?output'}
+              mode={mode}
+              value={compiledCode}
+            />
+            <props.editorComponent
+              v-else-if={mode === 'ts'}
+              ref={(e) => {
+                store.outputEditor = e?.editor
+              }}
+              readonly
+              filename={store.activeFile.filename + '?output'}
+              mode={mode}
+              value={compiledCode}
+            />
+            <props.editorComponent
+              v-else-if={mode === 'css'}
+              ref={(e) => {
+                store.outputEditor = e?.editor
+              }}
+              readonly
+              filename={store.activeFile.filename + '?output'}
               mode={mode}
               value={compiledCode}
             />

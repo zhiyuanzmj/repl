@@ -10,7 +10,7 @@ export default defineVaporComponent(
     filename = ''!,
     readonly = false,
     value = '',
-    mode = undefined as unknown as EditorMode,
+    mode = 'ts' as EditorMode,
     onChange = (value: string) => {},
   }) => {
     let containerRef = $useRef()
@@ -40,7 +40,7 @@ export default defineVaporComponent(
         throw new Error('Cannot find containerRef')
       }
       editorInstance = monaco.editor.create(containerRef, {
-        ...(readonly ? { value: value, language: lang } : { model: null }),
+        language: lang,
         fontSize: 13,
         tabSize: 2,
         theme: store.theme === 'light' ? theme.light : theme.dark,
@@ -82,21 +82,30 @@ export default defineVaporComponent(
       }
 
       watch(
-        () => value,
-        (value) => {
-          if (editorInstance.getValue() === value) return
-          editorInstance.setValue(value || '')
-        },
-        { immediate: true },
-      )
-
-      watch(
         () => lang,
         (lang) =>
           monaco.editor.setModelLanguage(editorInstance.getModel()!, lang),
       )
 
-      if (!readonly) {
+      watch(
+        () => readonly,
+        () => {
+          editorInstance.updateOptions({ readOnly: readonly })
+        },
+      )
+
+      watch(
+        () => value,
+        (value) => {
+          if (editorInstance.getValue() === value) return
+          setTimeout(() => {
+            editorInstance.setValue(value || '')
+          })
+        },
+        { immediate: true },
+      )
+
+      if (mode === 'ts') {
         watch(
           () => filename,
           (_, oldFilename) => {
@@ -106,7 +115,7 @@ export default defineVaporComponent(
             const model = getOrCreateModel(
               monaco.Uri.parse(`file:///${filename}`),
               file.language,
-              file.code,
+              value,
             )
 
             const oldFile = oldFilename ? store.files[oldFilename] : null
@@ -118,6 +127,11 @@ export default defineVaporComponent(
 
             if (file.editorViewState) {
               editorInstance.restoreViewState(file.editorViewState)
+              if (store.fileCaches[filename]) {
+                setTimeout(() => {
+                  editorInstance.setValue(store.fileCaches[filename])
+                })
+              }
               editorInstance.focus()
             }
           },

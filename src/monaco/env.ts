@@ -120,25 +120,24 @@ export function loadMonacoEnv(store: Store) {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {
               resolve()
-            } else if (data.data?.filePath) {
+            } else if (
+              data.data?.filePath &&
+              !store.activeFile.tsCompiledName
+            ) {
               const file = store.files[data.data.filePath.slice(1)]
               if (file) {
-                file.compiled.ts = data.data.code
-                const index = file.tsCompiledStack.findIndex(
-                  (i) => i.name === data.data.prevName,
-                )
-                if (file.tsCompiledStack.at(-1)?.code !== data.data.code) {
-                  file.tsCompiledStack.splice(
-                    index > -1 ? index : file.tsCompiledStack.length,
-                    1,
-                    {
-                      code: data.data.code,
-                      map: data.data.map,
-                      name: data.data.prevName,
-                      enforce: data.data.enforce,
-                    },
-                  )
+                if (data.data.init) {
+                  file.tsCompiledStack = []
                 }
+                if (file.compiled.ts !== data.data.code) {
+                  file.tsCompiledStack.push({
+                    code: data.data.code,
+                    map: data.data.map,
+                    name: data.data.prevName,
+                    enforce: data.data.enforce,
+                  })
+                }
+                file.compiled.ts = data.data.code
               }
             }
           })

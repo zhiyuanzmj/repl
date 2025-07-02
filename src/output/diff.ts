@@ -20,7 +20,8 @@ export const useDiff = () => {
 
   watch(
     () => [activeFile.compiledName, activeFile.tsCompiledName],
-    () => {
+    async () => {
+      await new Promise((r) => setTimeout(r))
       decorations.forEach((i) => i.clear())
       if (
         !(editor && outputEditor && editorModel && outputEditorModel) ||

@@ -86,6 +86,9 @@ export default defineVaporComponent(
                   store.editor = e?.editor
                 }}
                 filename={activeFile.filename}
+                readonly={
+                  !!(activeFile.compiledName || activeFile.tsCompiledName)
+                }
                 value={code}
                 onChange={onChange}
               />
