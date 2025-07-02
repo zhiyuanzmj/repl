@@ -87,7 +87,9 @@ export default defineVaporComponent(
                 }}
                 filename={activeFile.filename}
                 readonly={
-                  !!(activeFile.compiledName || activeFile.tsCompiledName)
+                  !!(outputMode === 'js'
+                    ? activeFile.compiledName
+                    : activeFile.tsCompiledName)
                 }
                 value={code}
                 onChange={onChange}
