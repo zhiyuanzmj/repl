@@ -32,7 +32,7 @@ const getVirtualCodePlugin = (
         map: buildMappings(codes).slice(1),
         prevName: name || `plugin ${index}`,
         enforce: enforce,
-        init: index === 1,
+        init: !index,
       })
     }
   },

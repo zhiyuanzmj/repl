@@ -136,8 +136,8 @@ export function loadMonacoEnv(store: Store) {
                     name: data.data.prevName,
                     enforce: data.data.enforce,
                   })
+                  file.compiled.ts = data.data.code
                 }
-                file.compiled.ts = data.data.code
               }
             }
           })
