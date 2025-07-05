@@ -1,6 +1,6 @@
 {
   "imports": {
-    "vue": "https://esm.sh/pr/vue@9e2eea9/es2022/dist/vue.runtime-with-vapor.esm-browser.mjs"
+    "vue": "https://esm.sh/pr/vue@51677cd/es2022/dist/vue.runtime-with-vapor.esm-browser.mjs"
   },
   "scopes": {}
 }
