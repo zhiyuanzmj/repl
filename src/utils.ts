@@ -88,12 +88,32 @@ export function useRoutePath<T extends string | boolean>(
 }
 
 const esmRE = /(?<=(?:from|import)\s+['"])(?!http|\.|\/)[^'"]+(?=['"])/g
-export function addEsmPrefix(code: string, importMap?: ImportMap) {
+export function addEsmPrefix(code: string, importMap: ImportMap) {
   const s = new MagicString(code)
   const matches = code.matchAll(esmRE)
   for (let match of matches) {
-    if (!importMap?.imports?.[match[0]]) {
-      s.appendLeft(match.index, 'https://esm.sh/')
+    const matchIndex = match.index
+    const matchName = match[0]
+    function transform(name: string) {
+      if (!importMap[name]) return
+      const queryIndex = importMap[name].indexOf('?')
+      const importValue =
+        queryIndex > -1 ? importMap[name].slice(0, queryIndex) : importMap[name]
+      const query = queryIndex > -1 ? importMap?.[name].slice(queryIndex) : ''
+      s.overwrite(matchIndex, matchIndex + name.length, importValue as string)
+      if (query) {
+        s.appendRight(matchIndex + matchName.length, query)
+      }
+    }
+    if (!importMap?.[matchName]) {
+      transform(
+        matchName
+          .split('/')
+          .slice(0, matchName.startsWith('@') ? 2 : 1)
+          .join('/'),
+      )
+    } else {
+      transform(matchName)
     }
   }
   return s.toString()

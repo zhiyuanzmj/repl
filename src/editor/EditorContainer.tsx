@@ -5,7 +5,6 @@ import ToggleButton from './ToggleButton'
 import { type EditorComponentType, injectKeyProps } from '../types'
 import { type File, configFileNames } from '../store'
 import SplitPane from '../SplitPane'
-import { ofetch } from 'ofetch'
 import Monaco from '../monaco/Monaco'
 import { useSourceMap } from './sourceMap'
 
@@ -16,35 +15,14 @@ export default defineVaporComponent(
     const { activeFile, activeConfigFile, outputMode } = $(store)
     let showMessage = $useRouteQuery('show-message', true)
 
-    function updateProject() {
-      const paths = location.pathname.slice(1).split('/')
-      const hasPermission = paths[0] === store.userName && paths[1]
-      if (hasPermission) {
-        history.pushState(null, '', location.pathname + location.search)
-        if (store.project) {
-          ofetch(
-            '/api/project/' + store.project.userName + '/' + store.project.name,
-            {
-              method: 'PUT',
-              body: {
-                hash: store.serialize(),
-              },
-            },
-          )
-        }
-      } else {
-        history.replaceState({}, '', store.serialize())
-      }
-    }
-
     const onChange = debounce((code: string) => {
       activeFile.code = code
-      updateProject()
+      store.updateProject()
     }, 250)
 
     const onConfigChange = debounce((code: string) => {
       activeConfigFile.code = code
-      updateProject()
+      store.updateProject()
     }, 250)
 
     const resolvedFiles = computed(() => {

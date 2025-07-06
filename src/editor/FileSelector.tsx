@@ -3,6 +3,7 @@ import { injectKeyProps } from '../../src/types'
 import {
   type File,
   appFile,
+  configFileNames,
   indexHtmlFile,
   stripSrcPrefix,
   tsconfigFile,
@@ -74,7 +75,9 @@ export default defineVaporComponent(
       }
 
       // add back the src prefix
-      const filename = 'src/' + pendingFilename
+      const filename =
+        (configFileNames.includes(pendingFilename) ? '' : 'src/') +
+        pendingFilename
       const oldFilename = pending === true ? '' : pending
 
       if (!/\.(vue|jsx?|tsx?|css|json)$/.test(filename)) {

@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "vue": "https://esm.sh/pr/vue@51677cd/es2022/dist/vue.runtime-with-vapor.esm-browser.mjs"
-  },
-  "scopes": {}
-}

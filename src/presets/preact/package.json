@@ -1,0 +1,8 @@
+{
+  "name": "preact",
+  "dependencies": {
+    "preact": "^10.26.9",
+    "@babel/standalone": "latest",
+    "@babel/plugin-transform-react-jsx": "latest"
+  }
+}

@@ -8,8 +8,8 @@ import { defaultPresets } from './presets'
 import { ofetch } from 'ofetch'
 import {
   appFile,
-  importMapFile,
   indexHtmlFile,
+  packageFile,
   tsMacroConfigFile,
   tsconfigFile,
   viteConfigFile,
@@ -18,7 +18,7 @@ import type { SourceMapInput } from '@ampproject/remapping'
 import type { Mapping } from '@volar/monaco/worker'
 
 export {
-  importMapFile,
+  packageFile,
   tsconfigFile,
   viteConfigFile,
   tsMacroConfigFile,
@@ -27,7 +27,7 @@ export {
 }
 
 export const configFileNames = [
-  importMapFile,
+  packageFile,
   tsconfigFile,
   tsMacroConfigFile,
   viteConfigFile,
@@ -86,28 +86,35 @@ export async function useStore(
   const viteConfig = ref({} as ViteConfig)
   const importMap = computed<ImportMap>(() => {
     try {
-      const result = JSON.parse(files.value[importMapFile]?.code || '{}')
-      if (result.imports)
-        for (const [key, value] of Object.entries(result.imports)) {
+      const result = JSON.parse(files.value[packageFile]?.code || '{}')
+      const dependencies = { ...result.dependencies, ...result.devDependencies }
+      if (dependencies)
+        for (const key in dependencies) {
+          let value = dependencies[key]
           if (value) {
-            result.imports[key] = (value + '').startsWith('http')
-              ? value
-              : location.origin + value
+            if (/^(?:\^|~|\d)/.test(value)) {
+              value = `https://esm.sh/${key}@${value}`
+            } else if (value === 'latest') {
+              value = `https://esm.sh/${key}`
+            } else if (value.startsWith('https://pkg.pr.new/')) {
+              value = value.replaceAll('pkg.pr.new', 'esm.sh/pkg.pr.new')
+            } else if (!value.startsWith('http')) {
+              value = location.origin + value
+            }
+            dependencies[key] = value
           }
         }
-      return result
+      return dependencies
     } catch (e) {
-      errors.value = [
-        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
-      ]
-      return { imports: {}, scopes: {} }
+      errors.value = [`Syntax error in ${packageFile}: ${(e as Error).message}`]
+      return {}
     }
   })
   async function getViteConfig(code = files.value[viteConfigFile]?.code) {
-    for (const name in importMap.value.imports) {
+    for (const name in importMap.value) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        importMap.value.imports[name] as string,
+        importMap.value[name] as string,
       )
     }
     try {
@@ -116,9 +123,7 @@ export async function useStore(
           encodeURIComponent(transformTS(addEsmPrefix(code, importMap.value)))
       ).then((i) => i.default || { plugins: [] })
     } catch (e) {
-      errors.value = [
-        `Syntax error in ${importMapFile}: ${(e as Error).message}`,
-      ]
+      errors.value = [`Syntax error in ${packageFile}: ${(e as Error).message}`]
       console.error(e)
       viteConfig.value = { plugins: [] }
     }
@@ -177,7 +182,7 @@ export async function useStore(
           tsMacroConfigFile,
           viteConfigFile,
           tsconfigFile,
-          importMapFile,
+          packageFile,
           activeFile.value.filename,
         ].includes(filename)
       )
@@ -210,6 +215,7 @@ export async function useStore(
     }
     files.value[file.filename] = file
     if (!file.hidden) setActive(file.filename)
+    updateProject()
   }
   const deleteFile: Store['deleteFile'] = (filename) => {
     if (
@@ -222,6 +228,7 @@ export async function useStore(
       activeFilename.value = appFile
     }
     delete files.value[filename]
+    updateProject()
   }
 
   const renameFile: Store['renameFile'] = async (oldFilename, newFilename) => {
@@ -256,6 +263,7 @@ export async function useStore(
     } else {
       await compileFile(store, file).then((errs) => (errors.value = errs))
     }
+    updateProject()
   }
 
   const getTsConfig: Store['getTsConfig'] = () => {
@@ -268,10 +276,10 @@ export async function useStore(
 
   const getTsMacroConfig: Store['getTsMacroConfig'] = async () => {
     let code = files.value[tsMacroConfigFile]?.code || ''
-    for (const name in importMap.value.imports) {
+    for (const name in importMap.value) {
       code = code.replaceAll(
         new RegExp(`(?<=from\\s+['"])${name}(?=['"])`, 'g'),
-        importMap.value.imports[name] as string,
+        importMap.value[name] as string,
       )
     }
     return (
@@ -327,6 +335,27 @@ export async function useStore(
   const editor = shallowRef()
   const outputEditor = shallowRef()
 
+  function updateProject() {
+    const paths = location.pathname.slice(1).split('/')
+    const hasPermission = paths[0] === store.userName && paths[1]
+    if (hasPermission) {
+      history.pushState(null, '', location.pathname + location.search)
+      if (store.project) {
+        ofetch(
+          '/api/project/' + store.project.userName + '/' + store.project.name,
+          {
+            method: 'PUT',
+            body: {
+              hash: store.serialize(),
+            },
+          },
+        )
+      }
+    } else {
+      history.replaceState({}, '', store.serialize())
+    }
+  }
+
   const store: ReplStore = reactive({
     editor,
     outputEditor,
@@ -367,14 +396,12 @@ export async function useStore(
     serialize,
     getFiles,
     setFiles,
+    updateProject,
   })
   return store
 }
 
-export interface ImportMap {
-  imports?: Record<string, string | undefined>
-  scopes?: Record<string, Record<string, string>>
-}
+export type ImportMap = Record<string, string | undefined>
 
 export type Template = {
   [indexHtmlFile]: File
@@ -382,7 +409,7 @@ export type Template = {
   [viteConfigFile]: File
   [tsMacroConfigFile]: File
   [tsconfigFile]: File
-  [importMapFile]: File
+  [packageFile]: File
 }
 
 export type StoreState = ToRefs<{
@@ -446,6 +473,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   serialize(): string
   getFiles(): Record<string, { code: string; hidden?: boolean }>
   setFiles(newFiles: Record<string, File>): Promise<void>
+  updateProject(): void
 }
 
 export type Store = Pick<
@@ -477,6 +505,7 @@ export type Store = Pick<
   | 'getTsConfig'
   | 'viteConfig'
   | 'getTsMacroConfig'
+  | 'updateProject'
   | 'preset'
   | 'presets'
   | 'importMap'
