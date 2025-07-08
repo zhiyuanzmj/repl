@@ -36,11 +36,11 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0
       '@ts-macro/language-plugin':
-        specifier: ^0.1.35
-        version: 0.1.35(rollup@4.44.2)
+        specifier: ^0.2.0
+        version: 0.2.0(rollup@4.44.2)
       '@ts-macro/tsc':
-        specifier: ^0.1.35
-        version: 0.1.35(rollup@4.44.2)
+        specifier: ^0.2.0
+        version: 0.2.0(rollup@4.44.2)
       '@types/node':
         specifier: ^22.16.0
         version: 22.16.0
@@ -129,8 +129,8 @@ importers:
         specifier: ^3.35.0
         version: 3.35.0
       ts-macro:
-        specifier: ^0.1.35
-        version: 0.1.35
+        specifier: ^0.2.0
+        version: 0.2.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1298,11 +1298,11 @@ packages:
   '@speed-highlight/core@1.2.7':
     resolution: {integrity: sha512-0dxmVj4gxg3Jg879kvFS/msl4s9F3T9UXC1InxgOf7t5NvcPD97u/WTA5vL/IxWHMn7qSxBozqrnnE2wvl1m8g==}
 
-  '@ts-macro/language-plugin@0.1.35':
-    resolution: {integrity: sha512-7MfrFcMj3iCXaqZSswMdQjVeJBaNhqmeaf04kaiOd02N7OMKm7FUbEyQ2s8yNnSFWL//VUdJPfyay5AaZIJCtQ==}
+  '@ts-macro/language-plugin@0.2.0':
+    resolution: {integrity: sha512-J+HCGmKfGuPCDL46vl04V5WJ/NaKQy+2dHpCmFqgni7k15mRe0ithrY2533l+Q+25bUuoX3tRVJzLcKUKGVqZQ==}
 
-  '@ts-macro/tsc@0.1.35':
-    resolution: {integrity: sha512-7ZxxNqhv5KlByzSvrJOwvKgzj/f8R35fl4eIuffE6Ii8yGqpPA8HCQj86qT/TFM0nNWtaA7e8b9FWISgc68cMA==}
+  '@ts-macro/tsc@0.2.0':
+    resolution: {integrity: sha512-Y3pcMnaWru9RbK5JsWAvYAxEC7J8thJG034FiN7cQTVGCifqoW4xgxV6UnnJhRALblnxnTatJgxG2vl77h7iQA==}
     hasBin: true
 
   '@tybys/wasm-util@0.9.0':
@@ -4405,6 +4405,9 @@ packages:
   ts-macro@0.1.35:
     resolution: {integrity: sha512-cMPJUCH8VsH9s9FANjL1r/SrkV2T6CKBjgWqgP2XGiS+y/zBBwmw0C3C31M4LqrLEjb8djgUMDV18vQ4Dr+/mg==}
 
+  ts-macro@0.2.0:
+    resolution: {integrity: sha512-2IVhHGWRohZCzCwX2KSJYFz5WwAemcquB1pQqX7PORH5PgO7C2eSYQhplnMkCBxKNmY0jMQd85VYoA+LzsSUzQ==}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -5977,20 +5980,20 @@ snapshots:
 
   '@speed-highlight/core@1.2.7': {}
 
-  '@ts-macro/language-plugin@0.1.35(rollup@4.44.2)':
+  '@ts-macro/language-plugin@0.2.0(rollup@4.44.2)':
     dependencies:
       '@volar/language-core': 2.4.17
       '@volar/typescript': 2.4.17
       jiti: 2.4.2
       rollup-utils: 0.0.5(rollup@4.44.2)
-      ts-macro: 0.1.35
+      ts-macro: 0.2.0
       vscode-uri: 3.1.0
     transitivePeerDependencies:
       - rollup
 
-  '@ts-macro/tsc@0.1.35(rollup@4.44.2)':
+  '@ts-macro/tsc@0.2.0(rollup@4.44.2)':
     dependencies:
-      '@ts-macro/language-plugin': 0.1.35(rollup@4.44.2)
+      '@ts-macro/language-plugin': 0.2.0(rollup@4.44.2)
       '@volar/typescript': 2.4.17
     transitivePeerDependencies:
       - rollup
@@ -9060,7 +9063,7 @@ snapshots:
 
   rollup-utils@0.0.5(rollup@4.44.2):
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.8
       estree-walker: 2.0.2
       path-browserify: 1.0.1
       picomatch: 4.0.2
@@ -9477,6 +9480,10 @@ snapshots:
   ts-interface-checker@0.1.13: {}
 
   ts-macro@0.1.35:
+    dependencies:
+      muggle-string: 0.4.1
+
+  ts-macro@0.2.0:
     dependencies:
       muggle-string: 0.4.1
 
