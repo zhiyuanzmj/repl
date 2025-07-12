@@ -88,13 +88,11 @@ export default defineVaporComponent(({ ssr = false }) => {
         /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
         previewOptions?.placeholderHTML || '',
       )
-    const isIosWx =
-      /iPhone|iPad|iPod/.test(navigator.userAgent) &&
-      /MicroMessenger/.test(navigator.userAgent)
+    const isIosWx = /MicroMessenger/.test(navigator.userAgent)
     containerRef?.appendChild(sandbox)
     if (isIosWx) {
       sandbox?.contentWindow?.document.write(
-        'IOS系统的微信浏览器不支持 iframe 沙箱模式，请使用默认浏览器打开。',
+        '由于微信浏览器的限制，不支持 iframe 沙箱模式，请使用默认浏览器打开。',
       )
     } else {
       sandbox.src = URL.createObjectURL(
