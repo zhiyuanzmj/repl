@@ -3,7 +3,6 @@ import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
   type LanguageServiceEnvironment,
-  type Mapping,
   createTypeScriptWorkerLanguageService,
 } from '@volar/monaco/worker'
 import { createNpmFileSystem } from '@volar/jsdelivr'
@@ -12,9 +11,9 @@ import { create as createTypeScriptServices } from 'volar-service-typescript'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
 import {
-  type Segment,
   type TsmLanguagePlugin,
   type TsmVirtualCode,
+  buildMappings,
   toString,
 } from 'ts-macro'
 
@@ -37,25 +36,6 @@ const getVirtualCodePlugin = (
     }
   },
 })
-
-function buildMappings<T>(chunks: Segment<T>[]) {
-  let length = 0
-  const mappings: Mapping<T>[] = []
-  for (const segment of chunks) {
-    if (typeof segment === 'string') {
-      length += segment.length
-    } else {
-      mappings.push({
-        sourceOffsets: [segment[2]],
-        generatedOffsets: [length],
-        lengths: [segment[0].length],
-        data: segment[3]!,
-      })
-      length += segment[0].length
-    }
-  }
-  return mappings
-}
 
 export interface CreateData {
   tsconfig: {
