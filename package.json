@@ -122,8 +122,8 @@
     "vite-plugin-inspect": "^11.3.0",
     "volar-service-typescript": "^0.0.64",
     "vscode-uri": "^3.1.0",
-    "vue": "https://pkg.pr.new/vue@51677cd",
-    "vue-jsx-vapor": "2.5.0"
+    "vue": "https://pkg.pr.new/vue@5771104",
+    "vue-jsx-vapor": "^2.5.2"
   },
   "prisma": {
     "schema": "./server/prisma/schema.prisma"

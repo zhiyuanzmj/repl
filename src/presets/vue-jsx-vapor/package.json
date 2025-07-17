@@ -1,7 +1,7 @@
 {
   "name": "vapor-jsx-vapor",
   "dependencies": {
-    "vue": "https://pkg.pr.new/vue@51677cd/dist/vue.runtime-with-vapor.esm-browser.mjs",
-    "vue-jsx-vapor": "^2.5.0"
+    "vue": "https://pkg.pr.new/vue@5771104/dist/vue.runtime-with-vapor.esm-browser.mjs",
+    "vue-jsx-vapor": "^2.5.2"
   }
 }
