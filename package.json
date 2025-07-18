@@ -83,6 +83,7 @@
     "@ts-macro/language-plugin": "^0.2.4",
     "@ts-macro/tsc": "^0.2.4",
     "@types/node": "^22.16.0",
+    "@unocss/transformer-attributify-jsx": "^66.3.3",
     "@volar/jsdelivr": "~2.4.17",
     "@volar/monaco": "~2.4.17",
     "@volar/source-map": "^2.4.17",
@@ -122,7 +123,7 @@
     "vite-plugin-inspect": "^11.3.0",
     "volar-service-typescript": "^0.0.64",
     "vscode-uri": "^3.1.0",
-    "vue": "https://pkg.pr.new/vue@5771104",
+    "vue": "3.6.0-alpha.2",
     "vue-jsx-vapor": "^2.5.2"
   },
   "prisma": {

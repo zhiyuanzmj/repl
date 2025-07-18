@@ -18,7 +18,9 @@ export default defineVaporComponent(() => {
     <>
       <Menu
         v-if={store.user.name}
-        class="flex items-center cursor-pointer"
+        cursor-pointer
+        flex
+        items-center
         distance={6}
         placement="bottom-end"
       >
