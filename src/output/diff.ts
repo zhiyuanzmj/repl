@@ -21,7 +21,7 @@ export const useDiff = () => {
   watch(
     () => [activeFile.compiledName, activeFile.tsCompiledName],
     async () => {
-      await new Promise((r) => setTimeout(r))
+      await new Promise((r) => setTimeout(r, 100))
       decorations.forEach((i) => i.clear())
       if (
         !(editor && outputEditor && editorModel && outputEditorModel) ||
