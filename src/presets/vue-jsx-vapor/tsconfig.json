@@ -3,7 +3,7 @@
     "allowJs": true,
     "checkJs": true,
     "jsx": "preserve",
-    "jsxImportSource": "vue",
+    "jsxImportSource": "vue-jsx-vapor",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
