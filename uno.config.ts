@@ -2,7 +2,7 @@ import {
   defineConfig,
   presetAttributify,
   presetIcons,
-  presetWind4,
+  presetUno,
   transformerAttributifyJsx,
   transformerDirectives,
   transformerVariantGroup,
@@ -20,7 +20,7 @@ export default defineConfig({
       include: [/\.(vue|tsx?|html)($|\?)/],
     },
   },
-  presets: [presetWind4(), presetAttributify(), presetIcons()],
+  presets: [presetUno(), presetAttributify(), presetIcons()],
   transformers: [
     transformerDirectives(),
     transformerAttributifyJsx(),
