@@ -2,7 +2,7 @@
   "name": "vue-jsx",
   "dependencies": {
     "vue": "^3.5.17",
-    "@babel/standalone": "latest",
+    "@babel/standalone": "7.27.7",
     "@vue/babel-plugin-jsx": "latest"
   }
 }
