@@ -140,9 +140,6 @@ importers:
       typescript-eslint:
         specifier: ^8.35.1
         version: 8.35.1(eslint@9.30.1(jiti@2.5.1))(typescript@5.8.3)
-      unenv:
-        specifier: ^1.10.0
-        version: 1.10.0
       unocss:
         specifier: ^66.3.2
         version: 66.3.2(postcss@8.5.6)(rolldown-vite@7.0.9(@types/node@22.16.0)(esbuild@0.25.5)(jiti@2.5.1)(sass@1.83.4)(terser@5.39.0)(tsx@4.19.2)(yaml@2.8.0))(vue@3.6.0-alpha.2(typescript@5.8.3))
@@ -4574,9 +4571,6 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
-  unenv@1.10.0:
-    resolution: {integrity: sha512-wY5bskBQFL9n3Eca5XnhH6KbUo/tfvkwm9OpcdCvLaeA7piBNbavbOKJySEwQ1V0RH6HvNlSAFRTpvTqgKRQXQ==}
 
   unenv@2.0.0-rc.18:
     resolution: {integrity: sha512-O0oVQVJ2X3Q8H4HITJr4e2cWxMYBeZ+p8S25yoKCxVCgDWtIJDcgwWNonYz12tI3ylVQCRyPV/Bdq0KJeXo7AA==}
@@ -9774,14 +9768,6 @@ snapshots:
       unplugin: 2.3.5
 
   undici-types@6.21.0: {}
-
-  unenv@1.10.0:
-    dependencies:
-      consola: 3.4.2
-      defu: 6.1.4
-      mime: 3.0.0
-      node-fetch-native: 1.6.6
-      pathe: 1.1.2
 
   unenv@2.0.0-rc.18:
     dependencies:
