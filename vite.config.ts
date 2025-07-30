@@ -44,6 +44,9 @@ export default defineConfig({
   define: {
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
+  optimizeDeps: {
+    include: ['vue-jsx-vapor'],
+  },
   build: {
     outDir: './.vercel/output/static',
     rollupOptions: {
@@ -60,7 +63,7 @@ export default defineConfig({
       treeshake: true,
     },
     lib: {
-      entry: ['index.html', ...(await globby(['./proxy/*']))],
+      entry: ['index.html'],
       fileName(_, name) {
         if (name === 'index.html') {
           return 'index.html'

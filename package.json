@@ -80,13 +80,13 @@
     "@prisma/extension-accelerate": "^2.0.1",
     "@rollup/plugin-replace": "^6.0.2",
     "@shikijs/monaco": "^3.7.0",
-    "@ts-macro/language-plugin": "^0.3.0",
-    "@ts-macro/tsc": "^0.3.0",
+    "@ts-macro/language-plugin": "^0.3.1",
+    "@ts-macro/tsc": "^0.3.1",
     "@types/node": "^22.16.0",
     "@unocss/transformer-attributify-jsx": "^66.3.3",
-    "@volar/jsdelivr": "~2.4.17",
-    "@volar/monaco": "~2.4.17",
-    "@volar/source-map": "^2.4.17",
+    "@volar/jsdelivr": "~2.4.22",
+    "@volar/monaco": "~2.4.22",
+    "@volar/source-map": "^2.4.22",
     "@vue-jsx-vapor/eslint": "^2.5.3",
     "assert": "^2.1.0",
     "ast-kit": "^2.1.1",
@@ -112,7 +112,7 @@
     "simple-git-hooks": "^2.13.0",
     "source-map-js": "^1.2.1",
     "sucrase": "^3.35.0",
-    "ts-macro": "^0.3.0",
+    "ts-macro": "^0.3.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
     "unocss": "^66.3.2",
@@ -124,7 +124,7 @@
     "volar-service-typescript": "^0.0.64",
     "vscode-uri": "^3.1.0",
     "vue": "3.6.0-alpha.2",
-    "vue-jsx-vapor": "^2.5.3"
+    "vue-jsx-vapor": "^2.5.6"
   },
   "prisma": {
     "schema": "./server/prisma/schema.prisma"
