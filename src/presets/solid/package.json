@@ -1,8 +1,8 @@
 {
   "name": "solid",
   "dependencies": {
-    "solid-js": "^1.9.7",
     "@babel/standalone": "7.27.7",
-    "babel-preset-solid": "latest"
+    "babel-preset-solid": "latest",
+    "solid-js": "^1.9.7"
   }
 }
