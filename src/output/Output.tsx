@@ -168,7 +168,11 @@ export default defineVaporComponent(
                 <Login />
               </div>
             </div>
-            <Preview v-if={!store.loading} ref$={previewRef} ssr={props.ssr} />
+            <Preview
+              v-if={!store.loading}
+              ref={(e) => (previewRef = e)}
+              ssr={props.ssr}
+            />
             <div
               v-else
               class="i-carbon:rotate-180 text-gray h-full mt--4 w-10 m-auto animate-spin"

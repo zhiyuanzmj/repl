@@ -111,13 +111,13 @@ export default defineVaporComponent(
       pending = file
     }
 
-    const fileSelector = $useRef()
+    let fileSelector = $useRef()
     function horizontalScroll(e: WheelEvent) {
       e.preventDefault()
       const direction =
         Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
       const distance = 30 * (direction > 0 ? 1 : -1)
-      fileSelector.scrollTo({
+      fileSelector?.scrollTo({
         left: fileSelector.scrollLeft + distance,
       })
     }
@@ -131,7 +131,11 @@ export default defineVaporComponent(
     )
 
     return (
-      <div class="file-selector" ref$={fileSelector} onWheel={horizontalScroll}>
+      <div
+        ref={(e) => (fileSelector = e)}
+        class="file-selector"
+        onWheel={horizontalScroll}
+      >
         {/* TODO <template v-for={(file, i) in files} key={file}> */}
         <template v-for={(file, i) in files}>
           <div

@@ -105,8 +105,8 @@ export default defineVaporComponent(
           </template>
           <template v-slot:$outputSlotName$={{}}>
             <Output
+              ref={(e) => (outputRef = e)}
               editorComponent={props.editor}
-              ref$={outputRef}
               showCompileOutput={showCompileOutput}
               ssr={!!ssr}
             />

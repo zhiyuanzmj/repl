@@ -1,9 +1,5 @@
-import type {
-  ComputedRef,
-  FunctionalComponent,
-  InjectionKey,
-  ToRefs,
-} from 'vue'
+import type { ComputedRef, InjectionKey, ToRefs } from 'vue'
+import type Monaco from './monaco/Monaco'
 import type { Props } from './Repl'
 
 export type EditorMode = 'js' | 'css' | 'ssr' | 'ts' | 'devtools'
@@ -14,7 +10,7 @@ export interface EditorProps {
   mode?: EditorMode
   onChange?: (code: string) => void
 }
-export type EditorComponentType = FunctionalComponent<EditorProps>
+export type EditorComponentType = typeof Monaco
 
 export type OutputModes = EditorMode
 

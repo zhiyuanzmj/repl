@@ -83,9 +83,9 @@
     "@ts-macro/language-plugin": "^0.3.2",
     "@ts-macro/tsc": "^0.3.2",
     "@types/node": "^22.17.0",
-    "@volar/jsdelivr": "~2.4.22",
-    "@volar/monaco": "~2.4.22",
-    "@volar/source-map": "^2.4.22",
+    "@volar/jsdelivr": "~2.4.23",
+    "@volar/monaco": "~2.4.23",
+    "@volar/source-map": "^2.4.23",
     "@vue-jsx-vapor/eslint": "^2.6.1",
     "assert": "^2.1.0",
     "ast-kit": "^2.1.1",
@@ -120,10 +120,11 @@
     "vite": "npm:rolldown-vite@latest",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-inspect": "^11.3.2",
+    "volar-plugin-ignore-attributes": "^0.2.6",
     "volar-service-typescript": "^0.0.64",
     "vscode-uri": "^3.1.0",
     "vue": "3.6.0-alpha.2",
-    "vue-jsx-vapor": "^2.6.1"
+    "vue-jsx-vapor": "^2.6.2"
   },
   "pnpm": {
     "overrides": {

@@ -44,8 +44,8 @@ export default defineVaporComponent(
     return (
       <div class="relative h-full">
         <iframe
+          ref={(e) => (devtoolsIframe = e)}
           class="absolute inset-0 block h-full w-full border-none"
-          ref$={devtoolsIframe}
           src={devtoolsSrc}
           title="Devtools"
         />

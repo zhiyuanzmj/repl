@@ -52,7 +52,8 @@ export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
 
   let dependencies: Record<string, string> = {
-    ...store.dependencyVersion,
+    '@vue/runtime-vapor': '3.6.0-alpha.2',
+    ...store.dependencies,
   }
 
   if (store.typescriptVersion) {

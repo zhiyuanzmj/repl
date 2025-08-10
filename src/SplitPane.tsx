@@ -4,7 +4,7 @@ export default defineVaporComponent(
   (props: { layout?: 'horizontal' | 'vertical' }) => {
     const isVertical = $computed(() => props.layout === 'vertical')
 
-    const containerRef = $useRef()
+    let containerRef = $useRef()
     const previewRef = $inject(injectKeyPreviewRef)!
 
     // mobile only
@@ -64,6 +64,7 @@ export default defineVaporComponent(
 
     return (
       <div
+        ref={(e) => (containerRef = e)}
         class={[
           'split-pane',
           state.dragging && 'dragging',
@@ -71,7 +72,6 @@ export default defineVaporComponent(
           isVertical && 'vertical',
           !isVertical && 'horizontal',
         ]}
-        ref$={containerRef}
         onMouseleave={dragEnd}
         onMousemove={dragMove}
         onMouseup={dragEnd}

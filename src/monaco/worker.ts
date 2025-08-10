@@ -122,7 +122,11 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
               }
             }
           },
-          (pkgName) => dependencies[pkgName],
+          (pkgName) => {
+            if (!pkgName.startsWith('https://')) {
+              return dependencies[pkgName]?.split('?')[0].replace('^', '')
+            }
+          },
           (path, content) => {
             ctx.host.onFetchCdnFile(
               asUri('/node_modules/' + path).toString(),

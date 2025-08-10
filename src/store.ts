@@ -47,7 +47,6 @@ export async function useStore(
 
     locale = ref(),
     typescriptVersion = ref('latest'),
-    dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
 
     preset = useRoutePath<string>('vue-jsx'),
@@ -83,32 +82,35 @@ export async function useStore(
     }
   }
 
-  const viteConfig = ref({} as ViteConfig)
-  const importMap = computed<ImportMap>(() => {
+  const dependencies = computed(() => {
     try {
       const result = JSON.parse(files.value[packageFile]?.code || '{}')
-      const dependencies = { ...result.dependencies, ...result.devDependencies }
-      if (dependencies)
-        for (const key in dependencies) {
-          let value = dependencies[key]
-          if (value) {
-            if (/^(?:\^|~|\d)/.test(value)) {
-              value = `https://esm.sh/${key}@${value}`
-            } else if (value === 'latest') {
-              value = `https://esm.sh/${key}`
-            } else if (value.startsWith('https://pkg.pr.new/')) {
-              value = value.replaceAll('pkg.pr.new', 'esm.sh/pkg.pr.new')
-            } else if (!value.startsWith('http')) {
-              value = location.origin + value
-            }
-            dependencies[key] = value
-          }
-        }
-      return dependencies
+      return { ...result.dependencies, ...result.devDependencies }
     } catch (e) {
       errors.value = [`Syntax error in ${packageFile}: ${(e as Error).message}`]
       return {}
     }
+  })
+
+  const viteConfig = ref({} as ViteConfig)
+  const importMap = computed<ImportMap>(() => {
+    const result = { ...dependencies.value }
+    for (const key in result) {
+      let value = result[key]
+      if (value) {
+        if (/^(?:\^|~|\d)/.test(value)) {
+          value = `https://esm.sh/${key}@${value}`
+        } else if (value === 'latest') {
+          value = `https://esm.sh/${key}`
+        } else if (value.startsWith('https://pkg.pr.new/')) {
+          value = value.replaceAll('pkg.pr.new', 'esm.sh/pkg.pr.new')
+        } else if (!value.startsWith('http')) {
+          value = location.origin + value
+        }
+        result[key] = value
+      }
+    }
+    return result
   })
   async function getViteConfig(code = files.value[viteConfigFile]?.code) {
     for (const name in importMap.value) {
@@ -155,7 +157,7 @@ export async function useStore(
         files.value[tsconfigFile]?.code,
         typescriptVersion.value,
         locale.value,
-        dependencyVersion.value,
+        dependencies.value,
       ],
       () => reloadLanguageTools.value?.(),
       { deep: true },
@@ -380,7 +382,7 @@ export async function useStore(
 
     locale,
     typescriptVersion,
-    dependencyVersion,
+    dependencies,
     reloadLanguageTools,
     viteConfig,
     preset,
@@ -401,7 +403,7 @@ export async function useStore(
   return store
 }
 
-export type ImportMap = Record<string, string | undefined>
+export type ImportMap = Record<string, string>
 
 export type Template = {
   [indexHtmlFile]: File
@@ -430,7 +432,7 @@ export type StoreState = ToRefs<{
   locale: string | undefined
   typescriptVersion: string
   /** \{ dependencyName: version \} */
-  dependencyVersion: Record<string, string>
+  dependencies: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
 
   preset: string
@@ -495,7 +497,7 @@ export type Store = Pick<
   | 'outputMode'
   | 'locale'
   | 'typescriptVersion'
-  | 'dependencyVersion'
+  | 'dependencies'
   | 'reloadLanguageTools'
   | 'init'
   | 'setActive'
