@@ -586,6 +586,8 @@ export class File {
       .filter((i) => !!i.map)
       .map((item) => item.map) as SourceMapInput[]
   }
+
+  loadedIds: string[] = []
 }
 
 export function addSrcPrefix(file: string) {

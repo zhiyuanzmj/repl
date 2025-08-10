@@ -52,11 +52,17 @@ export async function compileFile(
 
   if (REGEX_JS.test(filename) || !extRE.test(filename)) {
     file.compiledStack = []
+    if (file) {
+      file.loadedIds?.forEach((id) => {
+        delete store.files[id]
+      })
+      file.loadedIds = []
+    }
     compiled.js = compiled.ssr = await transformVitePlugin(
       code,
       filename,
       store,
-      file.compiledStack,
+      file,
     )
 
     setTimeout(() => {
@@ -111,8 +117,9 @@ async function transformVitePlugin(
   code: string,
   id: string,
   store: Store,
-  compiledStack: CompiledStack[] = [],
+  file?: File,
 ) {
+  const compiledStack = file?.compiledStack ?? []
   id = id.startsWith('/') ? id : `/${id}`
   let map
   const { plugins } = store.viteConfig
@@ -151,6 +158,7 @@ async function transformVitePlugin(
 
         const fileName = addSrcPrefix(resolvedId)
         if (!store.files[fileName] || store.files[fileName].code !== loaded) {
+          file && (file.loadedIds ??= []).push(fileName)
           store.files[fileName] = new File(fileName, loaded, true)
           await compileFile(store, store.files[fileName])
         }
