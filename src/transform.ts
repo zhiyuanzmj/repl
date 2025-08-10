@@ -1,10 +1,4 @@
-import {
-  type CompiledStack,
-  File,
-  type Store,
-  type VitePlugin,
-  addSrcPrefix,
-} from './store'
+import { File, type Store, type VitePlugin, addSrcPrefix } from './store'
 import { type Transform, transform } from 'sucrase'
 import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
