@@ -3,6 +3,6 @@
   "dependencies": {
     "@babel/standalone": "7.27.7",
     "@vue/babel-plugin-jsx": "latest",
-    "vue": "^3.5.18"
+    "vue": "^3.5.21"
   }
 }

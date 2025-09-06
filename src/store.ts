@@ -142,9 +142,11 @@ export async function useStore(
 
   async function init() {
     watch(preset, async () => {
+      loading.value = true
       await setDefaultFile()
       activeFilename.value = appFile
       history.pushState(null, '', location.pathname + location.search)
+      loading.value = false
     })
 
     watchEffect(() => {
