@@ -141,9 +141,11 @@ export default defineVaporComponent(() => {
           >
             <div class="text mb1 flex op70">Project Name</div>
             <div class="flex items-center">
+              {/* TODO can't use v-model */}
               <input
-                v-model={name}
                 class="outline-none bg-$bg-soft p2 rounded b-0 w-full"
+                value={name}
+                onChange={(e) => (name = e.currentTarget.value)}
                 onKeydown_enter={submit}
               />
               <button
