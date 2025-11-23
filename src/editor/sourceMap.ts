@@ -146,7 +146,9 @@ export const useSourceMap = () => {
     () => [showSourceMap, outputMode === 'js' ? map : tsMap],
     async ([showSourceMap, map]) => {
       await new Promise((resolve) => setTimeout(resolve, 16))
-      sourceMapDecorations.forEach((i) => i.clear())
+      try {
+        sourceMapDecorations.forEach((i) => i.clear())
+      } catch {}
       if (!showSourceMap || !map || !['js', 'ts'].includes(outputMode)) return
       const maps = getMapping()
       if (!maps.length) return

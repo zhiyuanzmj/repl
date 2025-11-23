@@ -11,6 +11,7 @@ import Project from './user/Project'
 import { useRef } from 'vue-jsx-vapor'
 import { useDiff } from './diff'
 import type { CompiledStack } from '../store'
+import SourceMap from './SourceMap'
 
 const CompiledSelect = defineVaporComponent(() => {
   const { store } = $inject(injectKeyProps)!
@@ -53,7 +54,7 @@ const CompiledSelect = defineVaporComponent(() => {
   useDiff()
 
   return (
-    <div class="ml-auto mr-2 flex items-center gap-2">
+    <div class="mr-2 flex items-center gap-2">
       <button
         class={`i-carbon:previous-outline bg-$text! text-xl ${
           !activeFile[indexKey] ? 'opacity-50 pointer-events-none' : ''
@@ -76,7 +77,7 @@ const CompiledSelect = defineVaporComponent(() => {
           </optgroup>
         </template>
         <hr />
-        <option value="">Normal Mode</option>
+        <option value="">Diff Mode</option>
       </select>
     </div>
   )
@@ -93,7 +94,7 @@ export default defineVaporComponent(
     let previewRef = $useRef()
     const modes = $computed(() =>
       props.showCompileOutput
-        ? (['js', 'ts', 'css', 'devtools'] as const)
+        ? (['js', 'ts', 'css', 'ast', 'sourcemap', 'devtools'] as const)
         : ([] as const),
     )
 
@@ -118,6 +119,8 @@ export default defineVaporComponent(
         return activeFile.tsCompiledName
           ? activeFile.tsCompiledStack[activeFile.tsCompiledIndex]?.code || ''
           : activeFile.compiled.ts
+      } else if (mode === 'ast') {
+        return activeFile.compiled.ast
       } else {
         return activeFile.compiled.css
       }
@@ -186,7 +189,7 @@ export default defineVaporComponent(
               <button
                 v-for={m in modes}
                 key={m}
-                class={{ active: mode === m }}
+                class={{ active: mode === m, 'ml-auto!': m === 'sourcemap' }}
                 onClick={() => {
                   mode = m
                   if (m === 'devtools') {
@@ -206,8 +209,9 @@ export default defineVaporComponent(
               theme={store.theme}
               v-show={mode === 'devtools'}
             />
+            <SourceMap v-else-if={mode === 'sourcemap'} />
             <props.editorComponent
-              v-if={mode === 'js'}
+              v-else-if={mode === 'js'}
               ref={(e) => {
                 store.outputEditor = e?.editor
               }}
@@ -236,6 +240,16 @@ export default defineVaporComponent(
               mode={mode}
               value={compiledCode}
             />
+            <props.editorComponent
+              v-else-if={mode === 'ast'}
+              ref={(e) => {
+                store.outputEditor = e?.editor
+              }}
+              readonly
+              filename={store.activeFile.filename + '?output'}
+              mode={mode}
+              value={compiledCode}
+            />
           </div>
         </template>
       </SplitPane>
@@ -251,16 +265,16 @@ export default defineVaporComponent(
         min-height: var(--header-height);
         overflow: hidden;
       }
-      
+
       .tab-buttons button {
         padding: 0;
         box-sizing: border-box;
       }
-      
+
       .tab-buttons .actions button {
         background-color: currentColor;
       }
-      
+
       .tab-buttons span {
         font-size: 13px;
         font-family: var(--font-code);
@@ -270,7 +284,7 @@ export default defineVaporComponent(
         padding: 8px 16px 6px;
         line-height: 20px;
       }
-      
+
       button.active {
         color: var(--color-branding-dark);
         border-bottom: 3px solid var(--color-branding-dark);

@@ -95,6 +95,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    fs: {
+      strict: false,
+    },
   },
   envPrefix: 'NITRO_',
 })

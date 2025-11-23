@@ -2,7 +2,14 @@ import type { ComputedRef, InjectionKey, ToRefs } from 'vue'
 import type Monaco from './monaco/Monaco'
 import type { Props } from './Repl'
 
-export type EditorMode = 'js' | 'css' | 'ssr' | 'ts' | 'devtools'
+export type EditorMode =
+  | 'js'
+  | 'css'
+  | 'ssr'
+  | 'ts'
+  | 'devtools'
+  | 'ast'
+  | 'sourcemap'
 export interface EditorProps {
   value: string
   filename: string

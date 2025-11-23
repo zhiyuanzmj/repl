@@ -4,6 +4,7 @@ import postcss from 'postcss'
 import postcssModules from 'postcss-modules'
 
 const REGEX_JS = /\.[jt]sx?$/
+const REGEX_VUE = /\.vue$/
 const extRE = /\.[^.]+$/
 function testTs(filename: string | undefined | null) {
   return !!(filename && /(\.|\b)tsx?$/.test(filename))
@@ -44,7 +45,11 @@ export async function compileFile(
     return []
   }
 
-  if (REGEX_JS.test(filename) || !extRE.test(filename)) {
+  if (
+    REGEX_JS.test(filename) ||
+    REGEX_VUE.test(filename) ||
+    !extRE.test(filename)
+  ) {
     file.compiledStack = []
     if (file) {
       file.loadedIds?.forEach((id) => {
@@ -116,6 +121,7 @@ async function transformVitePlugin(
   const compiledStack = file?.compiledStack ?? []
   id = id.startsWith('/') ? id : `/${id}`
   let map
+  let ast
   const { plugins } = store.viteConfig
   for (const plugin of resolvePlugins(plugins)) {
     if (plugin.transformInclude) {
@@ -127,6 +133,13 @@ async function transformVitePlugin(
     } else if (result) {
       code = result.code || code
       result.map && (map = result.map)
+      if (result.ast) {
+        if (typeof result.ast !== 'string') {
+          ast = JSON.stringify(result.ast)
+        } else {
+          ast = result.ast
+        }
+      }
     }
 
     if (plugin.resolveId) {
@@ -166,6 +179,9 @@ async function transformVitePlugin(
         map,
         enforce: plugin.enforce,
       })
+    }
+    if (file && ast) {
+      file.compiled.ast = ast
     }
   }
 

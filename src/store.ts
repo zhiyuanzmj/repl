@@ -450,7 +450,11 @@ export type VitePlugin = {
   transform?: (
     code: string,
     id: string,
-  ) => string | { code: string; map: SourceMapInput } | null | undefined
+  ) =>
+    | string
+    | { code: string; map: SourceMapInput; ast?: string }
+    | null
+    | undefined
 }
 export type ViteConfig = {
   plugins: VitePlugin[]
@@ -529,6 +533,7 @@ export class File {
     js: '',
     css: '',
     ts: '',
+    ast: '',
     ssr: '',
   }
   editorViewState: editor.ICodeEditorViewState | null = null
