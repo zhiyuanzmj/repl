@@ -2,7 +2,7 @@
   "name": "preact",
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "7.27.1?deps=@babel/traverse@7.27.7",
-    "@babel/standalone": "7.27.7",
+    "@babel/core": "7.27.7",
     "preact": "^10.27.1"
   }
 }

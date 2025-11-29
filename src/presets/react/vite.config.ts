@@ -1,4 +1,4 @@
-import { transform } from '@babel/standalone'
+import { transformSync } from '@babel/core'
 import jsx from '@babel/plugin-transform-react-jsx'
 
 export default {
@@ -7,7 +7,7 @@ export default {
       name: 'vite-plugin-react',
       transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return transform(code, {
+          return transformSync(code, {
             presets: [['typescript', { allExtensions: true, isTSX: true }]],
             plugins: [jsx],
             filename: id,
