@@ -11,6 +11,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig({
   plugins: [
     reactivityFunction(),
+    Unocss(),
     vueJsxVapor({
       macros: {
         defineExpose: {
@@ -25,7 +26,6 @@ export default defineConfig({
       },
       interop: true,
     }),
-    Unocss(),
     inspect(),
     AutoImport({
       imports: [
