@@ -1,4 +1,4 @@
-import { transformSync } from '@babel/core'
+import { transform } from '@babel/standalone'
 import jsx from '@vue/babel-plugin-jsx'
 
 export default {
@@ -7,7 +7,7 @@ export default {
       name: 'vite-plugin-vue-jsx',
       transform(code, id) {
         if (id.match(/\.[jt]sx$/))
-          return transformSync(code, {
+          return transform(code, {
             presets: [['typescript', { allExtensions: true, isTSX: true }]],
             plugins: [jsx],
             filename: id,
