@@ -117,14 +117,14 @@
     "unocss": "^66.5.0",
     "unplugin-auto-import": "^19.3.0",
     "unplugin-vue-reactivity-function": "^1.2.0",
-    "vite": "npm:rolldown-vite@latest",
+    "vite": "8.0.0-beta.5",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-inspect": "^11.3.3",
     "volar-plugin-ignore-attributes": "^0.2.6",
     "volar-service-typescript": "^0.0.64",
     "vscode-uri": "^3.1.0",
     "vue": "3.6.0-alpha.2",
-    "vue-jsx-vapor": "^3.1.0"
+    "vue-jsx-vapor": "^3.1.5"
   },
   "pnpm": {
     "overrides": {
