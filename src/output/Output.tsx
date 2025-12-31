@@ -155,6 +155,8 @@ export default defineVaporComponent(
               <div class="actions ml-auto flex items-center gap-2 pr-2">
                 <Project />
 
+                <button class="text-xl ml-1! i-carbon:renew" onClick={reload} />
+
                 <button
                   class={[
                     'text-xl',
