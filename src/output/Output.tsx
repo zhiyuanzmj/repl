@@ -202,14 +202,16 @@ export default defineVaporComponent(
 
               <CompiledSelect v-if={['js', 'ts'].includes(store.outputMode)} />
             </div>
-
             <Devtools
               v-if={devtoolsLoaded && previewRef?.container}
               previewContainer={previewRef.container}
               theme={store.theme}
               v-show={mode === 'devtools'}
             />
-            <SourceMap v-else-if={mode === 'sourcemap'} />
+            <template v-if={mode === 'sourcemap'}>
+              {/*TODO Can't use v-else-if */}
+              <SourceMap />
+            </template>
             <props.editorComponent
               v-else-if={mode === 'js'}
               ref={(e) => {
