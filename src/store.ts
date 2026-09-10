@@ -526,6 +526,8 @@ export type Store = Pick<
   | 'slim'
 > & {
   monacoInitialized?: boolean
+  /** per-instance prefix for monaco model URIs, set lazily by initMonaco */
+  uriPrefix?: string
 }
 
 export type CompiledStack = {

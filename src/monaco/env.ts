@@ -9,6 +9,29 @@ import * as languageConfigs from './language-configs'
 import type { WorkerLanguageService } from '@volar/monaco/worker'
 import { debounce } from '../utils'
 
+// Monaco keeps one global model table keyed by URI, and Volar's language
+// service runs per-URI as well. Multiple repl instances on the same page
+// would therefore share (and overwrite) each other's files. Scope every
+// model URI with the owning store's instance id, and strip the prefix in
+// the worker's uriConverter so the language service still sees plain
+// file:///src/App.tsx paths.
+let storeInstanceId = 0
+
+export function getStoreUriPrefix(store: Store) {
+  if (!store.uriPrefix) {
+    store.uriPrefix = `/${++storeInstanceId}/`
+  }
+  return store.uriPrefix
+}
+
+export function toMonacoUri(store: Store, filename: string) {
+  return Uri.parse(`file://${getStoreUriPrefix(store)}${filename}`)
+}
+
+export function fromMonacoPath(store: Store, path: string) {
+  return path.slice(getStoreUriPrefix(store).length)
+}
+
 export function initMonaco(store: Store) {
   if (store.monacoInitialized) return
   loadMonacoEnv(store)
@@ -17,18 +40,15 @@ export function initMonaco(store: Store) {
     // create a model for each file in the store
     for (const filename in store.files) {
       const file = store.files[filename]
-      if (editor.getModel(Uri.parse(`file:///${filename}`))) continue
-      getOrCreateModel(
-        Uri.parse(`file:///${filename}`),
-        file.language,
-        file.code,
-      )
+      const uri = toMonacoUri(store, filename)
+      if (editor.getModel(uri)) continue
+      getOrCreateModel(uri, file.language, file.code)
     }
 
     // dispose of any models that are not in the store
     for (const model of editor.getModels()) {
       const uri = model.uri.toString()
-      if (store.files[uri.substring('file:///'.length)]) continue
+      if (store.files[fromMonacoPath(store, model.uri.path)]) continue
 
       if (uri.startsWith('file:///node_modules')) continue
       if (uri.startsWith('inmemory://')) continue
@@ -73,11 +93,13 @@ export async function reloadLanguageTools(store: Store) {
       tsconfig: store.getTsConfig?.() || {},
       tsMacroConfig: (await store.getTsMacroConfig?.()) || '{}',
       dependencies,
+      /** used by the worker to strip the per-instance URI prefix */
+      uriPrefix: getStoreUriPrefix(store),
     } satisfies CreateData,
   })
   const languageId = ['vue', 'javascript', 'typescript']
   const getSyncUris = () =>
-    Object.keys(store.files).map((filename) => Uri.parse(`file:///${filename}`))
+    Object.keys(store.files).map((filename) => toMonacoUri(store, filename))
 
   const { dispose: disposeMarkers } = volar.activateMarkers(
     worker,
@@ -127,7 +149,8 @@ export function loadMonacoEnv(store: Store) {
               data.data?.filePath &&
               !store.activeFile.tsCompiledName
             ) {
-              const file = store.files[data.data.filePath.slice(1)]
+              const file =
+                store.files[fromMonacoPath(store, data.data.filePath)]
               if (file) {
                 if (data.data.init) {
                   file.tsCompiledStack = []
@@ -183,8 +206,8 @@ export function loadMonacoEnv(store: Store) {
       }
 
       const path = resource.path
-      if (/^\//.test(path)) {
-        const fileName = path.replace('/', '')
+      if (path.startsWith(getStoreUriPrefix(store))) {
+        const fileName = fromMonacoPath(store, path)
         if (fileName !== store.activeFile.filename) {
           store.setActive(fileName)
           return true

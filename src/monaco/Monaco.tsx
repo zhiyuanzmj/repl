@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor-core'
-import { initMonaco } from './env'
+import { initMonaco, toMonacoUri } from './env'
 import { getOrCreateModel } from './utils'
 import { type EditorMode, injectKeyProps } from '../types'
 import { registerHighlighter } from './highlight'
@@ -113,7 +113,7 @@ export default defineVaporComponent(
             const file = store.files[filename]
             if (!file) return null
             const model = getOrCreateModel(
-              monaco.Uri.parse(`file:///${filename}`),
+              toMonacoUri(store, filename),
               file.language,
               value,
             )

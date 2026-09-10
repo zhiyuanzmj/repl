@@ -43,6 +43,8 @@ export interface CreateData {
   }
   tsMacroConfig: any
   dependencies: Record<string, string>
+  /** per-instance prefix prepended to monaco model URIs, stripped here */
+  uriPrefix: string
 }
 
 let ts: typeof import('typescript')
@@ -105,9 +107,12 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      { tsconfig, dependencies }: CreateData,
+      { tsconfig, dependencies, uriPrefix }: CreateData,
     ) => {
-      const asFileName = (uri: URI) => uri.path
+      const asFileName = (uri: URI) =>
+        uri.path.startsWith(uriPrefix)
+          ? uri.path.slice(uriPrefix.length)
+          : uri.path
       const asUri = (fileName: string): URI => URI.file(fileName)
       const env: LanguageServiceEnvironment = {
         workspaceFolders: [URI.file('/')],
